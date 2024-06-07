@@ -1,4 +1,5 @@
-# UptonAir
+# Upton Air Quality Management
+## Overview
 This repository contains data from Air Quality sensors in Upton, Massachusetts. Quite a lot of data comes off these monitors, ranging from current to hourly, daily, weekly monthly and yearly. 
 <br>
 However either or both are also at times out of order, as shown below:
@@ -8,6 +9,7 @@ in which case the Upton Board Of Health needs to be notified so they can figure 
 
 
 
-Run main to pull the last 2 weeks of data from purpleair's API.
-Run data cleaner to order data by timestamp and remove duplicates.
-Sensors.txt specifies which sensors to pull from and data.txt is where the sensor data will be written to.
+# How to Use
+1. Run main to pull the last 2 weeks of data from purpleair's API.
+2. Run data cleaner to order data by timestamp and remove duplicates.
+(Sensors.txt specifies which sensors to pull from and data.txt is where the sensor data will be written to.)
