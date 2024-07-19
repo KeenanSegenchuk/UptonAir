@@ -15,15 +15,16 @@
   <button class="ibutton" onclick="test(document.getElementById('text').value, document.getElementById('user').value, document.getElementById('pass').value)">updatefile</button>
   
   
-  <script>
+  <script type="module">
     function test(input, user, pass)
     {
+      /*
       const fs = require('fs');
-	    const readline = require('readline');
-    
+      const readline = require('readline');
+
       //init file stream
       const readStream = fs.createReadStream("test.txt", 
-		    function(err) {if(err) {alert("Cannot read " + "test.txt");}});
+	function(err) {if(err) {alert("Cannot read " + "test.txt");}});
       const readInterface = readline.createInterface({
         input: readStream,
         output: process.stdout,
@@ -34,7 +35,8 @@
       readInterface.on('line', function(line){
         text = text + line + "\n";
       });
-      text = text + input;
+      text = text + input;*/
+      text = input;
 
       //github stuff
       var github = new Github({
@@ -50,7 +52,7 @@
         "test.txt",
         text,
         "test commit via api",
-        function(err){if(err) {alert("err")}}
+        function(err){if(err){alert("err")}}
       );
     }
   </script>  
