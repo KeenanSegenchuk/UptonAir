@@ -1,6 +1,6 @@
-import * from "./github-js/lib/GitHub.js";
+import {GitHub} from "./github-js/lib/GitHub.js";
 
-function test(input, user, pass)
+export function test(input, user, pass)
     {
       /*
       const fs = require('fs');
