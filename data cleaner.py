@@ -1,5 +1,5 @@
 import math
-
+#more documentation on file needed
 #open data file in read/write mode
 file = open("data.txt", "r+")
 
@@ -62,12 +62,12 @@ for line in data:
 		timestamp = line.split(",")[0]
 		while i < len(duplicates):
 			duplicates[i] = False
-			i = i + 1
+			i+=1
 	sensor = line.split(",")[1]
 	if sensor in sensors:
 		i = sensors.index(sensor)
 		if duplicates[i]:
-			continue;
+			continue
 		else:
 			cleaned.append(line)
 			duplicates[i] = True
