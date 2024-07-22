@@ -75,6 +75,7 @@ for line in data:
 data = []
 data.append(header)
 data.extend(cleaned)
-file.write(data)
+
+file.write(str(data))
 
 		
