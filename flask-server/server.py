@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Members API Route
 @app.route("/members")
 def members():
-    return {"members":["Member1", "Member2", "Member3"]}
+    return {"members":["Syed", "Keenan", "Peter"]}
 
 if __name__ == "__main__":
     app.run(debug=True)
