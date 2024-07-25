@@ -3,16 +3,20 @@
 #since the "get" function to get the air data from purpleair's website isn't native to python, we have to pip install and import it.
 #requests is the package that "get" is in
 import requests
-#same with pandas' function to read a table from a csv (comma seperated value) file
-import pandas
 from time import time
 
 #start by getting the sensor indices
-sensors = pandas.read_csv("sensors.txt")
+sensorf = open("sensors.txt")
+sensorf = sensorf.read().splitlines()[1:]
+sensors = []
+for line in sensorf:
+	sensors.append(int(line.split(",")[1]))
+	
 print(sensors)
-#get the column with the sensor ids
-sensors = sensors['SENSOR_ID']
 
+#now find the time of the last sample of data you have downloaded
+file = open("data.txt", "r").read().splitlines()
+lastSample = int(file[len(file)-1].split(",")[0])
 
 #now we build the url to the specific data we're trying to pull from purpleair.com's api
 
@@ -29,6 +33,9 @@ endtime = int(time())
 twoweeks = 604800
 #two weeks ago's time
 starttime = time() - twoweeks
+#or whatever time the last data point was downloaded
+#if starttime < lastSample:
+	#starttime = lastSample
 #now build url
 timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
 
@@ -52,7 +59,7 @@ for line in data:
     if line == "{":
         break;
     if line[0:1] in "0123456789":
-        file.write('\n' + line) 
+        file.write("\n" + line) 
 
 
 
