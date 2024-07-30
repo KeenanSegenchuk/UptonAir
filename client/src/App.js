@@ -28,10 +28,24 @@ function App() {
     <div>
       {/* This fetches members from the backend and presents them on the frontend */}
       {typeof data.members === 'undefined' ? (
-        <p>Loading..</p>
+        <p>Loading members...</p>
       ) : (
         data.members.map((member, i) => (
           <p key={i}>{member}</p>
+        ))
+      )}
+
+      {/* This fetches quality data from the backend and presents it on the frontend */}
+      {Object.keys(quality).length === 0 ? (
+        <p>Loading quality...</p>
+      ) : (
+        Object.keys(quality).map((date, i) => (
+          <div key={i}>
+            <h3>{date}</h3>
+            {quality[date].map((item, j) => (
+              <p key={j}>{item}</p>
+            ))}
+          </div>
         ))
       )}
     </div>
@@ -39,3 +53,4 @@ function App() {
 }
 
 export default App;
+
