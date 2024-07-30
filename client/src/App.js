@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
-
+//TODO: create front end functionality that used backend data
+// TEST if current API communication is effective usung postman, get, post requests 
 function App() {
   const [data,setData] = useState([{}])
 
