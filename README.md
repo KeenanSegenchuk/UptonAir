@@ -21,3 +21,8 @@ We hope to create a User-Interface that can send alerts or show the status of th
 1. Run main to pull the last 2 weeks of data from purpleair's API.
 2. Run data cleaner to order data by timestamp and remove duplicates.
 (Sensors.txt specifies which sensors to pull from and data.txt is where the sensor data will be written to.)
+# Running the Flask Server
+1. Download flask-server from the repo
+2. Pip install dependencies listed in run.txt (im on python 3.11.9 btw)
+3. Open command terminal and cd to flask-server
+4. Use command from run.txt
