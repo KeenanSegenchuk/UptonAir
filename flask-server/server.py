@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 app = Flask(__name__)
 
 qrl = "quality.html"
-frl = "Z:/Projects/UptonAir/flask-server/"
+frl = ""
 
 # Members API Route
 @app.route("/members")
