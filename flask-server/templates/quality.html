@@ -1,0 +1,23 @@
+<h1>Upton Air Quality Monitor</h1>
+<button action = "/p" value = "pull data from purpleAir">
+<form id = "aqForm" action = "/get_plot" method = "POST">
+ <label for="window">Timespan for Data:</label>
+ <input type="text" name="window" id="window" required/>
+ <input type="submit" name="submit" value="Get Plot">
+</form>
+<div></div>
+
+{% if plot_url and frl %}
+	{% for plot in plot_url %}
+		<img src = "{{frl + plot}} alt = "error displaying plot"">
+	{% endfor %}
+{% endif %}
+
+{% if updated %}
+	<b>Data synced from purpleair</b>
+{% endif %}
+
+
+
+
+

@@ -1,0 +1,3 @@
+LOCATION,SENSOR_ID
+Uxbridge,128729
+Nipmuc,186267

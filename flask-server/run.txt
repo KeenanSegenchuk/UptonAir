@@ -1,0 +1,6 @@
+python -m flask --app server run
+
+dependencies:
+Flask
+matplotlib
+requests
