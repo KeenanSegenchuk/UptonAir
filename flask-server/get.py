@@ -55,8 +55,12 @@ def get(window):
 	for row in data:
 		newrow = []
 		for num in row.split(","):
-			newrow = newrow + [float(num)]
-		newdata += [newrow]
+			if num != "":
+				newrow = newrow + [float(num)]
+			else:
+				break;
+		if newrow:
+			newdata += [newrow]
 	
 	return newdata
 

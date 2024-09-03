@@ -27,21 +27,37 @@ def home():
 def get_plot():
 	if request.method == "POST":
 		timeframes = request.form['window'].split(",")
-		plots = []
+		
+		#get sensor id
+		sensor = request.form['sensor']
+		with open("sensors.txt") as sensors:
+			s = sensors.read().splitlines()
+			for ss in s:
+				ss = ss.split(",")
+				if ss[0] == sensor:
+					sensor = float(ss[1])
+		print(sensor)
 
+		plots = []
 		count = 0
 		for timeframe in timeframes:
 			data = get(timeframe)
-			x = [row[0] for row in data]
-			y = [row[3] for row in data]
-			#print(f'PLOTTING DATA: \n X: {x} \n Y: {y}')
+			x = []
+			y = []
+			for row in data:
+				print(row[1])
+				if row[1] == sensor:
+					x += [row[0]]
+					y += [row[3]]
+			print(f'PLOTTING DATA: \n X: {x} \n Y: {y}')
+			plt.figure(count).clear()
 			plt.plot(x, y)
 			plt.title("Air quality over past " + timeframe)
 			plt.xlabel(timeframe)
 			plt.ylabel("PM_2.5 Readings")
 
-			plt.savefig("figs/aq_plot" + str(count) + ".png")
-			plots.append("figs/aq_plot" + str(count) + ".png")
+			plt.savefig("static/aq_plot" + str(count) + ".png")
+			plots.append("static/aq_plot" + str(count) + ".png")
 			count = count + 1
 		print(plots)
 		html = render_template(qrl, plot_url = plots, frl = frl)
