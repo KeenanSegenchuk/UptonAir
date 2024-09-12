@@ -5,6 +5,7 @@ from flask import Flask, render_template, request
 from clean import *
 from get import *
 import matplotlib.pyplot as plt 
+import smtplib #NEEDED TO TEXT PEOPLE ALERTS
 app = Flask(__name__)
 
 qrl = "quality.html"
