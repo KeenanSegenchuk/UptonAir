@@ -1,6 +1,6 @@
 import math
 
-def clean()
+def clean():
 	#open data file in read/write mode
 	file = open("data.txt", "r+")
 	
