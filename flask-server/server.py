@@ -2,11 +2,14 @@
 import matplotlib
 matplotlib.use('Agg')
 from flask import Flask, render_template, request
+from flask_cors import CORS
 from clean import *
 from get import *
+from getMapInfo import *
 import matplotlib.pyplot as plt 
-import smtplib #NEEDED TO TEXT PEOPLE ALERTS!
+
 app = Flask(__name__)
+CORS(app)
 
 qrl = "quality.html"
 frl = ""
@@ -66,6 +69,10 @@ def get_plot():
 		return render_template(qrl, plot_url = plots, frl = frl)
 	else:
 		return render_template(qrl)
+@app.route("/map", methods =["GET"])
+def map():
+	return getMapInfo()
+
 
 @app.route("/p", methods =['POST', 'GET'])
 def p():
