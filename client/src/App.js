@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import Map from "./components/Map";
 
 function App() {
-  const [data, setData] = useState({});
+  const [mapdata, setMapData] = useState({});
   const [quality, setQuality] = useState({});
+  const [membersc, setMembersc] = useState({});
   useEffect(() => {
     // Fetch members
     fetch("/members")
       .then(res => res.json())
-      .then(data => {
-        setData(data);
+      .then(membersc => {
+        setMembersc(data);
         console.log("Members:", data);
       })
       .catch(error => console.error("Error fetching members:", error));
@@ -20,14 +22,26 @@ function App() {
         console.log("Quality:", quality);
       })
       .catch(error => console.error("Error fetching quality:", error));
+    fetch("/map")
+      .then(response => {
+          console.log(response);
+          setMapData(response.data);
+      })
+      .catch(error => {
+          console.error('Error fetching map data:', error);
+      })
   }, []);
   return (
     <div>
+      {/* This fetches sensor 1-day averages and locations and creates buttons on the map at those locations with color indicating 1-day average range */}
+      <h1>Map:</h1>
+      <Map buttons = {mapdata} />
+    
       {/* This fetches members from the backend and presents them on the frontend */}
-      {typeof data.members === 'undefined' ? (
+      {typeof membersc.members === 'undefined' ? (
         <p>Loading members...</p>
       ) : (
-        data.members.map((member, i) => (
+        membersc.members.map((member, i) => (
           <p key={i}>{member}</p>
         ))
       )}
