@@ -6,6 +6,7 @@ from flask_cors import CORS
 from clean import *
 from get import *
 from getMapInfo import *
+from getSensorInfo import *
 import matplotlib.pyplot as plt 
 
 app = Flask(__name__)
@@ -69,6 +70,13 @@ def get_plot():
 		return render_template(qrl, plot_url = plots, frl = frl)
 	else:
 		return render_template(qrl)
+
+@app.route("/sensorinfo", methods =["GET"])
+def sensorinfo():
+	info = getSensorInfo(request.args.get("sensor"))
+	print(info)
+	return info
+
 @app.route("/map", methods =["GET"])
 def map():
 	return getMapInfo()
@@ -84,7 +92,6 @@ def p():
 def c():
 	clean()
 	return render_template(qrl, updated = "True")
-	
 
     
 
