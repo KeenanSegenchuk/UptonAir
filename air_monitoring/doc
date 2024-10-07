@@ -1,5 +1,0 @@
-"pull" and "clean" don't take any input args, "get" takes a string in the format "(int) (days/weeks/months/years)"
-  
-"pull" pulls 2 weeks of data from the API and writes it to data.txt
-"clean" sorts those data by time and removes duplicates
-"get" takes a string like "10 days" and would, in that case, return the last 10 days of data from data.txt
