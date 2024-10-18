@@ -8,6 +8,8 @@ def get(window):
 		
 		top = len(data) - 1
 		bottom = 0
+
+		#binary search to locate number T
 		while T != t:
 			t = int(data[int((top+bottom)/2)].split(",")[0])
 			#print(f'sample time: {t}, looking for {T}.')
