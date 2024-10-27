@@ -26,7 +26,7 @@ def get(window):
 	times = ["month", "year", "day", "week", "minute", "hour", "YTD"]
 	
 	num = [int(s) for s in window.split() if s.isdigit()]
-	num = num[0];
+	num = num[0]
 
 	for T in times:
 		if T in window:
@@ -60,7 +60,7 @@ def get(window):
 			if num != "":
 				newrow = newrow + [float(num)]
 			else:
-				break;
+				break
 		if newrow:
 			newdata += [newrow]
 	
