@@ -63,10 +63,17 @@ function Home() {
 	<div>
          <div>
             <p>
-              This is the home page. Click on the button below to learn more about us.
+              This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
             </p>
             <Link to="/about"><button>
               About Us
+            </button>
+            </Link>
+          </div>
+
+          <div>
+            <Link to="/contact"><button>
+              Contact Us
             </button>
             </Link>
           </div>
