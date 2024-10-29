@@ -15,7 +15,7 @@ This needs to be downloaded, organized,  recorded, "visualized" (on maps or char
 
 Related, the Mass State DEP has announced a grant program and Sustainable Upton's newly formed Air Quality Monitoring Project is exploring applying for grants for a 'network' of up to 10 more sensors, so there will be more data to be managed.
 
-We hope to create a User-Interface that can send alerts or show the status of the air quality sensors.
+We hope to create a User-Interface that can send alerts or show the status of the air quality sensors.The reason being is because elderly people or those who do not stay alerted on air quality updates may not know the dangers of the current air quality in the region. Our platform aims to email or text our recipients of daily, weekly, or monthly air quality reports. Additionally, we hope to have a system where we can immedietley notify the Upton Board of Health once a sensor is down.
 
 # How to Use
 1. Run main to pull the last 2 weeks of data from purpleair's API.
