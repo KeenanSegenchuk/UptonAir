@@ -3,6 +3,9 @@ import axios from 'axios';
 import Map from "../components/Map";
 import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
+import { Link } from 'react-router-dom'
+// import Button from '@material-ui/core/Button';
+
 
 function Home() {
     const [data, setData] = useState([]);
@@ -56,7 +59,17 @@ function Home() {
     };
 
     return (
+        
 	<div>
+         <div>
+            <p>
+              This is the home page. Click on the button below to learn more about us.
+            </p>
+            <Link to="/about"><button>
+              About Us
+            </button>
+            </Link>
+          </div>
             <h1 style = {{textAlign: "center",}}>Upton Air</h1>
             <div style = {floatContainer}>
                 <Map style = {floatBox} buttons={data} reff={infoRef} />
@@ -65,6 +78,8 @@ function Home() {
        		    <div id="infoBox" ref={infoRef} style={sinkBox}></div>
       		</div> 
             </div>
+            
+           
 	</div>
     );
 }

@@ -16,6 +16,7 @@ qrl = "quality.html"
 frl = ""
 
 # Members API Route
+#currently we get members through the backend. This was done to show how to get backend data to display on frontend, and should be changed to be statically shown on frontend
 @app.route("/members")
 def members():
 	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segenchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter Friedland is a passionate environmental activist with extensive experience in Air Quality. He runs the brains of the operation along with Laurie.", "Laurie Woodland is a passionate environmental activist with extensive experience in Air Quality. She runs the brains of the operation along with Peter."]}
