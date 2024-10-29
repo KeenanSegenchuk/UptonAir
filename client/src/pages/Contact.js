@@ -57,6 +57,7 @@ function Contact() {
 
     return (
 	<div>
+        Contact us to learn more! Whether you want to help maintain sensors, or are interested in hearing more about air quality in the Blackstone Region, feel free to reach out!
             {/* <h1 style = {{textAlign: "center",}}>Contact us</h1>
             <div style = {floatContainer}>
                 <Map style = {floatBox} buttons={data} reff={infoRef} />
