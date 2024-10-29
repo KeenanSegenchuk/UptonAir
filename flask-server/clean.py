@@ -90,7 +90,7 @@ def clean():
 	for line in cleaned:
 		data = data + line + "\n"
 
-	data2 = "";
+	data2 = ""
 	for line in data.splitlines():
 		if line != "\n":
 			data2 = data2 + line + "\n"

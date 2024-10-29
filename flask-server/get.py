@@ -18,7 +18,7 @@ def get(window):
 			elif T < t:
 				top = int((top+bottom)/2 - 1)
 			if abs(top - bottom) <= 1:
-				return bottom;
+				return bottom
 		return int((top+bottom)/2)
 
 	t = ""

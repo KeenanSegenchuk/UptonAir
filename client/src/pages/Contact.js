@@ -4,7 +4,7 @@ import Map from "../components/Map";
 import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
 
-function ContactUs() {
+function Contact() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -57,16 +57,16 @@ function ContactUs() {
 
     return (
 	<div>
-            <h1 style = {{textAlign: "center",}}>Contact us</h1>
+            {/* <h1 style = {{textAlign: "center",}}>Contact us</h1>
             <div style = {floatContainer}>
                 <Map style = {floatBox} buttons={data} reff={infoRef} />
                 <div style={{ width: "90%", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
         	    <Banner style={floatBox} avg={Math.round(100 * total / count) / 100} />
        		    <div id="infoBox" ref={infoRef} style={sinkBox}></div>
       		</div> 
-            </div>
+            </div> */}
 	</div>
     );
 }
 
-export default Home;
+export default Contact;

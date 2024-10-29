@@ -55,7 +55,7 @@ for sensor in sensors:
 file = open("data.txt", "a")
 for line in data:
     if line == "{":
-        break;
+        break
     if line[0:1] in "0123456789":
         file.write("\n" + line) 
 
