@@ -18,7 +18,7 @@ frl = ""
 # Members API Route
 @app.route("/members")
 def members():
-	return {"members":["Syed", "Keenan", "Peter", "Laurie"]}
+	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter", "Laurie"]}
 
 @app.route("/quality", methods =['POST', 'GET'])
 def quality():
