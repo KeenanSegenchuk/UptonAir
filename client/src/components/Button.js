@@ -1,45 +1,28 @@
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import SensorInfo from "./SensorInfo";
-
-function Button({ id, x, y, color, infoRef }) {
-    const onclick = async () => {
-    	var error = false;
-	let data;
-        try {
-            data = await axios.get('http://localhost:5000/sensorinfo', {params: {sensor: id}});
-        } catch(err) {
-            error = true;
-        } finally {
-	    data = data.data;
-	    console.log(data);
-	}
-	if(error){console.error('Error fetching data:', error);}
-	else {
-	    const renderedComponent = ReactDOMServer.renderToString(<SensorInfo data={data} />);
-	    if(infoRef && infoRef.current) {
-		//infoRef.current.innerHTML = renderedComponent;
-		infoRef.current.innerHTML = JSON.stringify(data); 
-	    } else {
-		document.getElementById("infoBox").innerHTML = renderedComponent; 
-	    }
-	}
-    }
+function Button({ id, x, y, color, updateSensor }) {
+    const handleButtonClick = (sensorValue, event) => {
+        event.preventDefault(); // Prevent default behavior
+        updateSensor(sensorValue); // Update sensor info
+    };
     return (
+	<div>
         <button
+	    type ="button"
             style={{
                 position: 'absolute',
-                width: '20px',
-                height: '20px',
-                top: y,
-                left: x,
+                width: '15px',
+                height: '15px',
+		borderRadius: '50%',
+                top: Math.round(y * 1020 /100),
+                left: Math.round(x * 723 /100),
                 backgroundColor: color,
             }}
-	    onClick={onclick}
+	    onClick={(event) => updateSensor(id, event)}
         >
             {/* Button content can be added here */}
         </button>
+	</div>
     );
 }
 
