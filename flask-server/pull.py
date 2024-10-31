@@ -45,19 +45,25 @@ key = "2F5CD35E-E169-11EE-B9F7-42010A80000D"
 #now we build the api call with a url and a header
 data = []
 for sensor in sensors:
+    print(f'Pulling data from sensor: {sensor}')
     url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
     header = {"X-API-Key": key}
     response = requests.get(url, headers=header)
     for line in response.content.decode('utf-8').splitlines():
         data.append(line)
+        print(f'line: {line}')
 
 #update file with new data
 file = open("data.txt", "a")
+i = 0
 for line in data:
-    if line == "{":
-        break
     if line[0:1] in "0123456789":
-        file.write("\n" + line) 
+        file.write(line + "\n") 
+    else:
+        print(f"Erasing line: {line}")
+    i += 1
+
+print(f"Stopped before wirting remaining data: {data[i:]}")
 
 
 

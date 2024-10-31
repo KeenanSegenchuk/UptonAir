@@ -1,14 +1,29 @@
 import math
-
+import time
 def clean():
 	#open data file in read/write mode
 	file = open("data.txt", "r")
 	
 	#extract lines of data
 	data = file.read().splitlines()
-	header = data[0]
+	print(f'fileLen: {len(data)}')
+	header = [data[0]]
 	data = data[1:]
 
+	cutoff = int(time.time()) - 60*60*24*14
+	c  = 0
+	for line in data:
+		if len(line) == 0:
+			del data[c]
+		else:
+			l = line.split(",")[0]
+			if int(l) < cutoff:
+				header += [line]
+				del data[c]
+		c += 1
+
+	print(f'lenData: {len(data)}')
+	print(f'lenHeader: {len(header)}')
 	#mergesort the data by timestamp
 	def merge(a1, a2):
 		#merge 2 sorted arrays
@@ -54,7 +69,8 @@ def clean():
 	
 	#mergesort the data by timestamp
 	data = sort(data)
-	
+	print(f'lenData after sort: {len(data)}')	
+
 	sensors = []
 	duplicates = []
 	sf = open("sensors.txt", "r")
@@ -64,8 +80,11 @@ def clean():
 			sensors.append(line.split(",")[1])
 			duplicates.append(False)
 	
+	print(f'Found sensors: {sensors}')
+
 	timestamp = 0
 	cleaned = []
+	print(f'Sensors: {sensors}')
 	for line in data:
 		try:
 			if int(line.split(",")[0]) != timestamp:
@@ -75,9 +94,11 @@ def clean():
 					duplicates[i] = False
 					i = i + 1
 			sensor = line.split(",")[1]
+			#print(f'Sensor: {sensor}')
 			if sensor in sensors:
 				i = sensors.index(sensor)
 				if duplicates[i]:
+					print(f'Duplicate line removed: {line}')
 					continue
 				else:
 					cleaned.append(line)
@@ -86,11 +107,14 @@ def clean():
 			print(f"error on line: {line}.")
 			continue
 	
-	data = 	header + "\n"
+	data = 	""
+	for line in header:
+		data = data + line + "\n"
+	
 	for line in cleaned:
 		data = data + line + "\n"
 
-	data2 = ""
+	data2 = "";
 	for line in data.splitlines():
 		if line != "\n":
 			data2 = data2 + line + "\n"
@@ -99,4 +123,5 @@ def clean():
 	file = open("data.txt", "w")
 	file.write(data)
 
+clean()
 		

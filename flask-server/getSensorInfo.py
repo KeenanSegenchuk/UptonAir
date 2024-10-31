@@ -14,7 +14,7 @@ def find(T, data):
 			elif T < t:
 				top = int((top+bottom)/2 - 1)
 			if abs(top - bottom) <= 1:
-				return bottom
+				return bottom;
 		return int((top+bottom)/2)
 
 def getSensorInfo(sensor):
@@ -24,16 +24,17 @@ def getSensorInfo(sensor):
 	avgs = []
 
 	for t in averages:
-		num = 0
-		if t == "month": 
+		t = t.split(" ")
+		num = int(t[0])
+		if t[1] == "Month": 
 			num = num * 30 * 24 * 60 * 60
-		elif t == "year":
+		elif t[1] == "Year":
 			num = num * 365 * 24 * 60 * 60
-		elif t == "week":
+		elif t[1] == "Week":
 			num = num * 60 * 60 * 24 * 7
-		elif t == "day":
+		elif t[1] == "Day":
 			num = num * 60 * 60 * 24
-		elif t == "hour":
+		elif t[1] == "Hour":
 			num = num * 60 * 60
 
 		dt = [sum([float(y) for y in x.split(",")[3:4]])/2 for x in data[find(num, data):] if int(x.split(",")[1]) == int(sensor)]
@@ -42,10 +43,12 @@ def getSensorInfo(sensor):
 
 	data = {
 		"id": sensor,
+		"name": "",
 		"avgs": avgs,
 		"inputs": averages,
 		"graphTitle": "",
 		"graphURL" : ""
 	}
+	print(json.dumps(data, indent=4))
 
 	return json.dumps(data, indent=4)

@@ -6,8 +6,11 @@ from flask_cors import CORS
 from clean import *
 from get import *
 from getMapInfo import *
+from graphData import *
 from getSensorInfo import *
 import matplotlib.pyplot as plt 
+import json
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -16,7 +19,6 @@ qrl = "quality.html"
 frl = ""
 
 # Members API Route
-#currently we get members through the backend. This was done to show how to get backend data to display on frontend, and should be changed to be statically shown on frontend
 @app.route("/members")
 def members():
 	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segenchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter Friedland is a passionate environmental activist with extensive experience in Air Quality. He runs the brains of the operation along with Laurie.", "Laurie Woodland is a passionate environmental activist with extensive experience in Air Quality. She runs the brains of the operation along with Peter."]}
@@ -29,62 +31,30 @@ def quality():
 def home():
 	return render_template(qrl)
 
-@app.route("/get_plot", methods =['POST', 'GET'])
+@app.route("/get_plot", methods =['GET'])
 def get_plot():
-	if request.method == "POST":
-		timeframes = request.form['window'].split(",")
-		
-		#get sensor id
-		sensor = request.form['sensor']
-		with open("sensors.txt") as sensors:
-			s = sensors.read().splitlines()
-			for ss in s:
-				ss = ss.split(",")
-				if ss[0] == sensor:
-					sensor = float(ss[1])
-		print(sensor)
-
-		plots = []
-		count = 0
-		for timeframe in timeframes:
-			data = get(timeframe)
-			x = []
-			y = []
-			for row in data:
-				print(row[1])
-				if row[1] == sensor:
-					x += [row[0]]
-					y += [row[3]]
-			print(f'PLOTTING DATA: \n X: {x} \n Y: {y}')
-			plt.figure(count).clear()
-			plt.plot(x, y)
-			plt.title("Air quality over past " + timeframe)
-			plt.xlabel(timeframe)
-			plt.ylabel("PM_2.5 Readings")
-
-			plt.savefig("static/aq_plot" + str(count) + ".png")
-			plots.append("static/aq_plot" + str(count) + ".png")
-			count = count + 1
-		print(plots)
-		html = render_template(qrl, plot_url = plots, frl = frl)
-		print(html)
-		return render_template(qrl, plot_url = plots, frl = frl)
-	else:
-		return render_template(qrl)
+	return 0
 
 @app.route("/sensorinfo", methods =["GET"])
 def sensorinfo():
-	info = getSensorInfo(request.args.get("sensor"))
-	print(info)
-	return info
+	with open("data\sensor-pos.json", "r") as sensors:
+		sensors = json.load(sensors)
+		sensor = [request.args.get("sensor"), sensors[[s["id"] for s in sensors].index(request.args.get("sensor"))]["name"]]
+	info = getSensorInfo(sensor[0])
+	graphData("1 week", "homeplot.jpg", [sensor])
+	info = json.loads(info)
+	info["name"] = str(sensor[1])
+	info["graphTitle"] = str(sensor[1]) + "'s readings from the past week."
+	info["graphURL"] = "../public/plots/homeplot.jpg"
+	return json.dumps(info, indent=4)
 
 @app.route("/map", methods =["GET"])
 def map():
 	return getMapInfo()
 
-
 @app.route("/p", methods =['POST', 'GET'])
 def p():
+	print("here")
 	with open("pull.py") as pull:
 		exec(pull.read())
 		clean()
