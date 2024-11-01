@@ -8,8 +8,6 @@ def get(window):
 		
 		top = len(data) - 1
 		bottom = 0
-
-		#binary search to locate number T
 		while T != t:
 			t = int(data[int((top+bottom)/2)].split(",")[0])
 			#print(f'sample time: {t}, looking for {T}.')
@@ -18,15 +16,19 @@ def get(window):
 			elif T < t:
 				top = int((top+bottom)/2 - 1)
 			if abs(top - bottom) <= 1:
-				return bottom
+				return bottom;
 		return int((top+bottom)/2)
 
 	t = ""
 	num = 0
 	times = ["month", "year", "day", "week", "minute", "hour", "YTD"]
 	
-	num = [int(s) for s in window.split() if s.isdigit()]
-	num = num[0]
+	nums = [int(s) for s in window.split() if s.isdigit()]
+	nums.reverse()
+	c = 1
+	for n in nums:
+		num += c * n
+		c = c * 10
 
 	for T in times:
 		if T in window:
@@ -60,7 +62,7 @@ def get(window):
 			if num != "":
 				newrow = newrow + [float(num)]
 			else:
-				break
+				break;
 		if newrow:
 			newdata += [newrow]
 	

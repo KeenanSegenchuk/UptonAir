@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'
 import Map from "../components/Map";
 import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
-import { Link } from 'react-router-dom'
-// import Button from '@material-ui/core/Button';
-
 
 function Home() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const infoRef = useRef(null);
+    const [infoSensor, setInfoSensor] = useState(0);
+
+    const updateSensor = useCallback((newSensorValue) => {
+        setInfoSensor(newSensorValue);
+    }, []);
 
     useEffect(() => {
         axios.get('http://localhost:5000/map')
@@ -53,40 +55,39 @@ function Home() {
 	padding: "10px",
 	border: "1px solid #000",
     };
+    const floatButton = {
+	marginTop: "15%",
+	width: "100%",
+	height: "70%",
+    };
     const floatContainer = {
 	display: "flex", // Use flexbox for layout
 	justifyContent: "space-around", // Optional, for spacing
     };
 
     return (
-        
-	<div>
-         <div>
+	<div style = {{background: "#e2eec9"}}>
+         <div style = {floatContainer}>
             <p>
               This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
             </p>
-            <Link to="/about"><button>
+            <Link to="/about"><button style={floatButton}>
               About Us
             </button>
             </Link>
-          </div>
-
-          <div>
-            <Link to="/contact"><button>
+            <Link to="/contact"><button style={floatButton}>
               Contact Us
             </button>
             </Link>
           </div>
-            <h1 style = {{textAlign: "center",}}>Upton Air</h1>
+            <h1 style = {{textAlign: "center", width: "100%", height: "65px", background: "#38ba5b",}}>Upton Air</h1>
             <div style = {floatContainer}>
-                <Map style = {floatBox} buttons={data} reff={infoRef} />
+                <Map style = {floatBox} buttons={data} updateSensor={updateSensor} />
                 <div style={{ width: "90%", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
         	    <Banner style={floatBox} avg={Math.round(100 * total / count) / 100} />
-       		    <div id="infoBox" ref={infoRef} style={sinkBox}></div>
+       		    <SensorInfo id="infoBox" sensor_id={infoSensor} style={sinkBox}/>
       		</div> 
             </div>
-            
-           
 	</div>
     );
 }
