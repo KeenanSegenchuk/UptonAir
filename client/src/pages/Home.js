@@ -54,6 +54,7 @@ function Home() {
     const floatBox = {
 	padding: "10px",
 	border: "1px solid #000",
+	width: "90%",
     };
     const floatButton = {
 	marginTop: "15%",
@@ -66,20 +67,20 @@ function Home() {
     };
 
     return (
-	<div style = {{background: "#e2eec9"}}>
-         <div style = {floatContainer}>
-            <p>
+	<div>
+            <div style = {floatContainer}>
+                <p>
               This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
-            </p>
-            <Link to="/about"><button style={floatButton}>
+                </p>
+                <Link to="/about"><button style={floatButton}>
               About Us
-            </button>
-            </Link>
-            <Link to="/contact"><button style={floatButton}>
+                </button>
+                </Link>
+                <Link to="/contact"><button style={floatButton}>
               Contact Us
-            </button>
-            </Link>
-          </div>
+                </button>
+                </Link>
+            </div>
             <h1 style = {{textAlign: "center", width: "100%", height: "65px", background: "#38ba5b",}}>Upton Air</h1>
             <div style = {floatContainer}>
                 <Map style = {floatBox} buttons={data} updateSensor={updateSensor} />

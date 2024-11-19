@@ -13,6 +13,13 @@
   }
 }
 
+.App-container {
+    background-color: #e2eec9; /* Background color */
+    min-height: 100vh; /* Full height */
+    margin: 0; /* Reset margin */
+    padding: 0; /* Reset padding */
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

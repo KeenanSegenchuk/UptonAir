@@ -11,20 +11,19 @@ function Button({ id, val, x, y, color, updateSensor }) {
 	    type ="button"
             style={{
                 position: 'absolute',
-                width: '17px',
-                height: '17px',
+                width: '15px',
+                height: '15px',
 		borderRadius: '50%',
                 top: Math.round(y * 1020 /100),
                 left: Math.round(x * 723 /100),
                 backgroundColor: color,
-		textAlign: "center",
-		alignItems: "center",
-		border: "none",
-		fontSize: ".6em",
+		text-align: center,
+		align-items: center,
+		border: none,
             }}
 	    onClick={(event) => updateSensor(id, event)}
         >
-	    {Math.round(val)}
+	    {val}
             {/* Button content can be added here */}
         </button>
 	</div>

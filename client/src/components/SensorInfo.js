@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Graph from './Graph';
+
 function SensorInfo({ sensor_id }) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [graphURL, setGraphURL] = useState('');
+
+    const d = Date.now();
+    const sec = 1000;
+    const week = sec * 60 * 60 * 24 * 7;
 
     useEffect(() => {
-	if (sensor_id !== 0) {
-	console.log(sensor_id);
-        axios.get('http://localhost:5000/sensorinfo', { params: { sensor: sensor_id } })
-            .then(response => {
-                console.log(response);
-                setData(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setError(error);
-                setLoading(false);
-            });}
-	else {
-	    setLoading(false);
+        if (sensor_id !== 0) {
+            console.log(sensor_id);
+            axios.get('http://localhost:5000/sensorinfo', { params: { sensor: sensor_id } })
+                .then(response => {
+                    console.log(response);
+                    setData(response.data);
+                    //setGraphURL(`data:image/png;base64,${response.data.graph}`); // Assuming `graphImage` is the base64-encoded image string
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    setError(error);
+                    setLoading(false);
+                });
+        } else {
+            setLoading(false);
 	}
     }, [sensor_id]);
 
@@ -68,8 +76,9 @@ function SensorInfo({ sensor_id }) {
                 <h1 style = {floatBox}>{Math.round(100 * avg) / 100}</h1>
             ))}
         </div>
-	<h1 style={{textAlign: "center",}}>{data.graphTitle}</h1>
-	<img src={data.graphURL} alt="failed to load graph"/>
+	{/* <h1 style={{textAlign: "center",}}>{data.graphTitle}</h1> */}
+	{/*<img src={data.graphURL} alt="failed to load graph"/> */}
+	<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)}/> 
 	</div>
     );
 }

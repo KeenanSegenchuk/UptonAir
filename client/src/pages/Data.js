@@ -1,39 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Graph from '../components/Graph';
 
 function Data() {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    console.log("App Rendered.");
+    	const [data, setData] = useState([]);
+    	const [loading, setLoading] = useState(true);
+    	const [error, setError] = useState(null);
 
-    useEffect(() => {
-        axios.get('http://localhost:5000/map')
-            .then(response => {
-                console.log(response);
-                setData(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setError(error);
-                setLoading(false);
-            });
-    }, []);
-
-    if (loading) {
-        return <h1>Loading...</h1>;
-    }
-
-    if (error) {
-        return <h1>Error: {error.message}</h1>;
-    }
-
-    return (
-        <div>
-            <h1>Data:</h1>
-        </div>
-    );
+	return  <div>
+		    <Graph sensor_id={221881} start="11/1/2024" end="11/7/2024"/>
+		</div>	
 }
 
 export default Data;

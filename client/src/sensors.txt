@@ -1,0 +1,6 @@
+LOCATION,SENSOR_ID
+Uxbridge,128729
+Memorial Middle School,221881
+Oxcart Farm,222641
+Mendon St,222275
+Coach Rd. Appts,222537
