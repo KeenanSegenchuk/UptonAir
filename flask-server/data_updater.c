@@ -30,8 +30,9 @@ int main() {
     time_t next_run_time;
 
     // Command to execute
-    const char *command = "python update.py";
-   
+    const char *command = "python pull.py";
+    const char *command2 = "python clean.py";
+    
     // Time till next update
     long sleep_time = 7 * 24 * 60 * 60; // in seconds
     printf("inited vars\n");
@@ -44,6 +45,8 @@ int main() {
 	now = time(NULL);
         if (now >= next_run_time) {
             system(command);
+            sleep(30);
+            system(command2);
             next_run_time = now + sleep_time;
 	    printf("writing new run time\n");
             write_next_run_time(next_run_time);

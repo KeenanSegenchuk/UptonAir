@@ -10,6 +10,7 @@ def clean():
 	header = [data[0]]
 	data = data[1:]
 
+	'''
 	cutoff = int(time.time()) - 60*60*24*14
 	c  = 0
 	for line in data:
@@ -21,6 +22,7 @@ def clean():
 				header += [line]
 				del data[c]
 		c += 1
+	'''
 
 	print(f'lenData: {len(data)}')
 	print(f'lenHeader: {len(header)}')

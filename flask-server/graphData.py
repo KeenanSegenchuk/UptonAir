@@ -1,4 +1,6 @@
 from get import *
+import base64
+import io
 import matplotlib.pyplot as plt 
 def graphData(timeframe, name, sensors, title = ""):
 	colors = ["r", "b", "g", "c", "m", "y", "k"]
@@ -21,16 +23,23 @@ def graphData(timeframe, name, sensors, title = ""):
 	plt.xlabel(timeframe)
 	plt.ylabel("PM_2.5 Readings")
 	plt.legend([s[1] for s in sensors])
-	plt.savefig("../client/public/plots/" + name)
 
-graphData("1 week", "test1.png", [[128729, "Uxbridge"]], "Uxbridge")
+	buffer = io.BytesIO()
+	plt.savefig(buffer, format='png')
+	plt.close()
 
-graphData("3 days", "test1D.png", [[128729, "Uxbridge"]], "Uxbridge")
+	buffer.seek(0)
+	graph = base64.b64encode(buffer.read()).decode('utf-8')
+	return graph
 
-graphData("1 week", "test2.png", [[222275, "Mendon St."]], "Mendon St.")
+#graphData("1 week", "test1.png", [[128729, "Uxbridge"]], "Uxbridge")
 
-graphData("3 days", "test2D.png", [[222275, "Mendon St."]], "Mendon St.")
+#graphData("3 days", "test1D.png", [[128729, "Uxbridge"]], "Uxbridge")
 
-graphData("1 week", "test3.png", [[222537, "Coach Rd. Appts."]], "Coach Rd. Appts.")
+#graphData("1 week", "test2.png", [[222275, "Mendon St."]], "Mendon St.")
 
-graphData("1 week", "test23.png", [[222275, "Mendon St."], [222537, "Coach Rd. Appts."]], "Mendon St. & Coach Rd. Appts.")
+#graphData("3 days", "test2D.png", [[222275, "Mendon St."]], "Mendon St.")
+
+#graphData("1 week", "test3.png", [[222537, "Coach Rd. Appts."]], "Coach Rd. Appts.")
+
+#graphData("1 week", "test23.png", [[222275, "Mendon St."], [222537, "Coach Rd. Appts."]], "Mendon St. & Coach Rd. Appts.")

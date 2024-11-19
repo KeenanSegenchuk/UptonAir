@@ -2,9 +2,8 @@ import json
 from get import *
 
 def getMapInfo():
-	data = get("1 day")
-	#print(f'Data for past day: {data}')
-
+	data = get("1 hour")
+	
 	with open("data/sensor-pos.json", "r") as json_file:
 		sensors = json.load(json_file)
 
