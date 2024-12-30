@@ -1,20 +1,18 @@
 function Banner({ avg }) {
+    const { getObj } = require("../getObj");
+    const qualities = getObj("qualities");
+    const colors = getObj("c");
+    const ranges = getObj("r");
+
     let color;
     let quality;
 
-    if (avg < 5) {
-	color = "green";
-	quality = "Good";
-    } else if (avg < 12.5) {
-	color = "yellow";
-	quality = "Mild";
-    } else if (avg < 25) {
-	color = "orange";
-	quality = "Not Good";
-    } else {
-	color = "red";
-	quality = "Bad";
-    }
+	
+    ranges.some((range, i) => {
+	if(avg<=range) {color = colors[i]; quality = qualities[i]; return true;}
+	return false;
+    });
+
     return (
         <div className="banner" style={{
                 width: '100%',

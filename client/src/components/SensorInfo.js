@@ -14,7 +14,7 @@ function SensorInfo({ sensor_id }) {
 
     useEffect(() => {
         if (sensor_id !== 0) {
-            console.log(sensor_id);
+            //console.log(sensor_id);
             axios.get('http://localhost:5000/sensorinfo', { params: { sensor: sensor_id } })
                 .then(response => {
                     console.log(response);
@@ -58,27 +58,25 @@ function SensorInfo({ sensor_id }) {
     };
     const floatContainer = {
 	display: "flex", // Use flexbox for layout
-	justifyContent: "space-around", // Optional, for spacing
+	justifyContent: 'center', // Optional, for spacing
     };
     return (
-	<div>
+	<div style = {{width: "100%"}}>
 	<center>
 	    <h1>Sensor: {data.name}</h1>
-	</center>
-	<h1>Averages:</h1>
-        <div style = {floatContainer}>
-	    {data.inputs.map(input => (
-                <h1 style = {floatBox}>{input}</h1>
-            ))}
-        </div>
-	<div style = {floatContainer}>
-	    {data.avgs.map(avg => (
-                <h1 style = {floatBox}>{Math.round(100 * avg) / 100}</h1>
+	<h1 style={{marginBottom: "0"}}>AQI Averages:</h1>
+        <div style={{ ...floatContainer, display: 'flex', flexDirection: 'row'}}>
+            {data.inputs.map((input, index) => (
+                <div key={index} style={{ display: 'flex', flexDirection: 'column', width: "22%"}}>
+                    <h1 style={{ ...floatBox, fontSize: "24px", marginBottom: '0', height: '35px' }}>{input}</h1>
+                    <h1 style={{ ...floatBox, marginTop: '0', height: '35px' }}>{Math.round(100 * data.avgs[index]) / 100}</h1>
+                </div>
             ))}
         </div>
 	{/* <h1 style={{textAlign: "center",}}>{data.graphTitle}</h1> */}
 	{/*<img src={data.graphURL} alt="failed to load graph"/> */}
 	<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)}/> 
+	</center>
 	</div>
     );
 }

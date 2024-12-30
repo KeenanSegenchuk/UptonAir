@@ -7,16 +7,16 @@ function Bar({ val, max }) {
     const tmargin = 100 - height;
     var index = 4;
 
-    ranges.forEach((v, i) => {console.log(val); if(index == 4 && val<v){index = i;}});
+    ranges.forEach((v, i) => {/*console.log(val);*/ if(index == 4 && val<v){index = i;}});
 
-    const color = {backgroundColor: colors[index],
+    const style = {backgroundColor: colors[index],
 		   width: "100%",
 		   height: height.toString() + "%",
 		   cursor: "pointer"
 		   };
 
     return (
-	<div style={color} title={val}/>
+	<div style={style} title={val}/>
     );
 }
 
