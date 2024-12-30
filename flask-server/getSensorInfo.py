@@ -38,7 +38,8 @@ def getSensorInfo(sensor):
 			num = num * 60 * 60
 
 		dt = [sum([float(y) for y in x.split(",")[3:4]])/2 for x in data[find(num, data):] if int(x.split(",")[1]) == int(sensor)]
-
+		if len(dt) == 0:
+			return []
 		avgs += [sum(dt)/len(dt)]
 
 	data = {

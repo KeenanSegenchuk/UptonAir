@@ -27,13 +27,18 @@ historyurl = ("/history/csv?")
 #specify that we want the last 2 weeks
 #get current time in seconds since epoch of computers and cut off decimal points
 endtime = int(time())
+
 #number of seconds in 2 weeks
 twoweeks = 604800
 #two weeks ago's time
 starttime = time() - twoweeks
+
 #or whatever time the last data point was downloaded
 #if starttime < lastSample:
 	#starttime = lastSample
+#starttime = 1732021200
+#endtime = 1732640400
+
 #now build url
 timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
 

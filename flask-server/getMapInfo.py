@@ -4,12 +4,12 @@ from get import *
 def getMapInfo():
 	data = get("1 hour")
 	
-	with open("data/sensor-pos.json", "r") as json_file:
+	with open("sensor-pos.json", "r") as json_file:
 		sensors = json.load(json_file)
 
 	for sensor in sensors:
 		id = int(sensor['id'])
-		sdata = [(x[3] + x[4])/2 for x in data if int(x[1]) == id] 
+		sdata = [x[6] for x in data if int(x[1]) == id] 
 		
 		if len(sdata) == 0:
 			print(f"Missing Data for Sensor: {id}")

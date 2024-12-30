@@ -6,3 +6,6 @@ Mendon St.,222275
 Coach Rd. Appts.,222537
 Community Center,221859
 Victoria Dr.,222527
+Nipmuc HS,186307
+Rockwood Meadows,222529
+Touchstone School,222757
