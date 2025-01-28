@@ -1,7 +1,11 @@
 import math
 import time
 from PMtoAQI import *
-def clean():
+from pullfn import pullfn
+
+def clean(cut = False):
+	cutoff = int(time.time()) - 60*60*24*14
+
 	#open data file in read/write mode
 	file = open("data.txt", "r")
 	
@@ -12,14 +16,13 @@ def clean():
 	data = [[float(x) for x in l.split(",")] for l in data[1:] if "null" not in l.split(",")]
 	old_data = []
 
-	cutoff = int(time.time()) - 60*60*24*14
 	c  = 0
 	for line in data:
 		if len(line) == 0:
 			del data[c]
 		else:
 			l = line[0]
-			if int(l) < cutoff and False:
+			if int(l) < cutoff and cut:
 				old_data += [line]
 				del data[c]
 		c += 1
@@ -128,5 +131,9 @@ def clean():
 	file = open("data.txt", "w")
 	file.write(data)
 
-clean()
+print("Updating data...")
+clean(True)
+pullfn()
+time.sleep(30)
+clean(True)
 		

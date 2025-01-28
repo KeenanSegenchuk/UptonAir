@@ -46,7 +46,7 @@ timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
 datafieldsurl = "&average=60&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
 
 #this is my api key
-key = "2F5CD35E-E169-11EE-B9F7-42010A80000D"
+key = "97F2B4FA-DD87-11EF-A3B4-42010A800010"
 #now we build the api call with a url and a header
 data = []
 for sensor in sensors:

@@ -7,6 +7,7 @@ from clean import *
 from get import *
 from getMapInfo import *
 from graphData import *
+from getWAV import *
 from getSensorInfo import *
 from getByDate import *
 import matplotlib.pyplot as plt 
@@ -33,6 +34,53 @@ sensor_info_bp = Blueprint('sensor_info', __name__, url_prefix='/api/sensor_info
 def raw_data():
 	with open("data.txt", "r") as data:
 		return data.read()
+
+# WAVEFORM
+@app.route("/api/wav/<string:query>")
+def wav(query):
+	# Get raw amplitude with fixed sampling frequency
+	# Options to fill in missing data should be zeroing or smoothing
+	# Query is used to set constants and should be in the form <code>:<value>,<code>:<value> etc...	
+	query = [pair.split(":") for pair in query.split(",")]
+
+	# Downsample to lambda second intervals of recording for uniform sampling rate
+	labda = 60*60    #code: &l
+	l = [pair for pair in query if pair[0] == "&l"]
+	if len(l) == 1:
+		labda = l[0][1]	
+
+	# Fill in missing data by zeroing or smoothing
+	zero = False #code: &z, valid values: 0 or 1
+	z = [pair for pair in query if pair[0] == "&z"]
+	if len(z) == 1:
+		zero = z[0][1]	
+
+	# Average sensors together, or make seperate vector?
+	combine = True #code: &c
+	c = [pair for pair in query if pair[0] == "&c"]
+	if len(c) == 1:
+		combine = c[0][1]	
+	
+	# Sensors IDs to include in the waveform 
+	sensors = [int(pair[1]) for pair in query if pair[0] == "&i"] #code: &i, make a new <code>,<value> pair for each sensor you want to include
+
+	# Whether you want AQI or PM2.5 values
+	aqi = [int(pair[1]) for pair in query if pair[0] == "&a"] #code: &a, make a new <code>,<value> pair for each sensor you want to include
+	
+	# Start Time
+	start = 0 #code: &s
+	s = [pair for pair in query if pair[0] == "&s"]
+	if len(s) == 1:
+		start = int(s[0][1])	
+
+	# End Time
+	end = float("Inf") #code: &e
+	e = [pair for pair in query if pair[0] == "&e"]
+	if len(e) == 1:
+		end = int(e[0][1])	
+
+	waveform = getWAV(sensors, start, end, labda, zero, combine)	
+	return waveform
 
 # AQI
 @aqi_bp.route("/avg/<string:timespan>")
@@ -106,7 +154,9 @@ def sensorinfo():
 	with open("sensor-pos.json", "r") as sensors:
 		sensors = json.load(sensors)
 		sensor = [request.args.get("sensor"), sensors[[s["id"] for s in sensors].index(request.args.get("sensor"))]["name"]]
+	print(sensor[0])
 	info = getSensorInfo(sensor[0])
+	print(info)
 	info = json.loads(info)
 	info["name"] = str(sensor[1])
 	info["graph"] = graphData("1 week", "homeplot.jpg", [sensor] , str(sensor[1]) + "'s readings from the past week.")

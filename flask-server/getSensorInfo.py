@@ -37,7 +37,7 @@ def getSensorInfo(sensor):
 		elif t[1] == "Hour":
 			num = num * 60 * 60
 
-		dt = [sum([float(y) for y in x.split(",")[3:4]])/2 for x in data[find(num, data):] if int(x.split(",")[1]) == int(sensor)]
+		dt = [sum([float(y) for y in x.split(",")[6:7]])/2 for x in data[find(num, data):] if int(x.split(",")[1]) == int(sensor)]
 		if len(dt) == 0:
 			return []
 		avgs += [sum(dt)/len(dt)]
@@ -53,3 +53,4 @@ def getSensorInfo(sensor):
 	print(json.dumps(data, indent=4))
 
 	return json.dumps(data, indent=4)
+getSensorInfo(222757)
