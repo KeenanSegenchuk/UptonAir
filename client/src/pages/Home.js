@@ -23,9 +23,9 @@ function Home() {
 	for (let i = 0; i <temp_data.length; i++) {
 		const id = temp_data[i]["id"];
 		const index = ids.indexOf(id.toString()); 
-		/*console.log("id,index");
+		console.log("id,index");
 		console.log(id);
-		console.log(index);*/
+		console.log(index);
 		temp_data[i]["name"] = sensors[index]["name"];
 		temp_data[i]["x"] = sensors[index]["x"];
 		temp_data[i]["y"] = sensors[index]["y"];

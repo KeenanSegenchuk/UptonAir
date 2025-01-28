@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const LineGraph = ({ data, gradient }) => {
+const LineGraph = ({ data, gradient, h, w }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ console.log("yM: "+yMax);
 
   return (
     <div>
-      <canvas ref={canvasRef} style={{ background: gradient, border: '1px solid black' }} width={500} height={200}></canvas>
+      <canvas ref={canvasRef} style={{ background: gradient, border: '1px solid black' }} width={w} height={h}></canvas>
     </div>
   );
 };

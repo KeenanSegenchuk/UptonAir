@@ -6,9 +6,11 @@ import { getObj } from "../getObj";
 function Button({ id, val, x, y, updateSensor }) {    
     const ranges = getObj("r");
     const colors = getObj("c");
+    const name = getObj("$" + id);
     const { globalLineBool } = useAppContext();
     const [toggle, setToggle] = useState(false);
     const [borderStyle, setBorderStyle] = useState("none");
+    const [hover, setHover] = useState(false);
 
     // Calculate the color based on val
     let color = "default";
@@ -34,11 +36,20 @@ function Button({ id, val, x, y, updateSensor }) {
         updateSensor(sensorValue); 
     };
 
+    const showName = () => {
+	setHover(true);
+    };
+    const hideName = () => {
+	setHover(false);
+    };
+
     return (
-        <div>
+        <div title={name}>
             <button
                 type="button"
                 id={id}
+		onmouseover="showName()"
+		onmouseout="hideName()"
                 style={{
                     position: 'absolute',
                     width: '17px',
@@ -52,12 +63,16 @@ function Button({ id, val, x, y, updateSensor }) {
 		    border: "none",
                     outline: borderStyle,
                     fontSize: ".6em",
+		    cursor: "pointer",
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >
                 {Math.round(val)}
                 {/* Button content can be added here */}
             </button>
+	    {hover && (
+		<div><input type="text" placeholder={name}/></div>
+	    )}
         </div>
     );
 }

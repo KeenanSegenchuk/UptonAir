@@ -1,4 +1,4 @@
-import Plot from 'react-plotly.js';
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import axios from "axios";
 import Bar from "./Bar";
@@ -6,13 +6,26 @@ import DateComp from "./Date";
 import LineGraph from "./LineGraph";
 import VertAxis from "./VertAxis";
 import { useAppContext } from "../AppContext";
-import { graphUtil } from "../graphUtil";
-import { getObj } from "../getObj";
 
 //TODO: fix loading, horizontalize dates, display bars
 function Graph({ sensor_id, start, end }) {
+	const {graphUtil} = require("../graphUtil");
+	const {getObj} = require("../getObj");
+
+	const [nBars, setNBars] = useState(50);
+	const [bars, setBars] = useState([]);
+	const [AQI, setAQI] = useState([]);
+	const [dates, setDates] = useState([]);
+	const [gradient, setGradient] = useState("powderblue");
     	const [loading, setLoading] = useState(false);
     	const [error, setError] = useState(null);
+	const [max, setMax] = useState(0);
+
+
+	const [lines, setLines] = useState([]); //entry format: {"data": [], "sensor": []}
+	const {setGlobalLineBool} = useAppContext();
+	const [lineBool, setLineBool] = useState(false);
+
 	const [axes, setAxes] = useState({"xVals": [], "xPos": [], "yVals": []});
 	const height = 200;
 	const width = 500;
@@ -23,17 +36,17 @@ function Graph({ sensor_id, start, end }) {
 	const [buttonHeight, setButtonHeight] = useState(0);
 	const xAxisRef = useRef(null);
 	const [xHeight, setXHeight] = useState(0);
-	const [gradient, setGradient] = useState("powderblue");
 
-	const [dates, setDates] = useState([]);
-	const [max, setMax] = useState(0);
-	const [lines, setLines] = useState([]); //entry format: {"data": [], "sensor": 0, "show": False}
-	const [bars, setBars] = useState([]);
-	const nBars = 50;
-	const {setGlobalLineBool} = useAppContext();
-	const [lineBool, setLineBool] = useState(false);
-	
+	//get data from api
 	useEffect(() => {
+            /*console.log(sensor_id);
+	    //console.log(typeof start);
+	    //console.log(typeof end);*/
+
+	    if (lineBool) {/*TODO: CHECK IF SENSOR DATA ALREADY IN LINES AND REMOVE IT*/}
+
+	    setLoading(true);
+	    //vvvvv WILL BECOME REDUNDANT WITH SETAXES vvvvv//
 	    var dts = graphUtil("getTimes")(start, end, 7);
 		dts = graphUtil("getDates")(dts);
 	    var midnights = graphUtil("getMidnights")(start, end); 
@@ -42,29 +55,44 @@ function Graph({ sensor_id, start, end }) {
 		midnights = graphUtil("midnightGradient")(start, end, midnights);
 		console.log(midnights);
 		setGradient(midnights.gradient);
-	}, [start, end]);
+
+	    /*console.log("dates:");
+	    //console.log(dts);*/
+
+	    setDates(dts);
+            axios.get('http://localhost:5000/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
+                .then(response => {
+		    setError(null);
+                    console.log(response);
+		    setAxes(getAxes(response.data.data, start, end));
+		    if (lineBool) {
+                    	setLines(lines =>[...lines, {"data": response.data.data, "sensor": [sensor_id, getObj("$" + sensor_id)], "color": getObj("C" + sensor_id)}]);
+		    }else{
+			setAQI(response.data.data);
+			const [brs, m] = graphUtil("getBars")(response.data.data.map(item => item[1]), nBars);
+			setBars(brs);
+			//console.log("bars" + bars);
+			setMax(m);
+		    }
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    setError(error.message);
+                    setLoading(false);
+                });
+    	}, [sensor_id, start, end]);
 
 	useEffect(() => {
-		if (lineBool)
-			if(checkForLine(sensor_id))
-				return;
-	
-		axios.get('http://localhost:5000/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
-			.then(response => {
-				setError(null);
-				console.log(response);
-				if(lineBool){
-					addLine(response.data.data);
-				}else{
-					const [brs, m] = graphUtil("getBars")(response.data.data.map(item => item[1]), nBars);
-					setBars(brs);
-					setMax(m);}
-			}).catch(error => {
-                    		console.error('Error fetching data:', error);
-                    		setError(error.message);
-                    		setLoading(false);
-                	});
-	}, [sensor_id, start, end, lineBool]);
+		const [brs, m] = graphUtil("getBars")(AQI.map(item => item[1]), nBars);
+		setBars(brs);
+		setMax(m);
+	}, [nBars]);
+
+	useEffect(() => {
+		setGlobalLineBool(lineBool);
+	}, [lineBool]);
+
 	useEffect(() => {
 		const updateSize = () => {
 			if (buttonRef.current && xAxisRef.current) {
@@ -82,42 +110,10 @@ function Graph({ sensor_id, start, end }) {
 		window.addEventListener("resize", updateSize);
 		return () => {window.removeEventListener("resize", updateSize);};
 	}, []);
-	
-  const addLine = (response) => {
-    let l = {"data": response, "sensor": sensor_id, "color":getObj("C"+sensor_id), "show": true}
-    setLines(prevItems => [...prevItems, l]);
-    return;
-  };
-  const checkForLine = (sensor) => {
-    for(let i = 0; i < lines.length; i++)
-      if(lines[i].sensor == sensor) {
-	lines[i].show = !lines[i].show;
-        return true;
-      }
-    return false;
-  };
-  const formatLine = (l) => {
-	console.log("Formatting line...");
-	console.log(l.data);
-    let X  = [];
-    let Y  = new Array(l.data.length);
-    for(let i = 0; i < l.data.length; i++)
-    { X[i] = l.data[i][0];
-      Y[i] = l.data[i][1]; }
-	console.log(X);
-    return { "x": X, "y": Y, type: "scatter", name: getObj("$"+l.sensor), mode: "lines", "marker": {"color": l.color}};
-  }; 
 
-  const newBar = (b) => {
-    const x = new Array(b.data.length);
-    const y = new Array(b.data.length);
-    for(let i = 0; i < b.data.length; i++)
-    { x[i] = b.data[i][0];
-      y[i] = b.data[i][1]; }
-    return { "x": x, "y": y, type: "scatter", mode: "bar", "marker": {"color": b.color}};
-  }; 
 
-//TODO: Decide if I need this function
+
+
   const getAxes = (data) => {
     const xVals = data.map(item => item[0]);
     const yVals = data.map(item => item[1]);
@@ -163,20 +159,6 @@ function Graph({ sensor_id, start, end }) {
     justifyContent: 'space-between',
   };
 
-  const lineGraphLayout = {
-	width: divSize.width, 
-	height: height,
-	margin: {
-		l:25,
-		r:0,
-		t:0,
-		b:15
-	},
-	legend: {
-		visible: false
-	}
-  };
-
 if (loading)
 	{return (<div className="loading-message">Loading...</div>);}
 if (error)
@@ -188,15 +170,14 @@ return (
         <h1>7-Day AQI Readings</h1>
         <div style={{ display: "flex", alignItems: "flex-start" }}>
             {/* TODO: Add y axis */}
-            {/*<div><VertAxis values={axes.yVals} h={height + buttonHeight} bh = {buttonHeight}/></div>*/}
+            <div><VertAxis values={axes.yVals} h={height + buttonHeight} bh = {buttonHeight}/></div>
 
             <div ref={divRef} style={{height: "100%", width:"100%"}}>
        		<button ref={buttonRef} onClick={toggleLineBool}>
             	    {lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
        		</button>
                 {lineBool ? (
-		    <Plot data={lines.map(l => formatLine(l))} layout={lineGraphLayout}/>
-                    /*<LineGraph data={lines} gradient={gradient} w={divSize.width} h={height}/>*/
+                    <LineGraph data={lines} gradient={gradient} w={divSize.width} h={height} />
                 ) : (
                     <div
                         style={{
@@ -213,11 +194,11 @@ return (
                         ))}
                     </div>
                 )}
-                {/*<div ref={xAxisRef} style={{ ...graphElement, height: "55px" }}>
+                <div ref={xAxisRef} style={{ ...graphElement, height: "55px" }}>
                     {dates.map((date, index) => (
                         <DateComp key={index} text={date} />
                     ))}
-                </div>*/}
+                </div>
             </div>
         </div>
     </div>

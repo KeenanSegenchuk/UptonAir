@@ -22,9 +22,9 @@ function Banner({ avg }) {
                 border: '5px solid black',
             }}
 	>
-	    <h1>Today's Air Quality:</h1>
+	    <h1>Today's Air Quality Average:</h1>
 	    <h1><strong>{quality}</strong></h1>
-	    <h1>({String(avg)} µg/m<sup>3</sup>)</h1>
+	    <h1>({String(avg)} AQI)</h1>
         </div>
     );
 }

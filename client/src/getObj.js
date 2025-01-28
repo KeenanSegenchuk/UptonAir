@@ -37,13 +37,13 @@ function getObj(obj) {
 	"name": "Mendon & Grove",
         "x": 43.8,
         "y": 58.3,
-	"color": "yellow"
+	"color": "khaki"
     },
     {
         "id": "222275",
-	"name": "Mendon St.",
-        "x": 41.9,
-        "y": 59.7,
+	"name": "Kiwanis Stoplight",
+        "x": 40.9,
+        "y": 38.5,
 	"color":"red"
     },
     {
@@ -68,25 +68,25 @@ function getObj(obj) {
 	"color": "orange"
     },
     {
-        "id": "186307",
+        "id": "221905",
 	"name": "Nipmuc HS",
         "x": 27.8,
         "y": 58.9,
-	"color": "black"
+	"color": "slateblue"
     },
     {
         "id": "222529",
 	"name": "Rockwood Meadows",
         "x": 68,
         "y": 29.7,
-	"color": "black"
+	"color": "sienna"
     },
     {
         "id": "222757",
 	"name": "Touchstone School",
         "x": 5,
         "y": 39.2,
-	"color": "black"
+	"color": "brown"
     }
 ];
 

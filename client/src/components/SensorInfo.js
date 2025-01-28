@@ -21,6 +21,7 @@ function SensorInfo({ sensor_id }) {
                     setData(response.data);
                     //setGraphURL(`data:image/png;base64,${response.data.graph}`); // Assuming `graphImage` is the base64-encoded image string
                     setLoading(false);
+		    setError(null);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);

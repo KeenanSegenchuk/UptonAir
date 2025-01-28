@@ -120,6 +120,10 @@ function graphUtil(func) {
 	    result[i] = formattedDate;}
 	  return result;
 	};
+	const getStyle = (x, y, args) => {
+		//TODO: Use graphUtil functions to configure plotly.js graphs
+
+	};
 
 	const gitBars = (data, nBars) => {
 		console.log("Entering gitBars...");
