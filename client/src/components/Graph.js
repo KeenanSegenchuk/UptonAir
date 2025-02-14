@@ -8,42 +8,52 @@ import VertAxis from "./VertAxis";
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
+import "../App.css";
 
 //TODO: fix loading, horizontalize dates, display bars
-function Graph({ sensor_id, start, end }) {
+function Graph({ sensor_id, start, end, dummy }) {
     	const [loading, setLoading] = useState(false);
     	const [error, setError] = useState(null);
-	const [axes, setAxes] = useState({"xVals": [], "xPos": [], "yVals": []});
-	const height = 200;
-	const width = 500;
+	const ref = useRef(null);
+	const [width, setWidth] = useState(1000);
+	const [height, setHeight] = useState(300);
 
-	const divRef = useRef(null);
-	const [divSize, setDivSize] = useState({width: 0, height: 0});
-	const buttonRef = useRef(null);
-	const [buttonHeight, setButtonHeight] = useState(0);
-	const xAxisRef = useRef(null);
-	const [xHeight, setXHeight] = useState(0);
-	const [gradient, setGradient] = useState("powderblue");
+	/*
+	const initUpdateSize = () => {
+	    const initWindowSize = [window.innerWidth, window.innerHeight];
+            const initGraphSize = [1000, 300];
+            return () => {
+		//console.log("Current Width, Height: ", width, height);
+		//console.log("New Window Width, Height: ", window.innerWidth, window.innerHeight);
+		//console.log("Expected Width, Height: ", initGraphSize[0] * (window.innerWidth/initWindowSize[0]), initGraphSize[1]* (window.innerHeight/initWindowSize[1]));
+                setWidth(initGraphSize[0] * (window.innerWidth / initWindowSize[0]));
+                setHeight(initGraphSize[1] * (window.innerHeight / initWindowSize[1]));
+            };
+	};
 
-	const [dates, setDates] = useState([]);
-	const [max, setMax] = useState(0);
+	useEffect(() => {
+	    const updateFN = initUpdateSize();
+	    window.addEventListener("resize", updateFN);
+	    return () => {
+		window.removeEventListener("resize", updateFN);
+	    };
+	}, []); 
+	*/
+
 	const [lines, setLines] = useState([]); //entry format: {"data": [], "sensor": 0, "show": False}
 	const [bars, setBars] = useState([]);
 	const nBars = 50;
 	const {setGlobalLineBool} = useAppContext();
 	const [lineBool, setLineBool] = useState(false);
+	const [graphLayout, setGraphLayout] = useState({});
 	
+	//Handle timespan changes
 	useEffect(() => {
-	    var dts = graphUtil("getTimes")(start, end, 7);
-		dts = graphUtil("getDates")(dts);
-	    var midnights = graphUtil("getMidnights")(start, end); 
-		//midnights = midnights.slice(1,midnights.length - 1);
-		console.log(midnights);
-		midnights = graphUtil("midnightGradient")(start, end, midnights);
-		console.log(midnights);
-		setGradient(midnights.gradient);
+	    setGraphLayout(lineGraphLayout(dayLightGradient(start, end, 500)));
+	    //console.log("LAYOUT:",graphLayout);
 	}, [start, end]);
 
+	//Handle data changes
 	useEffect(() => {
 		if (lineBool)
 			if(checkForLine(sensor_id))
@@ -52,59 +62,57 @@ function Graph({ sensor_id, start, end }) {
 		axios.get('http://localhost:5000/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				setError(null);
-				console.log(response);
+				//console.log(response);
 				if(lineBool){
 					addLine(response.data.data);
 				}else{
-					const [brs, m] = graphUtil("getBars")(response.data.data.map(item => item[1]), nBars);
-					setBars(brs);
-					setMax(m);}
+					//console.log("BARS: ", formatBars(response.data, nBars));
+					setBars(formatBars(response.data, nBars));
+				}
 			}).catch(error => {
                     		console.error('Error fetching data:', error);
                     		setError(error.message);
                     		setLoading(false);
                 	});
-	}, [sensor_id, start, end, lineBool]);
+	}, [sensor_id, start, end]);
+
+	//use dummy change to force updates when same button is consecutively pressed
 	useEffect(() => {
-		const updateSize = () => {
-			if (buttonRef.current && xAxisRef.current) {
-				setXHeight(xAxisRef.current.getBoundingClientRect().height);
-				const height = buttonRef.current.getBoundingClientRect().height;
-				setButtonHeight(height);}
-			if (divRef.current) {
-				let {width,height} = divRef.current.getBoundingClientRect();
-				width = width*.9;
-				console.log("width: " + width + " height: " + height);
-				setDivSize({width, height});
-		        }
-		};
-		updateSize();
-		window.addEventListener("resize", updateSize);
-		return () => {window.removeEventListener("resize", updateSize);};
-	}, []);
+		console.log("CLICK!!!");
+		if (lineBool)
+			if(checkForLine(sensor_id))
+				return;
+	}, [dummy]);
+	//push width, height changes to plot
+	/*useEffect(() => {
+		setGraphLayout(prev => lineGraphLayout(prev.shapes));
+	}, [width, height]);*/
 	
   const addLine = (response) => {
     let l = {"data": response, "sensor": sensor_id, "color":getObj("C"+sensor_id), "show": true}
     setLines(prevItems => [...prevItems, l]);
     return;
   };
-  const checkForLine = (sensor) => {
-    for(let i = 0; i < lines.length; i++)
-      if(lines[i].sensor == sensor) {
-	lines[i].show = !lines[i].show;
-        return true;
-      }
+
+  const checkForLine = () => {
+    if(lines.some(item=>item.sensor===sensor_id))
+    { 
+      const newLines = lines.map(item=>item.sensor===sensor_id ? {...item, show: !item.show} : item);
+      setLines(newLines);
+      return true;
+    }
     return false;
   };
+
   const formatLine = (l) => {
-	console.log("Formatting line...");
-	console.log(l.data);
+    //console.log("Formatting line...");
+    //console.log(l.data);
     let X  = [];
     let Y  = new Array(l.data.length);
     for(let i = 0; i < l.data.length; i++)
-    { X[i] = l.data[i][0];
+    { X[i] = l.data[i][0]*1000;
       Y[i] = l.data[i][1]; }
-	console.log(X);
+    //console.log(X);
     return { "x": X, "y": Y, type: "scatter", name: getObj("$"+l.sensor), mode: "lines", "marker": {"color": l.color}};
   }; 
 
@@ -117,64 +125,106 @@ function Graph({ sensor_id, start, end }) {
     return { "x": x, "y": y, type: "scatter", mode: "bar", "marker": {"color": b.color}};
   }; 
 
-//TODO: Decide if I need this function
-  const getAxes = (data) => {
-    const xVals = data.map(item => item[0]);
-    const yVals = data.map(item => item[1]);
-    const start = Math.min(xVals);
-    const end = Math.max(xVals);
-    const ymax = Math.max(yVals);
-
-    const xAxis = graphUtil("getMidnights")(start, end);
-    const offset = (xAxis[0] - start)/width
-    const unit_width = end-start
-    const gap = 60*60*24
-    const xPos_px = [Math.ceil(unit_width/gap)]; 
-    let i = 0;
-    while (offset < end){
-	xPos_px[i++] = (offset-start)/unit_width;
-	offset += gap;
+  const formatBars = (b, n) => {
+    const step = (end-start)/n;
+    let index = 0;
+    let cutoff = start + step
+    const X = new Array(n);
+    const Y = new Array(n);
+    let ty = 0;
+    let x;
+    let y;
+    let count = 0;
+    for(let i = 0; i < b.data.length; i++)
+    { x = b.data[i][0]; 
+      y = b.data[i][1];
+      if(x >= cutoff){
+        X[index] = (cutoff-.5*step)*1000;
+	if(count != 0){
+          Y[index] = ty/count;
+        }else{
+	  Y[index] = 0;
+	}
+	index++;
+        cutoff += step;
+        ty = 0;
+        count = 0;
+      }
+      ty += y;
+      count++;
     }
-	
-    const yAxis = graphUtil("linspace")(0, ymax, height/20);
-    
-    //SET AXES AS USESTATE or make axes obj to return
-    return {"xVals": xAxis, "xPos": xPos_px, "yVals": yAxis}
-  };
+    return {"x": X, "y": Y, type: "bar", "marker": {"color": Y.map(v => colorMap(v))}};
+  }; 
 
   const toggleLineBool = () => {
     let prevState = lineBool;
     setLineBool(!prevState); 
     setGlobalLineBool(!prevState);
   };
-
-  const graphContainer = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    margin: '10px'
+  const dayLightGradient = (start, end, n) => {
+	const X = graphUtil("linspace")(start, end, n);
+	//X is an array of unix timestamps, this function returns a list of plotly shapes to create a background gradient to show daylight
+	const params = {
+		fn: (x) => Math.abs((12*60*60)-(x-18000)%(24*60*60)),
+		lo: 0,
+		hi: 12*60*60,
+		loColor: "rgb(176, 224, 230)",
+		hiColor: "rgb(64, 125, 144)",
+	};
+	return graphUtil("getBlocks")(X, params, bgBlock());
   };
 
-  const graphElement = {
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'row',
-    marginBottom: '5px',
-    justifyContent: 'space-between',
+  //draw rectangle on graph to set gradient background
+  const bgBlock = () => {
+	return {
+	  type: "rect",
+	  x0: 0,
+	  y0: 0,
+	  x1: 1,
+	  y1: 1,
+	  xref: "paper",
+	  yref: "paper",
+	  fillcolor: "red",
+	  opacity: 1,
+	  layer: "below",
+	  line: {
+		color: "rgba(0,0,0,0)",
+		width: 0
+	  }
+	};
   };
 
-  const lineGraphLayout = {
-	width: divSize.width, 
-	height: height,
-	margin: {
-		l:25,
-		r:0,
-		t:0,
-		b:15
-	},
-	legend: {
-		visible: false
-	}
+  const lineGraphLayout = (shapes) => {
+	//console.log("Shapes:",shapes);
+	return {
+                width: width, 
+                height: height,
+		plot_bgcolor: "rgba(0,0,0,0)",
+		paper_bgcolor: "rgba(0,0,0,0)",
+                margin: {
+                        l:25,
+                        r:0,
+                        t:0,
+                        b:15
+                },
+                shapes: shapes,
+                legend: {
+                        visible: false
+                },
+                xaxis: {
+                        type: "date",
+                        //tickformat: "%h %b %d"
+                }
+	};
+  };
+
+  const colorMap = (val) => {
+    const colors = getObj("c");
+    const ranges = getObj("r");
+    for(let i = 0; i < ranges.length; i++)
+	if(val<ranges[i])
+	    return colors[i];
+    return colors[colors.length-1];
   };
 
 if (loading)
@@ -182,43 +232,18 @@ if (loading)
 if (error)
 	{return (<div className="error-message">Error: {error}</div>);}
 
-//TODO Add y-axis, fix x-axis
 return (
     <div>
         <h1>7-Day AQI Readings</h1>
-        <div style={{ display: "flex", alignItems: "flex-start" }}>
-            {/* TODO: Add y axis */}
-            {/*<div><VertAxis values={axes.yVals} h={height + buttonHeight} bh = {buttonHeight}/></div>*/}
-
-            <div ref={divRef} style={{height: "100%", width:"100%"}}>
-       		<button ref={buttonRef} onClick={toggleLineBool}>
-            	    {lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
-       		</button>
-                {lineBool ? (
-		    <Plot data={lines.map(l => formatLine(l))} layout={lineGraphLayout}/>
-                    /*<LineGraph data={lines} gradient={gradient} w={divSize.width} h={height}/>*/
-                ) : (
-                    <div
-                        style={{
-                            ...graphElement,
-                            border: "1px solid black",
-                            alignItems: "flex-end",
-                            height: height + "px", // Fixed height
-                            width: divSize.width + "px",  // width
-                            background: gradient
-                        }}
-                    >
-                        {bars.map((bar, index) => (
-                            <Bar key={index} val={bar} max={max} />
-                        ))}
-                    </div>
-                )}
-                {/*<div ref={xAxisRef} style={{ ...graphElement, height: "55px" }}>
-                    {dates.map((date, index) => (
-                        <DateComp key={index} text={date} />
-                    ))}
-                </div>*/}
-            </div>
+        <div className="graphContainer" ref={ref}>
+            <button className="Button" onClick={toggleLineBool} style={{width:"30%"}}>
+            	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
+            </button>
+            {lineBool ? (
+		<Plot data={lines.filter(l => l.show).map(l => formatLine(l))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
+            ) : (
+		<Plot data={[bars]} layout={graphLayout}/>
+            )}
         </div>
     </div>
 );

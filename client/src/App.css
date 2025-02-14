@@ -43,3 +43,96 @@
     transform: rotate(360deg);
   }
 }
+/*----Styles from pages----*/
+.Button {
+    border:1px solid black;
+    width:100%;
+}
+/*Homepage Title*/
+.title {
+    text-align:center;
+    line-height:1.35;
+    margin:0px;
+    width:100%;
+    background:#38ba5b;
+}
+/*Allignment styles*/
+.sinkBox {
+    width: 100%;
+    padding: 10px;
+    word-wrap: break-word;
+}
+.floatBox {
+    padding: 10px;
+    border: 1px solid #000;
+    width: 90%;
+    white-space: normal;
+    word-wrap: break-word;
+}
+.floatButton {
+    margin-top: 15%;
+    width: 100%;
+    height: 70%;
+}
+.floatContainer {
+    display: flex; 
+    justify-content: space-around; 
+}
+.sinkContainer {
+    width:90%;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+}
+{/*----Component Styles----*/}
+{/*Map Styles*/}
+.mapContainer {
+    position: relative;
+    display: inline-block;
+}
+.mapImg {
+    display: block;
+    width: 100%;
+    height: auto;
+    z-index:0;
+}
+.sensorOverlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index:1;
+}
+.mapButton {
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    text-align: center;
+    align-items: center;
+    border: none;
+    font-size: .6em;
+    cursor: pointer;
+}
+{/*Banner Styles*/}
+.banner {
+    width: 100%;
+    height: 30%;
+    text-align: center;
+    border: 5px solid black;
+}
+{/*Graph Styles*/}
+.graphContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+.graphElement {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    margin-bottom: 5px;
+    justify-content: space-between;
+}

@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
+import "../App.css";
 
 function Button({ id, val, x, y, updateSensor }) {    
     const ranges = getObj("r");
     const colors = getObj("c");
     const name = getObj("$" + id);
-    const { globalLineBool } = useAppContext();
+    const scale = [1020, 723];
+    const { globalLineBool, hover } = useAppContext();
     const [toggle, setToggle] = useState(false);
     const [borderStyle, setBorderStyle] = useState("none");
-    const [hover, setHover] = useState(false);
+    const [bhover, setbHover] = useState(false);
+    const hoverKey = "labels";
 
     // Calculate the color based on val
     let color = "default";
@@ -37,42 +40,49 @@ function Button({ id, val, x, y, updateSensor }) {
     };
 
     const showName = () => {
-	setHover(true);
+	setbHover(true);
     };
     const hideName = () => {
-	setHover(false);
+	setbHover(false);
+    };
+
+    const labelStyle = {
+      position: "absolute",
+      fontSize: '8px', // small text
+      fontWeight: 'bold', // bold text
+      backgroundColor: '#f4e1a1', // manila color (a soft yellow)
+      padding: '0', // no padding
+      margin: '0', // no margins
+      top: (y+2.3)+"%",
+      left: x+"%",
+      whiteSpace:"nowrap",
+      width:"auto",
+      display:"inline-block"
     };
 
     return (
-        <div title={name}>
+        <div title={name} style={{top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>
             <button
+		className="mapButton"
                 type="button"
                 id={id}
-		onmouseover="showName()"
-		onmouseout="hideName()"
+		onMouseOver={showName}
+		onMouseOut={hideName}
                 style={{
-                    position: 'absolute',
-                    width: '17px',
-                    height: '17px',
-                    borderRadius: '50%',
-                    top: Math.round(y * 1020 / 100),
-                    left: Math.round(x * 723 / 100),
-                    backgroundColor: color, 
-                    textAlign: "center",
-                    alignItems: "center",
-		    border: "none",
-                    outline: borderStyle,
-                    fontSize: ".6em",
-		    cursor: "pointer",
+		    backgroundColor: color,
+		    outline: borderStyle,
+                    top: y+"%",
+                    left: x+"%",
+		    zIndex: 10,
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >
                 {Math.round(val)}
                 {/* Button content can be added here */}
             </button>
-	    {hover && (
-		<div><input type="text" placeholder={name}/></div>
-	    )}
+	    {(hover==hoverKey || bhover) ? (
+		<div><input type="text" placeholder={name} style={labelStyle}/></div>
+	    ):null}
         </div>
     );
 }

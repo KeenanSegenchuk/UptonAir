@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import "../App.css";
 import { Link } from 'react-router-dom'
 import Map from "../components/Map";
 import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
+import HoverButton from "../components/HoverButton";
+import ToggleButton from "../components/ToggleButton";
+import InfoContainer from "../components/InfoContainer";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
+
 
 
 function Home() {
@@ -14,6 +19,7 @@ function Home() {
     const [error, setError] = useState(null);
     const [infoSensor, setInfoSensor] = useState(0);
     const sensorPos = "/sensor-pos.json";
+    const [dummy, setDummy] = useState(false);
 
     const setSensorPos = (temp_data) => {
 	console.log("sensors:");
@@ -36,6 +42,7 @@ function Home() {
 
     const updateSensor = useCallback((newSensorValue) => {
         setInfoSensor(newSensorValue);
+	setDummy(!dummy); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
     }, []);
 
     useEffect(() => {
@@ -54,7 +61,7 @@ function Home() {
     }, []);
 
     if (loading) {
-        return <h1>Loading...</h1>;
+        return <h1>Loading... </h1>;
     }
 
     if (error) {
@@ -79,49 +86,44 @@ function Home() {
 	background: "linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)",
     };
 
-    //define float css
-    const sinkBox = {
-	width: "100%",
-	padding: "10px",
-    };
-    const floatBox = {
-	padding: "10px",
-	border: "1px solid #000",
-	width: "90%",
-    };
-    const floatButton = {
-	marginTop: "15%",
-	width: "100%",
-	height: "70%",
-    };
-    const floatContainer = {
-	display: "flex", // Use flexbox for layout
-	justifyContent: "space-around", // Optional, for spacing
-    };
 
     return (
 	<div style = {gradient}>
-            <div style = {floatContainer}>
+            
+	{/*Header*/}
+	    <div className= "floatContainer">
                 <p>
               This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
                 </p>
-                <Link to="/about"><button style={floatButton}>
+                <Link to="/about"><button className="Button">
               About Us
                 </button>
                 </Link>
-                <Link to="/contact"><button style={floatButton}>
+                <Link to="/contact"><button className="Button">
               Contact Us
                 </button>
                 </Link>
             </div>
-            <h1 style = {{textAlign: "center", width: "100%", height: "65px", background: "#38ba5b",}}>Upton Air</h1>
-            <div style = {floatContainer}>
-                <Map style = {floatBox} buttons={data} updateSensor={updateSensor} />
-                <div style={{ width: "90%", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-        	    <Banner style={floatBox} avg={Math.round(100 * total / count) / 100} />
-       		    <SensorInfo id="infoBox" sensor_id={infoSensor} style={sinkBox}/>
+            <h1 className="title">Upton Air</h1>
+	
+	{/*Options Bar*/}
+	    <div className="floatContainer">
+		<HoverButton className="Button" text={"Hover here to show location names."} hoverKey="labels"/>
+		<ToggleButton className="Button" text={"Click here to toggle annotations."} toggleKey="annotations"/>
+	    </div>
+	    
+	{/*Page Body*/}
+            <div className="floatContainer">
+                <Map className="floatBox" buttons={data} updateSensor={updateSensor} />
+                <div className="sinkContainer">
+        	    <Banner className="floatBox" avg={Math.round(100 * total / count) / 100} />
+       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
       		</div> 
             </div>
+
+	{/*Information*/}
+	    <InfoContainer infodoc="../infodocs/AQIranges.txt"/>
+	    <InfoContainer infodoc="../infodocs/influencesOnPMReadings.txt"/>
 	</div>
     );
 }

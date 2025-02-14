@@ -22,70 +22,70 @@ function getObj(obj) {
         "id": "128729",
 	"name": "Uxbridge",
         "x": 0,
-        "y": 90,
+        "y": 97,
 	"color": "black"
     },
     {
         "id": "221881",
 	"name": "Memorial",
-        "x": 31,
-        "y": 48.7,
+        "x": 33.9,
+        "y": 52.7,
 	"color": "green"
     },
     {
         "id": "222641",
 	"name": "Mendon & Grove",
-        "x": 43.8,
-        "y": 58.3,
+        "x": 49.8,
+        "y": 63.3,
 	"color": "khaki"
     },
     {
         "id": "222275",
 	"name": "Kiwanis Stoplight",
-        "x": 40.9,
-        "y": 38.5,
+        "x": 45.9,
+        "y": 41.5,
 	"color":"red"
     },
     {
         "id": "222537",
 	"name": "Coach Rd. Appts.",
-        "x": 24.8,
-        "y": 48.8,
+        "x": 27.3,
+        "y": 51.8,
 	"color": "blue"
     },
     {
 	"id": "221859",
 	"name": "Community Center",
-	"x": 41.8,
-	"y": 47.3,
+	"x": 47,
+	"y": 52,
 	"color": "purple"
     },
     {
 	"id": "222527",
 	"name": "Victoria Dr.",
-	"x": 25.4,
-	"y": 52.5,
+	"x": 28.4,
+	"y": 58.5,
 	"color": "orange"
     },
     {
         "id": "221905",
 	"name": "Nipmuc HS",
-        "x": 27.8,
-        "y": 58.9,
+        "x": 30.8,
+        "y": 63.9,
 	"color": "slateblue"
     },
     {
         "id": "222529",
 	"name": "Rockwood Meadows",
-        "x": 68,
-        "y": 29.7,
+        "x": 77,
+        "y": 34.5,
 	"color": "sienna"
     },
     {
         "id": "222757",
 	"name": "Touchstone School",
         "x": 5,
-        "y": 39.2,
+        "y": 42.2,
 	"color": "brown"
     }
 ];

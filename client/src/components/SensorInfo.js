@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import "../App.css";
 import Graph from './Graph';
 
-function SensorInfo({ sensor_id }) {
+function SensorInfo({ sensor_id, dummy }) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -66,17 +67,17 @@ function SensorInfo({ sensor_id }) {
 	<center>
 	    <h1>Sensor: {data.name}</h1>
 	<h1 style={{marginBottom: "0"}}>AQI Averages:</h1>
-        <div style={{ ...floatContainer, display: 'flex', flexDirection: 'row'}}>
+        <div className="floatContainer" style={{display: 'flex', flexDirection: 'row'}}>
             {data.inputs.map((input, index) => (
                 <div key={index} style={{ display: 'flex', flexDirection: 'column', width: "22%"}}>
-                    <h1 style={{ ...floatBox, fontSize: "24px", marginBottom: '0', height: '35px' }}>{input}</h1>
-                    <h1 style={{ ...floatBox, marginTop: '0', height: '35px' }}>{Math.round(100 * data.avgs[index]) / 100}</h1>
+                    <h1 className="floatBox" style={{ fontSize: "24px", marginBottom: '0', height: '35px' }}>{input}</h1>
+                    <h1 className="floatBox" style={{ marginTop: '0', height: '35px' }}>{Math.round(100 * data.avgs[index]) / 100}</h1>
                 </div>
             ))}
         </div>
 	{/* <h1 style={{textAlign: "center",}}>{data.graphTitle}</h1> */}
 	{/*<img src={data.graphURL} alt="failed to load graph"/> */}
-	<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)}/> 
+	<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)} dummy={dummy}/> 
 	</center>
 	</div>
     );

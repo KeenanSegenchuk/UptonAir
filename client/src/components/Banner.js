@@ -1,3 +1,4 @@
+import "../App.css";
 function Banner({ avg }) {
     const { getObj } = require("../getObj");
     const qualities = getObj("qualities");
@@ -14,14 +15,7 @@ function Banner({ avg }) {
     });
 
     return (
-        <div className="banner" style={{
-                width: '100%',
-                height: '30%',
-		textAlign: 'center',
-                backgroundColor: color,
-                border: '5px solid black',
-            }}
-	>
+        <div className="banner" style={{backgroundColor: color}}>
 	    <h1>Today's Air Quality Average:</h1>
 	    <h1><strong>{quality}</strong></h1>
 	    <h1>({String(avg)} AQI)</h1>

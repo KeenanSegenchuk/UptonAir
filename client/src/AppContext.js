@@ -7,10 +7,14 @@ export const useAppContext = () => useContext(AppContext);
 export const ContextProvider = ({ children }) => {
   const [getLine, setLine] = useState(null);
   const [globalLineBool, setGlobalLineBool] = useState(false);
+  const [hover, setHover] = useState("");
+  const [switches, setSwitches] = useState(new Map());
 
   const contextVals = {
 	getLine, setLine,
-	globalLineBool, setGlobalLineBool
+	globalLineBool, setGlobalLineBool,
+	hover, setHover,
+	switches, setSwitches
   };
 
 

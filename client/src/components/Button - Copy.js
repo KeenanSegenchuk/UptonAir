@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-const InfoBox = ({ title, body, style }) => {
+const HoverButton = ({ text, key }) => {
+  //This type of button allows the setting of a global var to key when the button is hovered on so that other components can read that key
+  const {setHover} = useAppContext();
+  const mouseIn()=> {
+	setHover(key);
+  };
+  const mouseOut()=> {
+	setHover("");
+  };
+
   return (
     <div>
-	<div style={style.title}>
-		{title}
-	</div>
-	<div style={style.body}>
-		{body}
-	</div>
+	<Button onmouseover="mouseIn()" onmouseout="mouseOut()">
+	{text}	
+	</Button>
     </div>
   );
 };
