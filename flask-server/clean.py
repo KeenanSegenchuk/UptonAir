@@ -134,6 +134,7 @@ def clean(cut = False):
 
 async def update():
 	await pullfn()
+	print("Finished pullfn")
 	clean()
 
 print("Updating data...")

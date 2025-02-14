@@ -1,4 +1,5 @@
 import requests
+from cleanfn import cleanfn
 from time import time
 import asyncio
 
@@ -10,8 +11,15 @@ async def pullfn():
         sensors.append(int(line.split(",")[1]))
 
     file = open("data.txt", "r").read().splitlines()
+    while len(file[-1]) == 0 or file[-1][0] not in "0123456789":
+        print(f"Deleting non-data text line from data.txt: {file[-1]}")
+        del file[-1]
     lastSample = int(file[len(file)-1].split(",")[0])
     print(f"Pulling data after last entry at {lastSample}...")
+
+    #check to see if any sensors weren't pulled in that batch
+    lastSensors = [x.split(",")[1] for x in file[len(file)-len(sensors):]]
+    
 
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
@@ -19,6 +27,7 @@ async def pullfn():
 
     twoweeks = 604800
     starttime = time() - twoweeks
+    maxPullStarttime = starttime
 
     if starttime < lastSample:
         starttime = lastSample
@@ -31,7 +40,12 @@ async def pullfn():
 
     data = []
     for sensor in sensors:
-        print(f'Pulling data from sensor: {sensor}')
+        if sensor in lastSensors:
+            timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
+        else:
+	    timeurl = "start_timestamp=" + str(maxPullStarttime) + "&end_timestamp=" + str(endtime)
+	
+	print(f'Pulling data from sensor: {sensor}')
         url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
         header = {"X-API-Key": key}
         response = requests.get(url, headers=header)
@@ -39,12 +53,14 @@ async def pullfn():
             data.append(line)
             print(f'line: {line}')
 
+    #print(f"lenData: {len(data)}, dirty data: {data}")
+    data = cleanfn(data)
+    #print(f"lenData: {len(data)}, clean data: {data}")
+
     # update file with new data
     file = open("data.txt", "a")
     i = 0
 
-    data = [x.split(",") for x in data if x[0:1] in "0123456789"]
-    data.sort(key=lambda vals: (int(vals[0]), vals[1]))
     for line in data:
         file.write(",".join(line) + "\n")
         i += 1

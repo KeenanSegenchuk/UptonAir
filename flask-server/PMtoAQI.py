@@ -1,4 +1,11 @@
 def PMtoAQI(humidity, PMA, PMB):
+	if type(humidity) == str:
+		humidity = float(humidity)
+	if type(PMA) == str:
+		PMA = float(PMA)
+	if type(PMB) == str:
+		PMB = float(PMB)
+
 	avg = round((PMA + PMB)/2, 1)
 
 	f1 = lambda x, h: .524*x-.0862*h+5.75
@@ -24,7 +31,7 @@ def PMtoAQI(humidity, PMA, PMB):
 			AQI = f_AQI(iranges[i1], iranges[i2], pranges[i1], pranges[i2], avg)
 			PM_EPA = epaformulas[i](avg, humidity)
 			AQI_EPA = f_AQI(iranges[i1], iranges[i2], pranges[i1], pranges[i2], PM_EPA)
-			return [PM_EPA, AQI, AQI_EPA]
+			return [str(PM_EPA), str(int(AQI)), str(int(AQI_EPA))]
 		i1 += 1
 		i2 += 1
 	
