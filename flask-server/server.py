@@ -85,6 +85,7 @@ def wav(query):
 # AQI
 @aqi_bp.route("/avg/<string:timespan>")
 def avg_aqi(timespan):
+	print("Avg AQI Request") 
 	data = get(timespan)
 
 	with open("sensor-pos.json", "r") as json_file:

@@ -2,6 +2,7 @@ import math
 import time
 from PMtoAQI import *
 from pullfn import pullfn
+import asyncio
 
 def clean(cut = False):
 	cutoff = int(time.time()) - 60*60*24*14
@@ -131,9 +132,10 @@ def clean(cut = False):
 	file = open("data.txt", "w")
 	file.write(data)
 
+async def update():
+	await pullfn()
+	clean()
+
 print("Updating data...")
-clean(True)
-pullfn()
-time.sleep(30)
-clean(True)
+asyncio.run(update())
 		

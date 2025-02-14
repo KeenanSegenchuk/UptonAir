@@ -1,7 +1,8 @@
 import requests
 from time import time
+import asyncio
 
-def pullfn():
+async def pullfn():
     sensorf = open("sensors.txt")
     sensorf = sensorf.read().splitlines()[1:]
     sensors = []
@@ -21,9 +22,11 @@ def pullfn():
 
     if starttime < lastSample:
         starttime = lastSample
+    if endtime - starttime < 60*30:
+        return "no new updates"
 
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
-    datafieldsurl = "&average=60&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
+    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
     key = "97F2B4FA-DD87-11EF-A3B4-42010A800010"
 
     data = []
@@ -39,12 +42,13 @@ def pullfn():
     # update file with new data
     file = open("data.txt", "a")
     i = 0
+
+    data = [x.split(",") for x in data if x[0:1] in "0123456789"]
+    data.sort(key=lambda vals: (int(vals[0]), vals[1]))
     for line in data:
-        if line[0:1] in "0123456789":
-            file.write(line + "\n")
-        else:
-            print(f"Erasing line: {line}")
+        file.write(",".join(line) + "\n")
         i += 1
 
     if i < len(data):
         print(f"Stopped before writing remaining data: {data[i:]}")
+    return "finished pulling data"
