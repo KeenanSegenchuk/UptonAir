@@ -92,7 +92,7 @@ def avg_aqi(timespan):
 		sensors = json.load(json_file)
 	for sensor in sensors:
 		id = int(sensor['id'])
-		sdata = [x[6] for x in data if int(x[1]) == id]
+		sdata = [(float(x[7]) + float(x[6])) / 2 for x in data if int(x[1]) == id]
 		if len(sdata) > 0:
 			sensor['avg'] = sum(sdata)/len(sdata)
 
@@ -104,7 +104,7 @@ def aqi(sensor_id):
 	start = end - (60*60*24*7)
 
 	data = getByDate(sensor_id, start, end)
-	data = [float(x[6]) for x in data]
+	data = [(float(x[7]) + float(x[6])) / 2 for x in data]
 	data = {"data": data}
 
 	return json.dumps(data, indent=4)
@@ -112,15 +112,38 @@ def aqi(sensor_id):
 @aqi_bp.route("/<int:start>-<int:end>/<int:sensor_id>")
 def aqi2(start, end, sensor_id):
 	data = getByDate(sensor_id, start, end)
-	data = [float(x[6]) for x in data]
+	data = [(float(x[7]) + float(x[6])) / 2 for x in data]
 	data = {"data": data}
 
 	return json.dumps(data, indent=4)
 
 @aqi_bp.route("/time/<int:start>-<int:end>/<int:sensor_id>")
 def aqi3(start, end, sensor_id):
-	data = getByDate(sensor_id, start, end)
-	data = [[float(x[0]), float(x[6])] for x in data]
+	def avgAllSensors(data):
+		newdata = []
+		time = 0
+		total = 0
+		count = 0
+		for entry in data:
+			if time != entry[0]:
+				time = entry[0]
+				if count != 0:
+					newdata += [[int(time), total/count]]
+			total += (float(entry[7]) + int(entry[6])) / 2
+			count += 1
+		if count != 0:
+			newdata += [[int(time), total/count]]
+		return newdata
+
+	if sensor_id == 0:
+		with open("sensor-pos.json") as sensorfile:
+			sensors = json.load(sensorfile)
+			sensors = [s["id"] for s in sensors]
+		data = getByDate(sensors, start, end)
+		data = avgAllSensors(data)
+	else:
+		data = getByDate(sensor_id, start, end)
+		data = [[float(x[0]), (float(x[7]) + float(x[6])) / 2] for x in data]
 	data = {"data": data}
 
 	return json.dumps(data, indent=4)
@@ -149,7 +172,6 @@ def raw2(start, end, sensor_id):
 # Register Blueprint
 app.register_blueprint(raw_bp)
 
-
 @app.route("/sensorinfo", methods =["GET"])
 def sensorinfo():
 	with open("sensor-pos.json", "r") as sensors:
@@ -162,6 +184,24 @@ def sensorinfo():
 	info["name"] = str(sensor[1])
 	info["graph"] = graphData("1 week", "homeplot.jpg", [sensor] , str(sensor[1]) + "'s readings from the past week.")
 	return json.dumps(info, indent=4)
+
+@sensor_info_bp.route("/<int:start>-<int:end>/<int:sensor_id>", methods =["GET"])
+def sensorinfo(sensor_id, start, end):
+	with open("sensor-pos.json", "r") as sensors:
+		sensors = json.load(sensors)
+		sensor = [sensor_id, sensors[[s["id"] for s in sensors].index(sensor_id)]["name"]]
+	
+	data = getByDate(sensor_id, start, end)
+	averages = ["1 month","1 week", "1 day", "3 hour"]
+	times = []
+
+	response = {
+		"id": sensor[0],
+		"name": sensor[1],
+		"avgs": avgs,
+		"inputs": averages,
+	}
+	print(json.dumps(data, indent=4))
 
 @app.route("/map", methods =["GET"])
 def map():

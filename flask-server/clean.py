@@ -138,5 +138,5 @@ async def update():
 	clean()
 
 print("Updating data...")
-asyncio.run(update())
+#asyncio.run(update())
 		
