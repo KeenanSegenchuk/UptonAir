@@ -53,15 +53,6 @@ function SensorInfo({ sensor_id, dummy }) {
         );
     }
 
-
-    const floatBox = {
-	padding: "10px",
-	border: "1px solid #000",
-    };
-    const floatContainer = {
-	display: "flex", // Use flexbox for layout
-	justifyContent: 'center', // Optional, for spacing
-    };
     return (
 	<div style = {{width: "100%"}}>
 	<center>
@@ -75,9 +66,7 @@ function SensorInfo({ sensor_id, dummy }) {
                 </div>
             ))}
         </div>
-	{/* <h1 style={{textAlign: "center",}}>{data.graphTitle}</h1> */}
-	{/*<img src={data.graphURL} alt="failed to load graph"/> */}
-	<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)} dummy={dummy}/> 
+	{/*<Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)} dummy={dummy}/>*/} 
 	</center>
 	</div>
     );

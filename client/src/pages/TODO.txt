@@ -1,4 +1,4 @@
-0 - ADD OPTIONS BAR
+0 - ADD OPTIONS BAR -> Use calendars to select date range to play on the map.
 0 - ADD HOVER ZONE TO SHOW MAP 
 0 - FIX HIGHLIGHTING MAP BUTTON FOR LINE MODE, AND MAYBE COLORS
 

@@ -8,6 +8,7 @@ import SensorInfo from "../components/SensorInfo";
 import HoverButton from "../components/HoverButton";
 import ToggleButton from "../components/ToggleButton";
 import InfoContainer from "../components/InfoContainer";
+import Graph from "../components/Graph";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
@@ -20,6 +21,9 @@ function Home() {
     const [infoSensor, setInfoSensor] = useState(0);
     const sensorPos = "/sensor-pos.json";
     const [dummy, setDummy] = useState(false);
+    const date = Date.now();
+    const sec = 1000;
+    const week = sec * 60 * 60 * 24 * 7;
 
     const setSensorPos = (temp_data) => {
 	console.log("sensors:");
@@ -117,13 +121,14 @@ function Home() {
                 <Map className="floatBox" buttons={data} updateSensor={updateSensor} />
                 <div className="sinkContainer">
         	    <Banner className="floatBox" avg={Math.round(100 * total / count) / 100} />
-       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
+       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor}/>
+		    <Graph sensor_id={infoSensor} start={Math.floor((date-week)/sec)} end={Math.floor(date/sec)} dummy={dummy}/> 
       		</div> 
             </div>
 
 	{/*Information*/}
-	    <InfoContainer infodoc="../infodocs/AQIranges.txt"/>
-	    <InfoContainer infodoc="../infodocs/influencesOnPMReadings.txt"/>
+	    <InfoContainer infodoc="/infodocs/AQIranges.txt"/>
+	    <InfoContainer infodoc="/infodocs/influencesOnPMReadings.txt"/>
 	</div>
     );
 }

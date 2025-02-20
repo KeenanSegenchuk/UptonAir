@@ -4,7 +4,22 @@ import InfoBox from "./InfoBox";
 const InfoContainer = ({ infodoc }) => {
   let infolist = false;
   let allStyle = {};
-  fetch(infodoc).then(data=>{console.log("INFOLIST:", data); infolist=new Response(data).text().json();}).catch(error => {console.log("Error fetching infodoc:", error);});
+  
+  const loadDoc = async() => {
+	try{
+		const response = await fetch(infodoc);
+		console.log("Response: ", response);
+		infolist= await response.json();
+		console.log("Loaded list of infoBoxes:", infolist);
+	} catch(err) {
+		console.log("Error fetching infolist: ", err);
+	}
+  };
+
+  console.log(infodoc);
+  loadDoc();
+  console.log("Loaded list of infoBoxes: ", infolist);
+
   if(infolist && infolist[0].all){
     allStyle = infolist[0].all;}
 

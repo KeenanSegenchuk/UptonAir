@@ -10,7 +10,6 @@ import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
 import "../App.css";
 
-//TODO: fix loading, horizontalize dates, display bars
 function Graph({ sensor_id, start, end, dummy }) {
     	const [loading, setLoading] = useState(false);
     	const [error, setError] = useState(null);
@@ -66,7 +65,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 				if(lineBool){
 					addLine(response.data.data);
 				}else{
-					//console.log("BARS: ", formatBars(response.data, nBars));
+					console.log("BARS: ", formatBars(response.data, nBars));
 					setBars(formatBars(response.data, nBars));
 				}
 			}).catch(error => {
@@ -126,6 +125,7 @@ function Graph({ sensor_id, start, end, dummy }) {
   }; 
 
   const formatBars = (b, n) => {
+    console.log("Formatting Bars:", b);
     const step = (end-start)/n;
     let index = 0;
     let cutoff = start + step
