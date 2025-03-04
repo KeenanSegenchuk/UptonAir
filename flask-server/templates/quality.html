@@ -3,13 +3,17 @@
 <form id = "aqForm" action = "/get_plot" method = "POST">
  <label for="window">Timespan for Data:</label>
  <input type="text" name="window" id="window" required/>
- <input type="submit" name="submit" value="Get Plot">
+ <label for="sensor">Sensor:</label>
+ <select id="sensor" name="sensor">
+  <option value="Upton">Upton</option>
+  <option value="Uxbridge">Uxbridge</option>
+ </select>
 </form>
 <div></div>
 
-{% if plot_url and frl %}
+{% if plot_url %}
 	{% for plot in plot_url %}
-		<img src = "{{frl + plot}} alt = "error displaying plot"">
+		<img src = "{{plot}}" alt = "error displaying plot">
 	{% endfor %}
 {% endif %}
 

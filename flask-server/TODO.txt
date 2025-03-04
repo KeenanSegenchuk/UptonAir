@@ -1,9 +1,0 @@
-MOBILE: Put averages banner over the map and make map buttons do pupup summary and graph
-
-MAP: Make buttons toggle border same color as line they put on graph
-
-RIGHT PANEL: Display town average above summary and graph
-
-GRAPH: Start as average line and add line for each sensor selected on map with same color as button outline
-	Have two modes: bar and line.
-	Add option to toggle average line and option to change timespan

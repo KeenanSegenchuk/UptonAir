@@ -1,6 +1,6 @@
 import datetime
 
-def getByDate(sensors, start, end):
+def getByDate(sensors, start, end, qc = True):
 	if type(sensors) == int:
 		sensors = [str(sensors)]
 	else:
@@ -10,14 +10,15 @@ def getByDate(sensors, start, end):
 	#print(f'Start: {start}. End: {end}')
 
 	def bs(data, t):
+		#binary search
 		h = len(data) - 1
 		l = 0
-		while h > l + 1:
-			m = int((h+l)/2)
+		while h>l:
+			m = (h+l)//2
 			if int(data[m][0]) < t:
-				l = m 
+				l = m+1
 			else:
-				h = m-1
+				h = m
 		return h
 
 	if type(start) == str:
@@ -33,6 +34,15 @@ def getByDate(sensors, start, end):
 	#print(f'Data before sensor check: {data}.')
 	data = [y.split(",") for y in data if y.split(",")[1] in sensors]
 	#print(f'Data after sensor check: {data}.')
+	
+	#check for consistent readings between both air sensor channels
+	if qc:
+		max_percent_diff = .62
+		max_val_diff = 5
+		avg = lambda x: (float(x[3]) + float(x[4]))/2
+		diff = lambda x: abs(float(x[3])-float(x[4]))
+		check = lambda x: (d := diff(x))<=max_val_diff or (a:=avg(x))==0 or d/a<=max_percent_diff 
+		data = [x for x in data if check(x)]
 
 	start = bs(data, start)
 	endt = end

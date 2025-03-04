@@ -1,9 +1,6 @@
 import Plot from 'react-plotly.js';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import axios from "axios";
-import Bar from "./Bar";
-import DateComp from "./Date";
-import LineGraph from "./LineGraph";
 import VertAxis from "./VertAxis";
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
@@ -17,29 +14,9 @@ function Graph({ sensor_id, start, end, dummy }) {
 	const [width, setWidth] = useState(1000);
 	const [height, setHeight] = useState(300);
 
-	/*
-	const initUpdateSize = () => {
-	    const initWindowSize = [window.innerWidth, window.innerHeight];
-            const initGraphSize = [1000, 300];
-            return () => {
-		//console.log("Current Width, Height: ", width, height);
-		//console.log("New Window Width, Height: ", window.innerWidth, window.innerHeight);
-		//console.log("Expected Width, Height: ", initGraphSize[0] * (window.innerWidth/initWindowSize[0]), initGraphSize[1]* (window.innerHeight/initWindowSize[1]));
-                setWidth(initGraphSize[0] * (window.innerWidth / initWindowSize[0]));
-                setHeight(initGraphSize[1] * (window.innerHeight / initWindowSize[1]));
-            };
-	};
 
-	useEffect(() => {
-	    const updateFN = initUpdateSize();
-	    window.addEventListener("resize", updateFN);
-	    return () => {
-		window.removeEventListener("resize", updateFN);
-	    };
-	}, []); 
-	*/
-
-	const [lines, setLines] = useState([]); //entry format: {"data": [], "sensor": 0, "show": False}
+	const [data, setData] = useState([]); //entry format: {"data": [], "sensor": 0, "color": color, "show": False}
+	const [lines, setLines] = useState([]);
 	const [bars, setBars] = useState([]);
 	const nBars = 50;
 	const {setGlobalLineBool} = useAppContext();
@@ -55,55 +32,34 @@ function Graph({ sensor_id, start, end, dummy }) {
 	//Handle data changes
 	useEffect(() => {
 		if (lineBool)
-			if(checkForLine(sensor_id))
+			if(checkData()){
+				setData(prev => prev.map(entry => entry.sensor===sensor_id ? ({...entry, showline:!entry.showline}):(entry)));
 				return;
-	
+			}
+		else
+			if(checkData())
+				return;
+				
 		axios.get('http://localhost:5000/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				setError(null);
-				//console.log(response);
-				if(lineBool){
-					addLine(response.data.data);
-				}else{
-					console.log("BARS: ", formatBars(response.data, nBars));
-					setBars(formatBars(response.data, nBars));
-				}
+				console.log("Sensor_id:", sensor_id);
+				console.log("Server's Response", response);
+				setData(prev => [...prev, {sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
 			}).catch(error => {
                     		console.error('Error fetching data:', error);
                     		setError(error.message);
                     		setLoading(false);
                 	});
-	}, [sensor_id, start, end]);
+	}, [sensor_id, start, end, dummy]);
 
-	//use dummy change to force updates when same button is consecutively pressed
-	useEffect(() => {
-		console.log("CLICK!!!");
-		if (lineBool)
-			if(checkForLine(sensor_id))
-				return;
-	}, [dummy]);
-	//push width, height changes to plot
 	/*useEffect(() => {
 		setGraphLayout(prev => lineGraphLayout(prev.shapes));
 	}, [width, height]);*/
-	
-  const addLine = (response) => {
-    let l = {"data": response, "sensor": sensor_id, "color":getObj("C"+sensor_id), "show": true}
-    setLines(prevItems => [...prevItems, l]);
-    return;
-  };
 
-  const checkForLine = () => {
-    if(lines.some(item=>item.sensor===sensor_id))
-    { 
-      const newLines = lines.map(item=>item.sensor===sensor_id ? {...item, show: !item.show} : item);
-      setLines(newLines);
-      return true;
-    }
-    return false;
-  };
-
+  //formatLine: format a sensor's data entry into plotly line
   const formatLine = (l) => {
+    //Takes in data 
     //console.log("Formatting line...");
     //console.log(l.data);
     let X  = [];
@@ -115,17 +71,23 @@ function Graph({ sensor_id, start, end, dummy }) {
     return { "x": X, "y": Y, type: "scatter", name: getObj("$"+l.sensor), mode: "lines", "marker": {"color": l.color}};
   }; 
 
-  const newBar = (b) => {
-    const x = new Array(b.data.length);
-    const y = new Array(b.data.length);
-    for(let i = 0; i < b.data.length; i++)
-    { x[i] = b.data[i][0];
-      y[i] = b.data[i][1]; }
-    return { "x": x, "y": y, type: "scatter", mode: "bar", "marker": {"color": b.color}};
-  }; 
+  //check if data already exists for current sensor
+  const checkData = () => {
+    return data.some(entry => entry.sensor === sensor_id);
+  };
 
+
+  //get the bars for graphing current sensor
+  const getBars = () => {
+    //console.log("Filtered Data:",filteredData());
+    const selectedData = filteredData().find(entry => entry.sensor === sensor_id);
+    if(selectedData)
+	return formatBars(selectedData, nBars);
+    else
+	return [];
+  };
   const formatBars = (b, n) => {
-    console.log("Formatting Bars:", b);
+    //console.log("Formatting Bars:", b);
     const step = (end-start)/n;
     let index = 0;
     let cutoff = start + step
@@ -155,6 +117,12 @@ function Graph({ sensor_id, start, end, dummy }) {
     }
     return {"x": X, "y": Y, type: "bar", "marker": {"color": Y.map(v => colorMap(v))}};
   }; 
+
+  //apply some transformation or filter to data
+  const filteredData = () => {
+	//console.log(data);
+	return data;
+  };
 
   const toggleLineBool = () => {
     let prevState = lineBool;
@@ -233,16 +201,16 @@ if (error)
 	{return (<div className="error-message">Error: {error}</div>);}
 
 return (
-    <div>
-        <h1>7-Day AQI Readings</h1>
+    <div className="Marginless">
+        <h1 className="Marginless">7-Day AQI Readings</h1>
         <div className="graphContainer" ref={ref}>
             <button className="Button" onClick={toggleLineBool} style={{width:"30%"}}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>
             {lineBool ? (
-		<Plot data={lines.filter(l => l.show).map(l => formatLine(l))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
+		<Plot data={filteredData().filter(entry => entry.showline).map(entry => formatLine(entry))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
             ) : (
-		<Plot data={[bars]} layout={graphLayout}/>
+		<Plot data={[getBars()]} layout={graphLayout}/>
             )}
         </div>
     </div>

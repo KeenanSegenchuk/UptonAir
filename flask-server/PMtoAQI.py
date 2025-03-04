@@ -31,7 +31,7 @@ def PMtoAQI(humidity, PMA, PMB):
 			AQI = f_AQI(iranges[i1], iranges[i2], pranges[i1], pranges[i2], avg)
 			PM_EPA = epaformulas[i](avg, humidity)
 			AQI_EPA = f_AQI(iranges[i1], iranges[i2], pranges[i1], pranges[i2], PM_EPA)
-			return [str(PM_EPA), str(int(AQI)), str(int(AQI_EPA))]
+			return [str(round(PM_EPA,3)), str(int(AQI)), str(int(AQI_EPA))]
 		i1 += 1
 		i2 += 1
 	

@@ -8,20 +8,23 @@ async def pullfn():
     sensorf = open("sensors.txt")
     sensorf = sensorf.read().splitlines()[1:]
     sensors = []
+    #get sensor IDs
     for line in sensorf:
         sensors.append(int(line.split(",")[1]))
 
-    file = open("data.txt", "r").read().splitlines()
-    while len(file[-1]) == 0 or file[-1][0] not in "0123456789":
-        print(f"Deleting non-data text line from data.txt: {file[-1]}")
-        del file[-1]
-
-    file = [x.split(",") for x in file]
-
+    #set max pull timespan to 2 weeks to avoid large api calls
     endtime = int(time())
     twoweeks = 604800
     starttime = time() - twoweeks
 
+    #open data file
+    file = open("data.txt", "r").read().splitlines()
+    while len(file[-1]) == 0 or file[-1][0] not in "0123456789":
+        print(f"Deleting non-data text line from data.txt: {file[-1]}")
+        del file[-1]
+    file = [x.split(",") for x in file]
+
+    #find the last data point from each sensor
     print(f"Checking for data pulled from sensors: {sensors}")
     lastSample = [-1 for sensor in sensors]
     for i in range(len(file)-1, -1, -1):
@@ -35,13 +38,14 @@ async def pullfn():
             break
     print(f"Pulling data after last entry: {lastSample}...")
 
+    #init constants for building api call 
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
-
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
     datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
     key = "97F2B4FA-DD87-11EF-A3B4-42010A800010"
 
+    #populate data with responses from purpleair's api
     data = []
     for sensor in sensors:
         if lastSample[sensors.index(sensor)] == -1:
@@ -49,29 +53,26 @@ async def pullfn():
         else:
             timeurl = "start_timestamp=" + str(lastSample[sensors.index(sensor)]) + "&end_timestamp=" + str(endtime)
 	
+	#build api call
         print(f'Pulling data from sensor: {sensor}')
         url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
         header = {"X-API-Key": key}
+	#pull from purpleair's api
         response = requests.get(url, headers=header)
         for line in response.content.decode('utf-8').splitlines():
             data.append(line)
             print(f'line: {line}')
 
-    #print(f"lenData: {len(data)}, dirty data: {data}")
-    data = cleanfn(data)
-    #print(f"lenData: {len(data)}, clean data: {data}")
-
-    # update file with new data
     file = open("data.txt", "a")
     i = 0
-
+    #append to existing data
     for line in data:
-        file.write(",".join(line) + "\n")
+        if line[0] in "0123456789":
+            file.write(line + "\n")
         i += 1
 
-    if i < len(data):
-        print(f"Stopped before writing remaining data: {data[i:]}")
-    return "finished pulling data"
+    #return oldest data point added to data so we know not to re-sort the data from before that
+    return min(int(x[:10]) for x in data if x[0] in "0123456789")
 
 
 

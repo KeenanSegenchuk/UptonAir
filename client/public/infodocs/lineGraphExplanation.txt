@@ -1,0 +1,9 @@
+[
+  {
+    "all": {"both":{"backgroundColor":"rgb(245, 200, 180);",}}
+    "title": "What is this graph?",
+    "body": "The above graph shows the past week of air quality data. " +
+            "Each line plots the AQI readings from 20-minute averages PM2.5 data from the air monitor on the map that is highlighted the same color. " +
+            "",
+  }
+]

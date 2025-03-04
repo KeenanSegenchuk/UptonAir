@@ -1,0 +1,7 @@
+[
+  {
+    "all": {"both":{"backgroundColor":"rgb(245, 200, 180);",}}
+    "title": "What is this graph?",
+    "body": "The above graph shows the past week of air quality data. Each bar represents the average AQI for that time-span. The color gradient of the graph shows the time of day, where the dar lines are centered around midnight and the light ones around noon. "
+  }
+]

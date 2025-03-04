@@ -1,0 +1,47 @@
+
+#pull aqi readings as a discrete-time signal
+@app.route("/api/wav/<string:query>")
+def wav(query):
+	# Get raw amplitude with fixed sampling frequency
+	# Options to fill in missing data should be zeroing or smoothing
+	# Query is used to set constants and should be in the form <code>:<value>,<code>:<value> etc...	
+	query = [pair.split(":") for pair in query.split(",")]
+
+	# Downsample to lambda second intervals of recording for uniform sampling rate
+	labda = 60*60    #code: &l
+	l = [pair for pair in query if pair[0] == "&l"]
+	if len(l) == 1:
+		labda = l[0][1]	
+
+	# Fill in missing data by zeroing or smoothing
+	zero = False #code: &z, valid values: 0 or 1
+	z = [pair for pair in query if pair[0] == "&z"]
+	if len(z) == 1:
+		zero = z[0][1]	
+
+	# Average sensors together, or make seperate vector?
+	combine = True #code: &c
+	c = [pair for pair in query if pair[0] == "&c"]
+	if len(c) == 1:
+		combine = c[0][1]	
+	
+	# Sensors IDs to include in the waveform 
+	sensors = [int(pair[1]) for pair in query if pair[0] == "&i"] #code: &i, make a new <code>,<value> pair for each sensor you want to include
+
+	# Whether you want AQI or PM2.5 values
+	aqi = [int(pair[1]) for pair in query if pair[0] == "&a"] #code: &a, make a new <code>,<value> pair for each sensor you want to include
+	
+	# Start Time
+	start = 0 #code: &s
+	s = [pair for pair in query if pair[0] == "&s"]
+	if len(s) == 1:
+		start = int(s[0][1])	
+
+	# End Time
+	end = float("Inf") #code: &e
+	e = [pair for pair in query if pair[0] == "&e"]
+	if len(e) == 1:
+		end = int(e[0][1])	
+
+	waveform = getWAV(sensors, start, end, labda, zero, combine)	
+	return waveform

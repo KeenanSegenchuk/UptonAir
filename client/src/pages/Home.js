@@ -23,7 +23,8 @@ function Home() {
     const [dummy, setDummy] = useState(false);
     const date = Date.now();
     const sec = 1000;
-    const week = sec * 60 * 60 * 24 * 7;
+    const hour = sec * 60 * 60;
+    const week = hour * 24 * 7;
 
     const setSensorPos = (temp_data) => {
 	console.log("sensors:");
@@ -45,14 +46,15 @@ function Home() {
     };
 
     const updateSensor = useCallback((newSensorValue) => {
+	console.log("Entering updateSensor... Dummy: ", dummy);
         setInfoSensor(newSensorValue);
-	setDummy(!dummy); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
+	setDummy(prev => !prev); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
     }, []);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/aqi/avg/1%20hour')
+        axios.get('http://localhost:5000/api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
-                console.log(response);
+                console.log("Homepage API Response:",response);
                 var temp_data = response.data;
                 setLoading(false);
 		setSensorPos(temp_data);
@@ -86,15 +88,20 @@ function Home() {
 
     //BAKCGROUND GRADIENT
     const gradient = {
-	background: "rgb(34,193,195)",
+	background: "#4f99c6",
+	/*background: "rgb(34,193,195)",
+	background: "#E7D2AB",
 	background: "linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)",
+	*/
     };
 
 
     return (
-	<div style = {gradient}>
+	<div style = {{ ...gradient, height: '100vh', overflow: 'scroll' }}>
             
+            <h1 className="title">Upton Air</h1>
 	{/*Header*/}
+	{/*
 	    <div className= "floatContainer">
                 <p>
               This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
@@ -108,27 +115,28 @@ function Home() {
                 </button>
                 </Link>
             </div>
-            <h1 className="title">Upton Air</h1>
-	
-	{/*Options Bar*/}
+	*/}
+
+	{/*Options Bar*/}{/*
 	    <div className="floatContainer">
 		<HoverButton className="Button" text={"Hover here to show location names."} hoverKey="labels"/>
 		<ToggleButton className="Button" text={"Click here to toggle annotations."} toggleKey="annotations"/>
 	    </div>
+	*/}
 	    
 	{/*Page Body*/}
-            <div className="floatContainer">
+            <div className="floatContainer" >
                 <Map className="floatBox" buttons={data} updateSensor={updateSensor} />
-                <div className="sinkContainer">
-        	    <Banner className="floatBox" avg={Math.round(100 * total / count) / 100} />
-       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor}/>
-		    <Graph sensor_id={infoSensor} start={Math.floor((date-week)/sec)} end={Math.floor(date/sec)} dummy={dummy}/> 
+                <div className="sinkContainer sensorInfo">
+       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
       		</div> 
             </div>
-
-	{/*Information*/}
-	    <InfoContainer infodoc="/infodocs/AQIranges.txt"/>
-	    <InfoContainer infodoc="/infodocs/influencesOnPMReadings.txt"/>
+	    {/*Information*/}
+	    <div className="infodiv">
+		<InfoContainer infodoc="/infodocs/AQIranges.txt"/>
+		<div style={{height: "25px"}}/>
+		<InfoContainer infodoc="/infodocs/influencesOnPMReadings.txt"/>
+	    </div>
 	</div>
     );
 }

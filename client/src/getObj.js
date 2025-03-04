@@ -23,6 +23,8 @@ function getObj(obj) {
 	"name": "Uxbridge",
         "x": 0,
         "y": 97,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "black"
     },
     {
@@ -30,34 +32,44 @@ function getObj(obj) {
 	"name": "Memorial",
         "x": 33.9,
         "y": 52.7,
+	"xLabelOffset": 0,
+	"yLabelOffset": -1.75,
 	"color": "green"
     },
     {
         "id": "222641",
 	"name": "Mendon & Grove",
-        "x": 49.8,
-        "y": 63.3,
+        "x": 50.8,
+        "y": 63.7,
+	"xLabelOffset": 0,
+	"yLabelOffset": -1.75,
 	"color": "khaki"
     },
     {
         "id": "222275",
 	"name": "Kiwanis Stoplight",
-        "x": 45.9,
-        "y": 41.5,
+        "x": 46.7,
+        "y": 42.2,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color":"red"
     },
     {
         "id": "222537",
 	"name": "Coach Rd. Appts.",
-        "x": 27.3,
-        "y": 51.8,
+        "x": 26.3,
+        "y": 53,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "blue"
     },
     {
 	"id": "221859",
 	"name": "Community Center",
 	"x": 47,
-	"y": 52,
+	"y": 52.5,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "purple"
     },
     {
@@ -65,6 +77,8 @@ function getObj(obj) {
 	"name": "Victoria Dr.",
 	"x": 28.4,
 	"y": 58.5,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "orange"
     },
     {
@@ -72,21 +86,32 @@ function getObj(obj) {
 	"name": "Nipmuc HS",
         "x": 30.8,
         "y": 63.9,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "slateblue"
     },
     {
         "id": "222529",
 	"name": "Rockwood Meadows",
-        "x": 77,
+        "x": 84,
         "y": 34.5,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "sienna"
     },
     {
         "id": "222757",
 	"name": "Touchstone School",
-        "x": 5,
-        "y": 42.2,
+        "x": 4,
+        "y": 42.5,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
 	"color": "brown"
+    },
+    {
+	"id": "0",
+	"name": "Upton Town Average",
+	"color": "white"
     }
 ];
 
@@ -101,19 +126,25 @@ function getObj(obj) {
 		return "src/getObj: sensor id not found.";
 	case "Q":
 	case "q":
-		return qualities
+		return qualities;
 	case "C":
 		sensor_id = obj.substring(1,7);
 		return positions[positions.findIndex(item => item.id === sensor_id)].color;
 		return "src/getObj: sensor id not found.";
 	case "c":
-		return colors
+		return colors;
 	case "R":
 	case "r":
-		return ranges
+		return ranges;
 	case "P":
 	case "p":
-		return positions
+		return positions;
+	case "O":
+	case "o":
+		sensor_id = obj.substring(1,7);
+		let object = positions.find(sensor => sensor.id.trim() === sensor_id.trim());
+		if (object) {
+			return [object.xLabelOffset, object.yLabelOffset];}
     }
     
     console.log("getObj COULD NOT RECOGNIZE OBJECT:");

@@ -8,6 +8,7 @@ function Button({ id, val, x, y, updateSensor }) {
     const ranges = getObj("r");
     const colors = getObj("c");
     const name = getObj("$" + id);
+    const labelOffsets = getObj("O" + id);
     const scale = [1020, 723];
     const { globalLineBool, hover } = useAppContext();
     const [toggle, setToggle] = useState(false);
@@ -48,16 +49,16 @@ function Button({ id, val, x, y, updateSensor }) {
 
     const labelStyle = {
       position: "absolute",
-      fontSize: '8px', // small text
+      fontSize: '10px', // small text
       fontWeight: 'bold', // bold text
       backgroundColor: '#f4e1a1', // manila color (a soft yellow)
       padding: '0', // no padding
       margin: '0', // no margins
-      top: (y+2.3)+"%",
-      left: x+"%",
+      top: (y+labelOffsets[1])+"%",
+      left: (x+labelOffsets[0])+"%",
       whiteSpace:"nowrap",
-      width:"auto",
-      display:"inline-block"
+      width:`${name.length * 6.5}px`,
+      zIndex:9
     };
 
     return (
@@ -81,7 +82,7 @@ function Button({ id, val, x, y, updateSensor }) {
                 {/* Button content can be added here */}
             </button>
 	    {(hover==hoverKey || bhover) ? (
-		<div><input type="text" placeholder={name} style={labelStyle}/></div>
+		<input type="text" placeholder={name} style={labelStyle}/>
 	    ):null}
         </div>
     );
