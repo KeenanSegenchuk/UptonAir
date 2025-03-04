@@ -6,7 +6,7 @@ Here's what I've got so far:
 ![image](https://github.com/KeenanSegenchuk/UptonAir/blob/main/images/HomeBarGraph.PNG)
 
 
-By default the webpage shows the average for all the sensors in the town, but you can select one on the map to view its data. You can also graph the data from multiple sensors using the Line Graph as shown below:
+By default the webpage shows the average for all the sensors in the town, but you can select one on the map to view its data. All the data on the right side corresponds to the sensor listed at the top of the right side of the page. You can also graph the data from multiple sensors using the Line Graph as shown below:
 ![image](https://github.com/KeenanSegenchuk/UptonAir/blob/main/images/HomeLineGraph.PNG)
 
 There's also some more explicatory info if you scroll down. This info is defined in /client/public/infodocs.
