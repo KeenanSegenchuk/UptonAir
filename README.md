@@ -9,4 +9,6 @@ Here's what I've got so far:
 By default the webpage shows the average for all the sensors in the town, but you can select one on the map to view its data. You can also graph the data from multiple sensors using the Line Graph as shown below:
 ![image](https://github.com/KeenanSegenchuk/UptonAir/blob/main/images/HomeLineGraph.PNG)
 
+There's also some more explicatory info if you scroll down. This info is defined in /client/public/infodocs.
+
 <br> You can view the Purple Air sensors here: https://map.purpleair.com/1/mAQI/a10/p604800/cC0#10.23/42.1606/-71.7123
