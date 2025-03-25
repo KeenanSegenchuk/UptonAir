@@ -2,15 +2,17 @@ import "../App.css";
 function Banner({ avg }) {
     const { getObj } = require("../getObj");
     const qualities = getObj("qualities");
-    const colors = getObj("c");
+    const colors = getObj("v");
+    const textColors= getObj("t");
     const ranges = getObj("r");
 
     let color;
+    let textColor
     let quality;
 
 	
     ranges.some((range, i) => {
-	if(avg<=range) {color = colors[i]; quality = qualities[i]; return true;}
+	if(avg<=range) {textColor = textColors[i]; color = colors[i]; quality = qualities[i]; return true;}
 	return false;
     });
 

@@ -64,11 +64,13 @@
 /*Homepage Title*/
 .title {
     border:2px solid white;
+    background:#38ba5b;
+}
+.titleText {
+    margin-top:8px;
+    width:100%;
     text-align:center;
     line-height:1.35;
-    margin:0px;
-    width:100%;
-    background:#38ba5b;
 }
 /*Allignment styles*/
 .sinkBox {
@@ -160,4 +162,23 @@
 .infodiv{
     margin: 20px;
     background-color: "rgba(0,0,0,0)";
+}
+{/*Grid Layout for start of home page*/}
+.gridContainer{
+    display: grid;
+    gap: 0px;
+    grid-template-rows: 10% 90%;
+    grid-template-columns: 9fr 0fr;
+} 
+.gridHeader{
+    grid-column: 1 / span 2;
+    grid-row: 1;
+}
+.gridMap{
+    grid-colum: 1;
+    grid-row: 2;
+}
+.gridSensorInfo{
+    grid-column: 2 / span 2;
+    grid-row: 2;
 }

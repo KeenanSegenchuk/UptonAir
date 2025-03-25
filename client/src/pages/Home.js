@@ -6,6 +6,7 @@ import Map from "../components/Map";
 import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
 import HoverButton from "../components/HoverButton";
+import LinkButton from "../components/LinkButton";
 import ToggleButton from "../components/ToggleButton";
 import InfoContainer from "../components/InfoContainer";
 import Graph from "../components/Graph";
@@ -98,44 +99,27 @@ function Home() {
 
     return (
 	<div style = {{ ...gradient, height: '100vh', overflow: 'scroll' }}>
-            
-            <h1 className="title">Upton Air</h1>
-	{/*Header*/}
-	{/*
-	    <div className= "floatContainer">
-                <p>
-              This is the home page. Click on the button below to learn more about us, or contact us if you want to learn more!
-                </p>
-                <Link to="/about"><button className="Button">
-              About Us
-                </button>
-                </Link>
-                <Link to="/contact"><button className="Button">
-              Contact Us
-                </button>
-                </Link>
-            </div>
-	*/}
 
-	{/*Options Bar*/}{/*
-	    <div className="floatContainer">
-		<HoverButton className="Button" text={"Hover here to show location names."} hoverKey="labels"/>
-		<ToggleButton className="Button" text={"Click here to toggle annotations."} toggleKey="annotations"/>
+	    {/*Header*/}
+	    <div className="title" style={{display:"flex", aligItems:"center", flexDirection:"horizontal"}}>
+                <h1 className="titleText">Upton Air</h1>
+	        <LinkButton style={{marginLeft:"auto", marginRight: "0"}} text="Get Notified" href="http://localhost:3000/alerts"/>
 	    </div>
-	*/}
-	    
-	{/*Page Body*/}
+
+	    {/*Page Body*/}
             <div className="floatContainer" >
                 <Map className="floatBox" buttons={data} updateSensor={updateSensor} />
                 <div className="sinkContainer sensorInfo">
        		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
       		</div> 
             </div>
+	    
+	
 	    {/*Information*/}
 	    <div className="infodiv">
 		<InfoContainer infodoc="/infodocs/AQIranges.txt"/>
 		<div style={{height: "25px"}}/>
-		<InfoContainer infodoc="/infodocs/influencesOnPMReadings.txt"/>
+		<InfoContainer infodoc="/infodocs/Particulate Pollution Patterns.txt"/>
 	    </div>
 	</div>
     );

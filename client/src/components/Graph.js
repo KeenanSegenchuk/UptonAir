@@ -8,17 +8,28 @@ import { getObj } from "../getObj";
 import "../App.css";
 
 function Graph({ sensor_id, start, end, dummy }) {
-    	const [loading, setLoading] = useState(false);
+	/* Graph sensor_id's readings from start to end.
+	 * Author: Keenan
+	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
+	 */   	
+
+	const [loading, setLoading] = useState(false);
     	const [error, setError] = useState(null);
 	const ref = useRef(null);
 	const [width, setWidth] = useState(1000);
 	const [height, setHeight] = useState(300);
 
-
 	const [data, setData] = useState([]); //entry format: {"data": [], "sensor": 0, "color": color, "show": False}
 	const [lines, setLines] = useState([]);
 	const [bars, setBars] = useState([]);
-	const nBars = 50;
+
+	//setup nBars slider functionality
+	const [nBars, setN] = useState(50); 
+	const handleSlider = (e) => {
+	    setN(parseInt(e.target.value));
+	};
+
+
 	const {setGlobalLineBool} = useAppContext();
 	const [lineBool, setLineBool] = useState(false);
 	const [graphLayout, setGraphLayout] = useState({});
@@ -208,10 +219,25 @@ return (
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>
             {lineBool ? (
-		<Plot data={filteredData().filter(entry => entry.showline).map(entry => formatLine(entry))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
+		<div>
+		    <center>*Click a button on the map to toggle displaying it on the line graph</center>
+		    <Plot data={filteredData().filter(entry => entry.showline).map(entry => formatLine(entry))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
+		</div>
             ) : (
-		<Plot data={[getBars()]} layout={graphLayout}/>
-            )}
+		<div>
+		    <h2>Use slider to set number of bars:</h2>
+		    <input
+		        type="range"
+		        min="7" //1 bar per day
+		        max="1008" // 1 bar per sample
+		        value={nBars}
+		        onChange={handleSlider}
+		        style={{ width: '100%' }}
+		    />
+		    <Plot data={[getBars()]} layout={graphLayout}/>
+		</div>
+            )}    
+	    <center>*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
         </div>
     </div>
 );

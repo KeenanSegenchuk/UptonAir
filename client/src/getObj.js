@@ -12,6 +12,18 @@ function getObj(obj) {
 			"rgb(255, 0, 0)",
 			"rgb(137, 9, 151)",
 			"rgb(100, 0, 21)"];
+    const vibrColors = ["rgb(0,228,0)",
+			"rgb(255,255,0)",
+			"rgb(255,126,0)",
+			"rgb(255,0,0)",
+			"rgb(143,63,151)",
+			"rgb(126,0,35)"];
+    const textColors = ["black",
+			"black",
+			"black",
+			"black",
+			"white",
+			"white"];
 
     const ranges = [50, 100, 150, 200, 300, 10000];
 
@@ -133,6 +145,12 @@ function getObj(obj) {
 		return "src/getObj: sensor id not found.";
 	case "c":
 		return colors;
+	case "T":
+	case "t":
+		return textColors;
+	case "V":
+	case "v":
+		return vibrColors;
 	case "R":
 	case "r":
 		return ranges;

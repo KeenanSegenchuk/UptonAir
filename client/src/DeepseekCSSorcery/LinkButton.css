@@ -1,0 +1,74 @@
+/* Modern Link Button */
+.modern-link-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  z-index: 1;
+  border: none;
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.modern-link-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+}
+
+.modern-link-button:active {
+  transform: translateY(0);
+}
+
+.button-text {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.button-icon {
+  position: relative;
+  z-index: 2;
+  margin-left: 8px;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+.modern-link-button:hover .button-icon {
+  transform: translateX(4px);
+}
+
+.hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.modern-link-button:hover .hover-effect {
+  opacity: 1;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+.pulse-effect {
+  animation: pulse 2s infinite;
+}
