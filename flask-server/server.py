@@ -26,6 +26,7 @@ def members():
 	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segenchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter Friedland is a passionate environmental activist with extensive experience in Air Quality. He runs the brains of the operation along with Laurie.", "Laurie Woodland is a passionate environmental activist with extensive experience in Air Quality. She runs the brains of the operation along with Peter."]}
 
 # API ROUTES
+alert_bp = Blueprint('alerts', __name__, url_prefix='/alerts') #API for submitting and withdrawing emails/phone #s from alerts system
 aqi_bp = Blueprint('aqi', __name__, url_prefix='/api/aqi') #API for pulling AQI readings
 raw_bp = Blueprint('raw', __name__, url_prefix='/api/raw') #API for pulling raw data
 sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo') #API for preformated sensorinfo JSON
@@ -35,6 +36,37 @@ sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo')
 def raw_data():
 	with open(datafile, "r") as data:
 		return data.read()
+
+# ALERTS
+@alert_bp.route("/<string:media>/<string:action>/<string:address>", methods=["POST"])
+def handle_contact_info(media, action, address):
+	#media specifices whether this contact info is your "phone" or "email", 
+	#action specifies whether you wanna add or remove that phone/email from the list,
+	#address is the email address or phone number
+	efile = "alerts/mailing list.txt"
+	pfile = "alerts/phone list.txt"
+	file = efile if media == "email" else pfile
+
+	with open(file, "r") as f:
+		list = f.read().splitlines()
+
+	if action == "add":
+		if address in list:
+			return "Entry already in list."
+		with open(file, "a") as f:
+			f.write(address + "\n")
+	if action == "remove":	
+		oldlen = len(list)	
+		list = [entry for entry in list if entry != address]
+		newlen = len(list)
+		list = "\n".join(list) + "\n"	
+	
+		with open(file, "w") as f:
+			f.write(list)
+		if oldlen == newlen:
+			return f"Contact info not found in {media} list." 
+	return "Success updating contact info."
+app.register_blueprint(alert_bp)
 
 # AQI
 update_lock = threading.Lock()
@@ -175,7 +207,7 @@ async def update():
 	print("Finished Updating.")
 
 print("Updating data...")
-#asyncio.run(update())    
+asyncio.run(update())    
 
 if __name__ == "__main__":
 	app.run(debug=True)

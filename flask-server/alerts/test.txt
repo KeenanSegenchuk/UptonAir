@@ -1,0 +1,6 @@
+Subject: Testing air quality alert system...
+
+
+This message is being automatically sent via secure smtp server to test Sustainable Upton's air quality alert system.
+
+Cheers!
