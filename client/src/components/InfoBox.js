@@ -1,7 +1,7 @@
 import React from 'react';
 
 const InfoBox = ({ title, body, style, images }) => {
-  console.log("InfoBox Style:", style); 
+  //console.log("InfoBox Style:", style); 
   return (
     <div style={style.both}>
 	<div style={style.title}>

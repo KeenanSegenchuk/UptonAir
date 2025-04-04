@@ -26,8 +26,8 @@ const InfoContainer = ({ infodoc }) => {
 
   return (
     <div>
-	{infolist ? (infolist.map((info) => (
-	    <InfoBox images={info.images && info.images} title={info.title} body={info.body && info.body} style={{
+	{infolist ? (infolist.map((info, index) => (
+	    <InfoBox id={index} images={info.images && info.images} title={info.title} body={info.body && info.body} style={{
 		title: {...(allStyle.title || {}),
 			...(info.style?.title || {})},
 		both:  {...(allStyle.both || {}),

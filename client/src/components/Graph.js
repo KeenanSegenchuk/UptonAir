@@ -18,8 +18,9 @@ function Graph({ sensor_id, start, end, dummy }) {
 	const ref = useRef(null);
 	const [width, setWidth] = useState(1000);
 	const [height, setHeight] = useState(300);
+	const {dataContext} = useAppContext();
 
-	const [data, setData] = useState([]); //entry format: {"data": [], "sensor": 0, "color": color, "show": False}
+	const [data, setData] = useState([]); //entry format: {"start": start time(in seconds), "data": [], "sensor": 0, "color": color, "show": False}
 	const [lines, setLines] = useState([]);
 	const [bars, setBars] = useState([]);
 
@@ -28,7 +29,6 @@ function Graph({ sensor_id, start, end, dummy }) {
 	const handleSlider = (e) => {
 	    setN(parseInt(e.target.value));
 	};
-
 
 	const {setGlobalLineBool} = useAppContext();
 	const [lineBool, setLineBool] = useState(false);
@@ -54,9 +54,10 @@ function Graph({ sensor_id, start, end, dummy }) {
 		axios.get('http://localhost:5000/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				setError(null);
-				console.log("Sensor_id:", sensor_id);
-				console.log("Server's Response", response);
-				setData(prev => [...prev, {sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
+				console.log("Existing Data:", data);
+				//console.log("Sensor_id:", sensor_id);
+				//console.log("Server's Response", response);
+				setData(prev => [...prev, {context: dataContext, sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
 			}).catch(error => {
                     		console.error('Error fetching data:', error);
                     		setError(error.message);
@@ -84,7 +85,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 
   //check if data already exists for current sensor
   const checkData = () => {
-    return data.some(entry => entry.sensor === sensor_id);
+    return data.some(entry => entry.sensor === sensor_id && entry.start === start);
   };
 
 
@@ -131,8 +132,9 @@ function Graph({ sensor_id, start, end, dummy }) {
 
   //apply some transformation or filter to data
   const filteredData = () => {
-	//console.log(data);
-	return data;
+	const fd = data.filter(entry => entry.context === dataContext);
+	console.log("Filtered Data: ", fd);
+	return fd;
   };
 
   const toggleLineBool = () => {
@@ -221,7 +223,7 @@ return (
             {lineBool ? (
 		<div>
 		    <center>*Click a button on the map to toggle displaying it on the line graph</center>
-		    <Plot data={filteredData().filter(entry => entry.showline).map(entry => formatLine(entry))} layout={graphLayout}/> /*RANGEBREAKS FOR X AXIS DATES?*/
+		    <Plot data={filteredData().filter(entry => entry.showline).map(entry => formatLine(entry))} layout={graphLayout}/>
 		</div>
             ) : (
 		<div>
@@ -229,7 +231,7 @@ return (
 		    <input
 		        type="range"
 		        min="7" //1 bar per day
-		        max="1008" // 1 bar per sample
+		        max={(end-start)/600} // 1 bar per sample
 		        value={nBars}
 		        onChange={handleSlider}
 		        style={{ width: '100%' }}

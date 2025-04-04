@@ -16,6 +16,11 @@ function Button({ id, val, x, y, updateSensor }) {
     const [bhover, setbHover] = useState(false);
     const hoverKey = "labels";
 
+    const {dataContext} = useAppContext();
+    const contexts = getObj("DataContexts");
+    const [contextToggles, setContextToggles] = useState(new Array(contexts.length).fill(false));
+
+
     // Calculate the color based on val
     let color = "default";
     for (let i = 0; i < ranges.length; i++) {
@@ -27,14 +32,20 @@ function Button({ id, val, x, y, updateSensor }) {
 
     const handleButtonClick = (sensorValue, event) => {
         if (globalLineBool) {
-	    if (toggle) {
+	    const cidx = contexts.indexOf(dataContext);
+	    const ctoggle = contextToggles[cidx];
+	    if (ctoggle) {
 		setBorderStyle("none");
 	    }
 	    else {
             	const borderColor = getObj("C" + id);
             	setBorderStyle("5px solid " + borderColor);
 	    }
-	    setToggle(!toggle);
+	    setContextToggles(prev => {
+		const next = [...prev];
+		next[cidx] = !ctoggle;
+		return next;
+	    });
         }
         event.preventDefault(); 
         updateSensor(sensorValue); 

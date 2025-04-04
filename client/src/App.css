@@ -62,6 +62,12 @@
     padding:0px;
 }
 /*Homepage Title*/
+.blue{
+    background:#4f99c6;
+}
+.green { 
+    background:#38ba5b;
+}
 .title {
     border:2px solid white;
     background:#38ba5b;

@@ -3,6 +3,7 @@ import axios from 'axios';
 import "../App.css";
 import Graph from './Graph';
 import Banner from './Banner';
+import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 
 function SensorInfo({ sensor_id, dummy }) {
@@ -11,17 +12,26 @@ function SensorInfo({ sensor_id, dummy }) {
     const [error, setError] = useState(null);
     const [graphURL, setGraphURL] = useState('');
     const [sensorName, setSensorName] = useState('');
+    const [contextIndex, setIndex] = useState(1);
+    const {setDataContext} = useAppContext();
 
     const d = Date.now();
     const sec = 1000;
-    const week = sec * 60 * 60 * 24 * 7;
+    const day = sec * 60 * 60 * 24;
+    const week = day * 7;
+    const end = Math.floor(d/sec);
+
+    const dataContexts = [{context: "30-Day", timespan: "30 days", end: end, start: Math.floor((d-30*day)/sec)}, 
+		{context: "7-Day", timespan: "7 days", end: end, start: Math.floor((d-week)/sec)}, 
+		{context: "1-Day", timespan: "1 day", end: end, start: Math.floor((d-day)/sec)}, 
+		{context: "6-Hour", timespan: "6 hours", end: end, start: Math.floor(d/sec-6*60*60)}];
 
     useEffect(() => {
 	setSensorName(getObj("$" + sensor_id));
         //console.log(sensor_id);
         axios.get('http://localhost:5000/api/aqi/sensorinfo/'+sensor_id)
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 setData(response.data);
                 setLoading(false);
                 setError(null);
@@ -53,6 +63,11 @@ function SensorInfo({ sensor_id, dummy }) {
         );
     }
 
+    const infoClick = (index) => {
+	setIndex(index);
+	setDataContext(dataContexts[index].context);
+    };
+
     return (
 	<div style = {{textAlign: "center",border: "5px solid black", width: "100%"}}>
 	<center>
@@ -61,14 +76,14 @@ function SensorInfo({ sensor_id, dummy }) {
 
     	    <h1 className="Marginless">Recent AQI Averages:</h1>
             <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', gap: '0'}}>
-                {data.inputs.map((input, index) => (
+                {data.avgs.map((avg, index) => (
                     <div key={index} style={{ margin: "0", display: 'flex', flexDirection: 'column', width: "22%"}}>
-                        <h1 className="floatBox" style={{ fontSize: "24px", marginBottom: '0', height: '35px' }}>{input}</h1>
-                        <h1 className="floatBox" style={{ marginTop: '0', height: '35px' }}>{Math.round(100 * data.avgs[index]) / 100}</h1>
+                        <button className="floatBox" onClick={() => infoClick(index)} style={{fontSize: "24px", marginBottom: '0', height: '55px' }}>{dataContexts[index].context}</button>
+                        <h1 className="floatBox" style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}findcolorofAQI`), marginTop: '0', height: '35px' }}>{Math.round(100 * avg) / 100}</h1>
                     </div>
                 ))}
             </div>
-	    <Graph sensor_id={sensor_id} start={Math.floor((d-week)/sec)} end={Math.floor(d/sec)} dummy={dummy}/> 
+	    <Graph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	</center>
 	</div>
     );

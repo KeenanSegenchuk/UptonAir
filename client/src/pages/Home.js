@@ -31,20 +31,21 @@ function Home() {
 	console.log("sensors:");
 	console.log(sensors);
 	const ids = sensors.map(sensors => sensors.id);
-	console.log(ids);
+	//console.log(ids);
 	for (let i = 0; i <temp_data.length; i++) {
 		const id = temp_data[i]["id"];
 		const index = ids.indexOf(id.toString()); 
-		console.log("id,index");
-		console.log(id);
-		console.log(index);
+		//console.log("id,index");
+		//console.log(id);
+		//console.log(index);
 		temp_data[i]["name"] = sensors[index]["name"];
 		temp_data[i]["x"] = sensors[index]["x"];
 		temp_data[i]["y"] = sensors[index]["y"];
 	}
 	setData(temp_data);
-	console.log(temp_data);
+	//console.log("SETTING BUTTONS", temp_data);
     };
+    
 
     const updateSensor = useCallback((newSensorValue) => {
 	console.log("Entering updateSensor... Dummy: ", dummy);
@@ -53,6 +54,8 @@ function Home() {
     }, []);
 
     useEffect(() => {
+	//init map button positions if data unavailable
+	setSensorPos(sensors)
         axios.get('http://localhost:5000/api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
                 console.log("Homepage API Response:",response);
@@ -98,7 +101,7 @@ function Home() {
 
 
     return (
-	<div style = {{ ...gradient, height: '100vh', overflow: 'scroll' }}>
+	<div className="blue" style = {{ height: '100vh', overflow: 'scroll' }}>
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", aligItems:"center", flexDirection:"horizontal"}}>
@@ -108,8 +111,10 @@ function Home() {
 
 	    {/*Page Body*/}
             <div className="floatContainer" >
-                <Map className="floatBox" buttons={data} updateSensor={updateSensor} />
+                {/* Map */}
+		<Map className="floatBox" buttons={data} updateSensor={updateSensor} />
                 <div className="sinkContainer sensorInfo">
+		    {/* Summary and Graph */}
        		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
       		</div> 
             </div>

@@ -24,6 +24,10 @@ function getObj(obj) {
 			"black",
 			"white",
 			"white"];
+    const dataContexts=["30-Day",
+			"7-Day",
+			"1-Day",
+			"6-Hour"];
 
     const ranges = [50, 100, 150, 200, 300, 10000];
 
@@ -148,6 +152,12 @@ function getObj(obj) {
 	case "T":
 	case "t":
 		return textColors;
+	case "X": 
+		const value = parseFloat(obj.substring(1,7));
+		//console.log("GETOBJ  X VALUE:", value);
+		const index = ranges.findIndex(item => item > value);
+		//console.log("RETURNING COLOR FROM GETOBJ", vibrColors[index]);
+		return vibrColors[index];
 	case "V":
 	case "v":
 		return vibrColors;
@@ -157,6 +167,9 @@ function getObj(obj) {
 	case "P":
 	case "p":
 		return positions;
+	case "D":
+	case "d":
+		return dataContexts;
 	case "O":
 	case "o":
 		sensor_id = obj.substring(1,7);

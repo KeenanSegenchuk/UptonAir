@@ -99,7 +99,12 @@ function Alerts() {
 
     return (
       <div style={{width:"100%"}}>
-	<LinkButton style={{height:"20px", marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href="http://localhost:3000"/>
+	{/*Header*/}
+	<div className="title" style={{display:"flex", height:"70px", aligItems:"center", flexDirection:"horizontal"}}>
+	    <LinkButton style={{marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href="http://localhost:3000"/>
+            <h1 className="titleText" style={{position: "absolute"}}>Upton Air</h1>
+	</div>
+	
         <div className="alerts-container">
 	        <center className="title">
                     <h1>Air Quality Alerts</h1>
