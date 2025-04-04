@@ -8,7 +8,8 @@ def cleanfn(data_filename, cutoff):
 	
 	header = data.pop(0)
 	#bisect to find cutoff, extract after, sort, write
-	i = bisect.bisect_left(data, cutoff, key=lambda x: int(x[:10]))
+	second_data = [int(x[:10]) for x in data]
+	i = bisect.bisect_left(second_data, cutoff)
 	old_data = [header] + data[:i]
 	new_data = data[i:]
 	data = ""

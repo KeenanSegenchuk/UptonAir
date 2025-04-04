@@ -1,7 +1,5 @@
 # This is our backend file
-import matplotlib
 import asyncio
-matplotlib.use('Agg')
 from flask import Flask, Blueprint, request
 from flask_cors import CORS
 #from clean import *
@@ -9,12 +7,12 @@ from pullfn import *
 #from get import *
 from fileUtil import getSensors, getLastTimestamp
 from getByDate import *
-import matplotlib.pyplot as plt 
 import json
 import os
 import threading
-from numpy import linspace
+from waitress import serve
 from datetime import datetime
+from postgresql.pgUtil import *
 
 app = Flask(__name__)
 CORS(app)
@@ -36,6 +34,9 @@ sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo')
 def raw_data():
 	with open(datafile, "r") as data:
 		return data.read()
+@app.route("/PGtest")
+def test():
+	return pgTest()
 
 # ALERTS
 @alert_bp.route("/<string:media>/<string:action>/<string:address>", methods=["POST"])
@@ -69,11 +70,6 @@ def handle_contact_info(media, action, address):
 app.register_blueprint(alert_bp)
 
 # AQI
-update_lock = threading.Lock()
-def acquire_lock():
-    update_lock.acquire()
-def release_lock():
-    update_lock.release()
 
 #update data if out of date
 @aqi_bp.before_request
@@ -82,13 +78,11 @@ async def check_data():
 	rn = datetime.now().timestamp()
 	half_hour_ago = rn - 60*30
 	
-	await asyncio.to_thread(acquire_lock)
-
 	last_sample = getLastTimestamp()
 	if last_sample < half_hour_ago:
-		await update()
+		print("BOUTTA UPDATE THE DATA")
+		asyncio.create_task(update())
 
-	release_lock()	
 
 # Average the AQI of all sensors in for given timespan
 @aqi_bp.route("/avg/<int:start>-<int:end>")
@@ -102,6 +96,7 @@ def avg_aqi(start, end):
 		data = [int(x[7]) for x in data]
 		if len(data) > 0:
 			response += [{'avg': sum(data)/len(data), 'id': sensor}]
+	print(f"outgoing response: {response}")
 
 	return json.dumps(response, indent=4)
 
@@ -165,8 +160,8 @@ def sensorinfo(sensor_id):
 				totals[i] += aqi
 	avgs = [totals[i]/counts[i] if counts[i] > 0 else -1 for i in range(len(starts))]		
 
-	if avgs[-1] == -1:
-		update()
+	#if avgs[-1] == -1:
+		#await update()
 
 	response = {
 		"id": sensor_id,
@@ -192,7 +187,6 @@ def raw2(start, end, sensor_id):
 # Register Blueprint
 app.register_blueprint(raw_bp)
 
-#pull data from purpleair to update archive
 app.config["updating"] = False
 async def update():
 	print("Updating Archive...")
@@ -206,8 +200,12 @@ async def update():
 	app.config["updating"] = False
 	print("Finished Updating.")
 
-print("Updating data...")
-asyncio.run(update())    
+#print("Updating data...")
+#asyncio.run(update())    
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	#Production server:
+	pgInit(datafile)
+	serve(app, host="0.0.0.0", port=5000)
+	#Development server:
+	#app.run(debug=True)

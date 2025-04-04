@@ -1,0 +1,5 @@
+Flask[async]==3.0.3
+Waitress==3.0.2
+Flask-Cors==5.0.0
+requests==2.31.0
+psycopg2-binary==2.9.10
