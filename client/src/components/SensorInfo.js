@@ -10,7 +10,6 @@ function SensorInfo({ sensor_id, dummy }) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [graphURL, setGraphURL] = useState('');
     const [sensorName, setSensorName] = useState('');
     const [contextIndex, setIndex] = useState(1);
     const {setDataContext} = useAppContext();

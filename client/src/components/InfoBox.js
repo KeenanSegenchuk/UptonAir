@@ -12,7 +12,7 @@ const InfoBox = ({ title, body, style, images }) => {
 	</div>
 	<div style={style.images}>
 		{images && images.map((image, index) => (
-				<img src={image} alt="Cannot load image."/>
+				<img src={image} key={index} alt="Cannot load image." loading="eager"/>
 		))}
 	</div>
     </div>

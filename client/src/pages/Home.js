@@ -1,15 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import "../App.css";
-import { Link } from 'react-router-dom'
 import Map from "../components/Map";
-import Banner from "../components/Banner";
 import SensorInfo from "../components/SensorInfo";
-import HoverButton from "../components/HoverButton";
 import LinkButton from "../components/LinkButton";
-import ToggleButton from "../components/ToggleButton";
 import InfoContainer from "../components/InfoContainer";
-import Graph from "../components/Graph";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
@@ -20,7 +15,6 @@ function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [infoSensor, setInfoSensor] = useState(0);
-    const sensorPos = "/sensor-pos.json";
     const [dummy, setDummy] = useState(false);
     const date = Date.now();
     const sec = 1000;
@@ -28,22 +22,23 @@ function Home() {
     const week = hour * 24 * 7;
 
     const setSensorPos = (temp_data) => {
-	console.log("sensors:");
-	console.log(sensors);
-	const ids = sensors.map(sensors => sensors.id);
+	//console.log("sensors:");
+	//console.log(sensors);
+	const ids = temp_data.map(sensors => sensors.id.toString());
 	//console.log(ids);
-	for (let i = 0; i <temp_data.length; i++) {
-		const id = temp_data[i]["id"];
-		const index = ids.indexOf(id.toString()); 
+	for (let i = 0; i <sensors.length; i++) {
+		const id = sensors[i]["id"];
+		const index = ids.indexOf(id); 
 		//console.log("id,index");
 		//console.log(id);
 		//console.log(index);
-		temp_data[i]["name"] = sensors[index]["name"];
-		temp_data[i]["x"] = sensors[index]["x"];
-		temp_data[i]["y"] = sensors[index]["y"];
+		if(index >= 0)
+			sensors[i].avg = temp_data[index].avg;
+		else
+			sensors[i].avg = -1;
 	}
-	setData(temp_data);
-	//console.log("SETTING BUTTONS", temp_data);
+	setData(sensors);
+	//console.log("SETTING BUTTONS", sensors);
     };
     
 
@@ -51,7 +46,7 @@ function Home() {
 	console.log("Entering updateSensor... Dummy: ", dummy);
         setInfoSensor(newSensorValue);
 	setDummy(prev => !prev); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
-    }, []);
+    }, [dummy]);
 
     useEffect(() => {
 	//init map button positions if data unavailable
@@ -68,7 +63,7 @@ function Home() {
                 setError(error);
                 setLoading(false);
             });
-    }, []);
+    });
 
     if (loading) {
         return <h1>Loading... </h1>;
@@ -91,13 +86,12 @@ function Home() {
     //console.log(total + ", " + count);
 
     //BAKCGROUND GRADIENT
+    /* currently not used *
     const gradient = {
-	background: "#4f99c6",
-	/*background: "rgb(34,193,195)",
+	background: "rgb(34,193,195)",
 	background: "#E7D2AB",
 	background: "linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)",
-	*/
-    };
+    };                    */
 
 
     return (

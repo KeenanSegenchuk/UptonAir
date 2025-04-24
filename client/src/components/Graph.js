@@ -1,14 +1,13 @@
 import Plot from 'react-plotly.js';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
-import VertAxis from "./VertAxis";
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
 import "../App.css";
 
 function Graph({ sensor_id, start, end, dummy }) {
-	/* Graph sensor_id's readings from start to end.
+	/* Graph sensor_id's readings from times start to end.
 	 * Author: Keenan
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
@@ -21,8 +20,6 @@ function Graph({ sensor_id, start, end, dummy }) {
 	const {dataContext} = useAppContext();
 
 	const [data, setData] = useState([]); //entry format: {"start": start time(in seconds), "data": [], "sensor": 0, "color": color, "show": False}
-	const [lines, setLines] = useState([]);
-	const [bars, setBars] = useState([]);
 
 	//setup nBars slider functionality
 	const [nBars, setN] = useState(50); 
@@ -44,7 +41,8 @@ function Graph({ sensor_id, start, end, dummy }) {
 	useEffect(() => {
 		if (lineBool)
 			if(checkData()){
-				setData(prev => prev.map(entry => entry.sensor===sensor_id ? ({...entry, showline:!entry.showline}):(entry)));
+				if(sensor_id !== 0)
+					setData(prev => prev.map(entry => entry.sensor===sensor_id ? ({...entry, showline:!entry.showline}):(entry)));
 				return;
 			}
 		else
@@ -85,7 +83,9 @@ function Graph({ sensor_id, start, end, dummy }) {
 
   //check if data already exists for current sensor
   const checkData = () => {
-    return data.some(entry => entry.sensor === sensor_id && entry.start === start);
+    console.log(`Checking if data already exists; sensor = ${sensor_id} and context = ${dataContext}`)
+    console.log("Result: " + data.some(entry => entry.sensor === sensor_id && entry.context === dataContext));
+    return data.some(entry => entry.sensor === sensor_id && entry.context === dataContext);
   };
 
 
@@ -98,7 +98,11 @@ function Graph({ sensor_id, start, end, dummy }) {
     else
 	return [];
   };
+
+  //average data into n bars
   const formatBars = (b, n) => {
+    if(b.data.length == n)
+	return b.data
     //console.log("Formatting Bars:", b);
     const step = (end-start)/n;
     let index = 0;
@@ -110,11 +114,12 @@ function Graph({ sensor_id, start, end, dummy }) {
     let y;
     let count = 0;
     for(let i = 0; i < b.data.length; i++)
-    { x = b.data[i][0]; 
+    { //average data into n bars
+      x = b.data[i][0]; 
       y = b.data[i][1];
       if(x >= cutoff){
-        X[index] = (cutoff-.5*step)*1000;
-	if(count != 0){
+        X[index] = cutoff*1000;
+	if(count !== 0){
           Y[index] = ty/count;
         }else{
 	  Y[index] = 0;
@@ -127,13 +132,18 @@ function Graph({ sensor_id, start, end, dummy }) {
       ty += y;
       count++;
     }
+    if(ty > 0 && count > 0)
+    {
+        Y[index] = ty/count;
+        X[index] = cutoff*1000;	
+    }
     return {"x": X, "y": Y, type: "bar", "marker": {"color": Y.map(v => colorMap(v))}};
   }; 
 
   //apply some transformation or filter to data
   const filteredData = () => {
 	const fd = data.filter(entry => entry.context === dataContext);
-	console.log("Filtered Data: ", fd);
+	//console.log("Filtered Data: ", fd);
 	return fd;
   };
 
@@ -176,6 +186,7 @@ function Graph({ sensor_id, start, end, dummy }) {
   };
 
   const lineGraphLayout = (shapes) => {
+	//Wrap line graph gradient shapes with the rest of the layout config for the line graph
 	//console.log("Shapes:",shapes);
 	return {
                 width: width, 
@@ -237,6 +248,7 @@ return (
 		        style={{ width: '100%' }}
 		    />
 		    <Plot data={[getBars()]} layout={graphLayout}/>
+		<center>*Bar graph's times are not exact, may be off by up to 10 minutes.</center>
 		</div>
             )}    
 	    <center>*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>

@@ -4,6 +4,10 @@ import "../App.css";
 import HoverButton from "./HoverButton";
 
 function Map({ buttons, updateSensor }) {
+    console.log("MAP BUTTONS: " + buttons);
+    buttons.forEach((button, index) => {
+      console.log(`Button ${index + 1}:`, button);
+    });
     return (
         <div className="map-container">
             <div className="sensorOverlay">

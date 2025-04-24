@@ -11,9 +11,12 @@
       }
     },
     "style": {
-	"both": {
-		"text-align": "center"
-    	}
+      "title": {
+	"font-size": "3em"
+      },
+      "both": {
+	"text-align": "center"
+      }
     },
     "title": "Particulate Pollution Patterns",
     "body": "We have noticed some patterns in the air quality data that we've archived. This section of the website discusses those patterns."

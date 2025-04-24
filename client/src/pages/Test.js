@@ -1,48 +1,34 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import "../App.css";
-import { Link } from 'react-router-dom'
-const { getObj } = require("../getObj");
-const sensors = getObj("positions");
 
 
 
-function Home() {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-
-    useEffect(() => {
-        axios.get('http://localhost:5000/PGtest')
-            .then(response => {
-                console.log("Homepage API Response:",response);
-                setData(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setError(error);
-                setLoading(false);
-            });
-    }, []);
-
-    if (loading) {
-        return <h1>Loading... </h1>;
-    }
-
-    if (error) {
-        return <h1>Error: {error.message}</h1>;
-    }
+function Test() {
 
     return (
 	<div>
-		{data.map((line, index) => (
-			<div>{line}</div>
-		))}
+		<center><h1>Test Page</h1></center>
+		Test Images:	
+		<img src="/figs/upton.png" alt="Map"/>
+		<img src="/figs/daily_avgs.png" alt="Graph"/>
+		<img src="/figs/daily_avgs_aqi.png" alt="Graph"/>
+		<img src="/figs/hourly_avgs.png" alt="Graph"/>
+		<img src="/figs/hourly_avgs_aqi.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_1.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_2.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_3.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_4.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_5.png" alt="Graph"/>
+		<img src="/figs/sampling_artifacts_6.png" alt="Graph"/>
+		<img src="/figs/test.png" alt="jpg_test"/>
+		<img src="/figs/narrow_snip.png" alt="narrow_snip_png"/>
+		<img src="/figs/narrow_snip.jpeg" alt="narrow_snip_jpeg"/>
+		<img src="/figs/wide_snip.png" alt="wide_snip_png"/>
+		<img src="/figs/wide_snip.jpeg" alt="wide_snip_jpeg"/>
 	</div>
     );
 }
 
-export default Home;
+export default Test;
 

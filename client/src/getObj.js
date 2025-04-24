@@ -1,18 +1,21 @@
 function getObj(obj) {
-    const qualities = ["It’s a great day to be active outside.",
+    const qualities = ["Air quality is impossibly good, this is showing up because of an internal error.",
+			"It’s a great day to be active outside.",
 			"Unusually sensitive people: Consider making outdoor activities shorter and less intense. Go inside if you have symptoms such as coughing or shortness of breath.",
 			"Sensitive groups: Make outdoor activities shorter and less intense. It’s OK to be active outdoors but take more breaks. Watch for symptoms such as coughing or shortness of breath. People with asthma: Follow your asthma action plan and keep quick relief medicine handy. People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. If you have any of these, contact your health care provider.",
 			"Sensitive groups: Consider rescheduling or moving all activities inside. Go inside if you have symptoms. People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. If you have any of these, contact your health care provider. Everyone else: Keep outdoor activities shorter and less intense. Go inside if you have symptoms.",
 			"Sensitive groups: Avoid all physical activity outdoors. Reschedule to a time when air quality is better or move activities indoors.* People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. If you have any of these, contact your health care provider. Everyone else: Limit outdoor physical activity. Go indoors* if you have symptoms.",
 			"Sensitive groups: Stay indoors and keep activity levels light. Follow tips for keeping particle levels low indoors.* People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. If you have any of these, contact your health care provider. Everyone: Avoid all physical activity outdoors.* *WARNING*: If it's hot out and you have no air conditioner, closing your windows can make your house dangerously hot."];
 
-    const colors =     ["rgb(158, 255, 145)", 
+    const colors =     ["rgb(250, 250, 240)",
+			"rgb(158, 255, 145)", 
 			"rgb(255, 255, 0)",
 			"rgb(255, 130, 0)",
 			"rgb(255, 0, 0)",
 			"rgb(137, 9, 151)",
 			"rgb(100, 0, 21)"];
-    const vibrColors = ["rgb(0,228,0)",
+    const vibrColors = ["rgb(250, 250, 240)",
+			"rgb(0,228,0)",
 			"rgb(255,255,0)",
 			"rgb(255,126,0)",
 			"rgb(255,0,0)",
@@ -22,14 +25,16 @@ function getObj(obj) {
 			"black",
 			"black",
 			"black",
+			"black",
 			"white",
 			"white"];
+
+    const ranges = [0, 50, 100, 150, 200, 300, 10000];
+
     const dataContexts=["30-Day",
 			"7-Day",
 			"1-Day",
 			"6-Hour"];
-
-    const ranges = [50, 100, 150, 200, 300, 10000];
 
     let sensor_id = obj.substring(1,7);
 
@@ -40,7 +45,7 @@ function getObj(obj) {
         "x": 0,
         "y": 97,
 	"xLabelOffset": 0,
-	"yLabelOffset": 2,
+	"yLabelOffset": -2,
 	"color": "black"
     },
     {
@@ -48,7 +53,7 @@ function getObj(obj) {
 	"name": "Memorial",
         "x": 33.9,
         "y": 52.7,
-	"xLabelOffset": 0,
+	"xLabelOffset": -1,
 	"yLabelOffset": -1.75,
 	"color": "green"
     },
@@ -84,8 +89,8 @@ function getObj(obj) {
 	"name": "Community Center",
 	"x": 47,
 	"y": 52.5,
-	"xLabelOffset": 0,
-	"yLabelOffset": 2,
+	"xLabelOffset": 3,
+	"yLabelOffset": 0,
 	"color": "purple"
     },
     {
@@ -127,9 +132,29 @@ function getObj(obj) {
     {
 	"id": "0",
 	"name": "Upton Town Average",
-	"color": "white"
+	"color": "white",
+	"x": 0,
+	"y": 0,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2
     }
 ];
+    /* CODES *//*
+	call getObj(code) to access static objects stored in this file
+	
+	$ + <id> : get name for given sensor id
+	Q / q : get list of text descriptions of the air quality ranges
+	C + <id> : get color assigned to the line and button highlight of a sensor
+	c : get list of AQI colors
+	T / t : get list of text colors used to make white text for more contrast on high-AQI dark-colored backgrounds
+	X + <aqi value> : get vibrant AQI color for the range of a given value
+	V / v : get list of vibrant AQI range colors
+	R / r : get list of upper bounds of AQI ranges
+	P / p : get list of positions of sensors on the map
+	D / d : get list of timeframes available for plotting on Graph
+	O / o + <id> : get info object contianing id, name, x, y, label offsets (for map button labels), and that sensor's color on the line graph 
+	
+    */
 
     switch (obj.substring(0,1)) {
 	case "$":
@@ -146,7 +171,6 @@ function getObj(obj) {
 	case "C":
 		sensor_id = obj.substring(1,7);
 		return positions[positions.findIndex(item => item.id === sensor_id)].color;
-		return "src/getObj: sensor id not found.";
 	case "c":
 		return colors;
 	case "T":
@@ -176,11 +200,13 @@ function getObj(obj) {
 		let object = positions.find(sensor => sensor.id.trim() === sensor_id.trim());
 		if (object) {
 			return [object.xLabelOffset, object.yLabelOffset];}
+		break;
+	default:   
+    		console.log("getObj COULD NOT RECOGNIZE OBJECT:");
+    		console.log("obj");
+    		return []
     }
-    
-    console.log("getObj COULD NOT RECOGNIZE OBJECT:");
-    console.log("obj");
-    return []
+
 }
 
 module.exports = { getObj };

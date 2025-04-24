@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 import "../App.css";
@@ -9,9 +8,7 @@ function Button({ id, val, x, y, updateSensor }) {
     const colors = getObj("c");
     const name = getObj("$" + id);
     const labelOffsets = getObj("O" + id);
-    const scale = [1020, 723];
     const { globalLineBool, hover } = useAppContext();
-    const [toggle, setToggle] = useState(false);
     const [borderStyle, setBorderStyle] = useState("none");
     const [bhover, setbHover] = useState(false);
     const hoverKey = "labels";
@@ -26,6 +23,8 @@ function Button({ id, val, x, y, updateSensor }) {
     for (let i = 0; i < ranges.length; i++) {
         if (val < ranges[i]) {
             color = colors[i];
+	    if(i == 0)
+		val = -1;
             break;
         }
     }
@@ -60,7 +59,7 @@ function Button({ id, val, x, y, updateSensor }) {
 
     const labelStyle = {
       position: "absolute",
-      fontSize: '10px', // small text
+      fontSize: '14px', // small text
       fontWeight: 'bold', // bold text
       backgroundColor: '#f4e1a1', // manila color (a soft yellow)
       padding: '0', // no padding
@@ -68,7 +67,7 @@ function Button({ id, val, x, y, updateSensor }) {
       top: (y+labelOffsets[1])+"%",
       left: (x+labelOffsets[0])+"%",
       whiteSpace:"nowrap",
-      width:`${name.length * 6.5}px`,
+      width:`${name.length * 9}px`, //adjust length based on length of text
       zIndex:9
     };
 
