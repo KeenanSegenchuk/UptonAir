@@ -1,1 +1,0 @@
-sensor index moved to getObj.js
