@@ -2,15 +2,12 @@
 import asyncio
 from flask import Flask, Blueprint, request, send_from_directory
 from flask_cors import CORS
-#from clean import *
 from pullfn import *
-#from get import *
 from fileUtil import getSensors, getLastTimestamp
 from getByDate import *
 import json
 import os
 import threading
-from waitress import serve
 from datetime import datetime
 from pgUtil import *
 from updateTask import update_loop
