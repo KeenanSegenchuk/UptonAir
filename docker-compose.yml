@@ -1,0 +1,72 @@
+services:
+  react-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build-client
+    working_dir: /app/client
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  flask-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: flask-server
+    environment:
+      - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
+      - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
+    ports:
+      - "5000:5000"  # Expose port 5000 to the host
+    depends_on:
+      - react-client
+      - pgdb
+    volumes:
+      - react-build:/app/flask-server/static 
+
+  pgdb:
+    image: postgres:17
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=passw0rd
+      - POSTGRES_DB=postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  data-updater:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: flask-server
+    command: python updateTask.py
+    environment:   
+      - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
+      - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
+      - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
+      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
+      - LOOP=1 # 0 to disable update loop
+    depends_on:
+      - pgdb
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx 
+    ports:
+      - "80:80"  # Exposes port 80 for web traffic
+    depends_on:
+      - flask-server  # Ensures Flask is up before Nginx
+    volumes:
+      - react-build:/usr/share/nginx/html  # Mount the shared volume here
+
+volumes:
+  data:
+    driver: local
+  react-build:  # Define the shared volume here
+    driver: local
