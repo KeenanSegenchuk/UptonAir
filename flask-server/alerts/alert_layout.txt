@@ -1,0 +1,7 @@
+Subject: Upton Air Quality Alert...
+
+
+You are recieving this email because the average EPA adjusted AQI rating in Upton ({}) has surpased the cutoff ({}) you specified when signing up for alerts.
+To unsubscribe or update your alert configuration, visit: ourwebsite.url/alerts 
+
+Cheers!

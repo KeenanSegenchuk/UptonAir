@@ -34,5 +34,5 @@ def cleanfn(data_filename, cutoff):
 	with open(data_filename, "w") as dfile:
 		dfile.write(data)
 	
-#cleanfn("data.txt", 1741107600)
-cleanfn("data.txt", 0)
+if __name__ == "__main__":
+	cleanfn("data.txt", 1744819800)

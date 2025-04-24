@@ -4,7 +4,7 @@ from time import time
 import asyncio
 import sys
 
-async def pullfn():
+async def pullfn(return_data = False):
     sensorf = open("sensors.txt")
     sensorf = sensorf.read().splitlines()[1:]
     sensors = []
@@ -64,15 +64,18 @@ async def pullfn():
             print(f'line: {line}')
 
     file = open("data.txt", "a")
-    i = 0
+    #keep track of new data to push to postgres
+    new_lines = []
     #append to existing data
     for line in data:
-        if line[0] in "0123456789":
+        if len(line) > 0 and line[0] in "0123456789":
+            new_lines += [line]
             file.write(line + "\n")
-        i += 1
 
     #return oldest data point added to data so we know not to re-sort the data from before that
-    return min(int(x[:10]) for x in data if x[0] in "0123456789")
-
+    if return_data:
+        return [min(int(x[:10]) for x in data if x[0] in "0123456789"), new_lines]
+    else:
+        return min(int(x[:10]) for x in data if x[0] in "0123456789")
 
 

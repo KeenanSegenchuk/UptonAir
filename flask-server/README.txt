@@ -20,5 +20,6 @@ File Structure:
   /pyvenv.cfg
 	*Contains the server's virtual environment config
   /data analysis
-	*Contains extra and backup data, analysis functions, and deprecated functions
-
+	*Contains extra and backup data, analysis functions, and other replaced python files
+  /updateTask
+	*Contains the code for loop that perpetually updates the data, but that code is ran in a seperate docker container from the rest of the server.

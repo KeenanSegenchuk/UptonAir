@@ -1,6 +1,6 @@
 # This is our backend file
 import asyncio
-from flask import Flask, Blueprint, request
+from flask import Flask, Blueprint, request, send_from_directory
 from flask_cors import CORS
 #from clean import *
 from pullfn import *
@@ -12,7 +12,8 @@ import os
 import threading
 from waitress import serve
 from datetime import datetime
-from postgresql.pgUtil import *
+from pgUtil import *
+from updateTask import update_loop
 
 app = Flask(__name__)
 CORS(app)
@@ -34,9 +35,6 @@ sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo')
 def raw_data():
 	with open(datafile, "r") as data:
 		return data.read()
-@app.route("/PGtest")
-def test():
-	return pgTest()
 
 # ALERTS
 @alert_bp.route("/<string:media>/<string:action>/<string:address>", methods=["POST"])
@@ -67,101 +65,108 @@ def handle_contact_info(media, action, address):
 		if oldlen == newlen:
 			return f"Contact info not found in {media} list." 
 	return "Success updating contact info."
+
+@alert_bp.route("add/<string:address>/<int:min_AQI>/", methods=["POST"])
+def add_alert(address, min_AQI):
+	#action specifies whether you wanna add or remove that phone/email from the list,
+	#address is the email address or phone number
+	#min_AQI is the minimum aqi to trigger an alert
+	table = "alerts"
+	DATA_ROW = (address, min_AQI, 0) #a row of data has this format, the last entry is the last time an alert has been issued to the given contact address
+	conn, cur = pgOpen()
+	if pgCheck(cur, table):
+		print("Found alerts table...")
+	else:
+		pgBuildAlertsTable(cur)
+		print("Built new Alerts table because none was found...")
+	pgPushAddress(cur, DATA_ROW)
+	pgClose(conn, cur)
+
+@alert_bp.route("remove/<string:address>/", methods=["POST"])
+def remove_alert(address):
+	#action specifies whether you wanna add or remove that phone/email from the list,
+	#address is the email address or phone number
+	#min_AQI is the minimum aqi to trigger an alert
+	table = "alerts"
+	conn, cur = pgOpen()
+	if pgCheck(cur, table):
+		print("Found alerts table...")
+	else:
+		print("Could not find table to remove address from.")
+
+	pgRemoveAddress(cur, address)
+	pgClose(conn, cur)
+
 app.register_blueprint(alert_bp)
 
 # AQI
-
-#update data if out of date
-@aqi_bp.before_request
-async def check_data():
-	#pull new data if none within past half hour
-	rn = datetime.now().timestamp()
-	half_hour_ago = rn - 60*30
-	
-	last_sample = getLastTimestamp()
-	if last_sample < half_hour_ago:
-		print("BOUTTA UPDATE THE DATA")
-		asyncio.create_task(update())
-
 
 # Average the AQI of all sensors in for given timespan
 @aqi_bp.route("/avg/<int:start>-<int:end>")
 def avg_aqi(start, end):
 	print(f"Avg AQI from {start} to {end} Requested...")
 	sensors = getSensors()
-	
-	response = []
-	for sensor in sensors:
-		data = getByDate(sensor,start,end)
-		data = [int(x[7]) for x in data]
-		if len(data) > 0:
-			response += [{'avg': sum(data)/len(data), 'id': sensor}]
-	print(f"outgoing response: {response}")
 
+	#connect to postgres database
+	conn, cur = pgOpen()
+	response = []
+	#get avg for each sensor
+	for sensor in sensors:
+		pgQuery(cur, start, end, sensor, col = "AQI")
+		data = cur.fetchone()
+		try:
+			response += [{"avg": sum(data)/len(data), "id": sensor}]
+		except:
+			print(f"Error averaging aqi data: {data}")
+	pgClose(conn, cur) 
+	
+	print(f"outgoing response: {response}")
 	return json.dumps(response, indent=4)
 
 #pull time, aqi data for given timespan and sensor for plotting
 @aqi_bp.route("/time/<int:start>-<int:end>/<int:sensor_id>")
 def aqi3(start, end, sensor_id):
-	def avgAllSensors(data):
-		newdata = []
-		time = 0
-		total = 0
-		count = 0
-		for entry in data:
-			if time != entry[0]:
-				if count != 0:
-					newdata += [[int(time), total/count]]
-				time = entry[0]
-				total = 0
-				count = 0
-			total += int(entry[7])
-			count += 1
-		if count != 0:
-			newdata += [[int(time), total/count]]
-		return newdata
-
+	conn, cur = pgOpen()
 	if sensor_id == 0:
-		sensors = getSensors()
-		data = getByDate(sensors, start, end)
-		data = avgAllSensors(data)
+		pgQuery(cur, start, end, sensor_id, "time, AVG(AQI) AS average_AQI")
+		data = cur.fetchall()
 	else:
-		data = getByDate(sensor_id, start, end)
-		data = [[float(x[0]), int(x[7])] for x in data]
+		pgQuery(cur, start, end, sensor_id, "time, AQI")
+		data = cur.fetchall()
+
+	#type and sort(?) unsorted pg data	
+	data = [[row[0], int(row[1])] for row in data]
+	#data.sort(key= lambda x: (x[0], x[1]))
+
+	#package data
 	data = {"data": data}
+	pgClose(conn, cur) 
 
 	return json.dumps(data, indent=4)
 
 #Get aqi averages for each sensor for past x days/hours
 @aqi_bp.route("/sensorinfo/<int:sensor_id>")
-def sensorinfo(sensor_id):
-	if sensor_id == 0:
-		sensors = getSensors()
-	
-	averages = ["30 days","7 days", "1 day", "6 hours"]
+def sensorinfo(sensor_id):	
+	averages = ["30 days","7 days", "1 day", "6 hours", "1 hour"]
 	hour = 60*60
 	day = 24*hour
 	end = datetime.now().timestamp()
 	starts = [end-day*30, end-day*7, end-day, end-6*hour, end-hour]
-	if sensor_id == 0:
-		data = getByDate(sensors, starts[0], end)
-	else:
-		data = getByDate(sensor_id, starts[0], end)
-
-	counts = [0]*len(starts)
-	totals = [0]*len(starts)
-	for line in data:
-		time = int(line[0])
-		aqi = int(line[7])
-		#add aqi to avg for time range(s) that contain it
-		for i in range(len(starts)):
-			if time >= starts[i]:
-				counts[i] += 1
-				totals[i] += aqi
-	avgs = [totals[i]/counts[i] if counts[i] > 0 else -1 for i in range(len(starts))]		
-
-	#if avgs[-1] == -1:
-		#await update()
+	
+	conn, cur = pgOpen()
+	avgs = []		
+	for i, start in enumerate(starts):
+		if sensor_id == 0:
+			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
+		else:
+			pgQuery(cur, start, end, sensor_id, col = "AQI")
+		avg = cur.fetchone()
+		if avg:
+			avgs += [avg] 
+		else:
+			avgs += [-1]
+			print(f"No samples from sensor {sensor_id} in the past {averages[i]}.")
+	pgClose(conn, cur)
 
 	response = {
 		"id": sensor_id,
@@ -169,7 +174,7 @@ def sensorinfo(sensor_id):
 		"inputs": averages,
 		"banner_avg": avgs[-1]
 	}
-	print(json.dumps(response, indent=4))
+	#print(json.dumps(response, indent=4))
 	return response
 
 # Register Blueprint
@@ -187,25 +192,30 @@ def raw2(start, end, sensor_id):
 # Register Blueprint
 app.register_blueprint(raw_bp)
 
-app.config["updating"] = False
-async def update():
-	print("Updating Archive...")
-	if app.config["updating"]:
-		print("Already Updating.")
-		return
-	app.config["updating"] = True
-	cutoff = await pullfn()
-	print(f"About to clean after cutoff: {cutoff-60*10}")
-	cleanfn(datafile, cutoff-60*10)
-	app.config["updating"] = False
-	print("Finished Updating.")
+def test():
+	with open('tests.py') as f:
+		exec(f.read())
 
-#print("Updating data...")
-#asyncio.run(update())    
+# Catch all non-API routes and serve index.html
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
+# Since updateTask is moved to it's own image for production launch, 
+# when when launching dev server, I now use "/update" to trigger a database update
+@app.route('/update')
+def update():
+	print("Update API called. This should not be in the production build.")
+	update_loop()
+	return ""
+
+
+#test()
 
 if __name__ == "__main__":
-	#Production server:
-	pgInit(datafile)
-	serve(app, host="0.0.0.0", port=5000)
 	#Development server:
-	#app.run(debug=True)
+	app.run(debug=False)
