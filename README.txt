@@ -7,7 +7,7 @@ Workflows:
 			to install dependencies, run the command "pip install -r requirements.txt"
 			to run the server, run "python -m flask --app server run"
 			you will need to install pgAdmin to use the postgre database
-			to update data from dev environment, visit localhost:port/update
+			to update data from dev workflow, visit localhost:3000/update
 		in client:
 			to install dependencies, run the command "npm install"
 			to run launch the client, run "npm start"
