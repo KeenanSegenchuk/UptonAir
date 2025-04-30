@@ -11,6 +11,7 @@ Workflows:
 		in client:
 			to install dependencies, run the command "npm install"
 			to run launch the client, run "npm start"
+		type the url http//localhost:3000 in your browser to view the page
 	Production:
 		When installing:
 			install docker
