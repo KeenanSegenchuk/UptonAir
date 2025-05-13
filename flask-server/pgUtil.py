@@ -122,6 +122,7 @@ def pgQuery(cur, start, end, sensor, col = "*"):
 
 def pgPushData(cur, data):
 	#print(f"Pushing data {data}")
+	#TODO: check for PM2.5 > 999 and humidity > .999 to filter out anamolous readings that don't fit database
 	cur.executemany("""
 		    INSERT INTO readings (time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA)
 		    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
