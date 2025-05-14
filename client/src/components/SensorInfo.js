@@ -7,6 +7,10 @@ import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 
 function SensorInfo({ sensor_id, dummy }) {
+    const api = axios.create({
+      baseURL: process.env.API_URL,
+    });
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,7 +32,7 @@ function SensorInfo({ sensor_id, dummy }) {
     useEffect(() => {
 	setSensorName(getObj("$" + sensor_id));
         //console.log(sensor_id);
-        axios.get('http://localhost:5000/api/aqi/sensorinfo/'+sensor_id)
+        api.get('/aqi/sensorinfo/'+sensor_id)
             .then(response => {
                 //console.log(response);
                 setData(response.data);

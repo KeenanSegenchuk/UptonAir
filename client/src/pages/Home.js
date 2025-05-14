@@ -11,6 +11,10 @@ const sensors = getObj("positions");
 
 
 function Home() {
+    const api = axios.create({
+      baseURL: process.env.API_URL,
+    });
+
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -51,7 +55,7 @@ function Home() {
     useEffect(() => {
 	//init map button positions if data unavailable
 	setSensorPos(sensors)
-        axios.get('http://localhost:5000/api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
+        api.get('/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
                 console.log("Homepage API Response:",response);
                 var temp_data = response.data;

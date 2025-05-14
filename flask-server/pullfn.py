@@ -43,7 +43,7 @@ async def pullfn(return_data = False):
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
     datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
-    key = "97F2B4FA-DD87-11EF-A3B4-42010A800010"
+    key = "A52182AD-3030-11F0-81BE-42010A80001F"
 
     #populate data with responses from purpleair's api
     data = []
@@ -73,9 +73,14 @@ async def pullfn(return_data = False):
             file.write(line + "\n")
 
     #return oldest data point added to data so we know not to re-sort the data from before that
+    try:
+        oldest_point = min(int(x[:10]) for x in data if x[0] in "0123456789")
+    except:
+        #return if no data was recieved from the API call
+        return 0   
     if return_data:
-        return [min(int(x[:10]) for x in data if x[0] in "0123456789"), new_lines]
+        return [oldest_point, new_lines]
     else:
-        return min(int(x[:10]) for x in data if x[0] in "0123456789")
+        return oldest_point
 
 
