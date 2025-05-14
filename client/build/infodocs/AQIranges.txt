@@ -1,0 +1,118 @@
+[
+  {
+    "all": {
+      "both": {
+	"border": "2px solid black",
+        "padding": "10px"
+      },
+      "title": {
+	"font-size": "1.25em"
+      }
+    },
+    "style": {
+      "title": {
+	"font-size": "3em"
+      },
+      "both": {
+	"text-align": "center",
+        "backgroundColor": "#E7D2AB"
+      }
+    },
+    "title": "What is AQI?",
+    "body": [
+      "Air Quality Index is a standardized air pollution unit developed by the EPA to make readings scale linearly with the severity of the resulting health effects. ",
+      "AQI is used for various pollutants: particulate matter, ozone, carbon monoxide, nitrogen dioxide, sulfure dioxide. ",
+      "Our censors only measure particulate matter, so the AQI values and health effects reported on this page are only for particulate pollution. ",
+      "Since both the chemical composition of particulate pollution and individuals' sensitivy to it can vary from day to day, and person to person, ",
+      "so you are encouraged to use these data we report within the greater context of how you analyze your health. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(0,228,0)"
+      }
+    },
+    "title": "Good (0-50)",
+    "body": [
+      "It's a great day to be active outside. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(255,255,0)"
+      }
+    },
+    "title": "Moderate (51-100)",
+    "body": [
+      "Unusually sensitive people: Consider making outdoor activities shorter and less intense. ",
+      "Go inside if you have symptoms such as coughing or shortness of breath. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(255,126,0)"
+      }
+    },
+    "title": "Unhealthy for Sensitive Groups (101-150)",
+    "body": [
+      "Sensitive groups: Make outdoor activities shorter and less intense. It’s OK to be active outdoors but take more breaks. ",
+      "Watch for symptoms such as coughing or shortness of breath. ",
+      "People with asthma: Follow your asthma action plan and keep quick relief medicine handy. ",
+      "People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. ",
+      "If you have any of these, contact your health care provider. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(255,0,0)"
+      }
+    },
+    "title": "Unhealthy (151-200)",
+    "body": [
+      "Sensitive groups: Consider rescheduling or moving all activities inside. Go inside if you have symptoms. ",
+      "People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. ",
+      "People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. ",
+      "If you have any of these, contact your health care provider. ",
+      "Everyone else: Keep outdoor activities shorter and less intense. ",
+      "Go inside if you have symptoms. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(143,63,151)",
+	"color": "white"
+      }
+    },
+    "title": "Very Unhealthy (201-300)",
+    "body": [
+      "Sensitive groups: Avoid all physical activity outdoors. Reschedule to a time when air quality is better or move activities indoors. ",
+      "People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. ",
+      "People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. ",
+      "If you have any of these, contact your health care provider. ",
+      "Everyone else: Limit outdoor physical activity. ",
+      "Go indoors if you have symptoms. "
+    ]
+  },
+  {
+    "style": {
+      "both": {
+        "backgroundColor": "rgb(126,0,35)",
+	"color": "white"
+      }
+    },
+    "title": "Hazardous (301+)",
+    "body": [
+      "Sensitive groups: Stay indoors and keep activity levels light. Follow tips for keeping particle levels low indoors. ",
+      "People with asthma: Follow your asthma action plan and keep quick-relief medicine handy. ",
+      "People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. ",
+      "If you have any of these, contact your health care provider. ",
+      "Everyone: Avoid all physical activity outdoors. "
+    ]
+  }
+]
+

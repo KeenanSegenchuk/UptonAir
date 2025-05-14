@@ -1,0 +1,74 @@
+[
+  {
+    "all": {
+      "title": {
+	"font-size": "1.25em"
+      },
+      "both": {
+        "backgroundColor": "#E7D2AB",
+	"border": "2px solid black",
+        "padding": "10px"
+      }
+    },
+    "style": {
+      "title": {
+	"font-size": "3em"
+      },
+      "both": {
+	"text-align": "center"
+      }
+    },
+    "title": "Particulate Pollution Patterns",
+    "body": "We have noticed some patterns in the air quality data that we've archived. This section of the website discusses those patterns."
+  },
+  {
+    "title": "Temperature Inversion",
+    "body": ["The temperature inversion phenomenon is when sunlight heats up the ground and in turn the air closest to the ground, causing it ", 
+      "to rise up and disperse ground-level pollutants throughout the atmosphere. This causes air quality readings to improve despite higher ", 
+      "pollutant production throughout the day as the ground absorbs more heat from the sun. Due to this phenomenon, Upton tends to experience ",
+      "its best air quality in the evening while air temperature is dropping, but the ground is still holding some of the heat it absorbed throughout the day."
+    ]
+  },
+  {
+    "title": "Seasonal Changes",
+    "body": ["According Western Mass' Healthy Air Network (healthyairnetwork.org/measuring-air-quality/#SensorDataAnalysis), ",
+      "air quality is generally worse in the middle of winter and summer. ",
+      "Their data shows the 5 months with the worst air quality are, in order: July, August, June, December, January. "
+    ]
+  },
+  {
+    "style": {
+	"images": {
+		"display":"flex",
+		"justifyContent":"space-evenly",
+		"alignItems":"center"
+	}
+    },
+    "title": "Conclusions from Our Data",
+    "body": ["While our own town's data only goes back to Summer 2024, Uxbridge has a sensor that has been up since ",
+      "May 2023. Below are a couple graphs that plot Uxbrdiges average PM2.5 readings for given times of the day/week. ",
+      "On the Left: Here you can see the effects of temperature inversion on average PM2.5 reading for each hour of the day. ",
+      "On the Right: Average PM2.5 readings for each day of the week show that weekends have the highest ground-level air pollution."
+    ],
+    "images": ["/figs/hourly_avgs.png", "figs/daily_avgs.png"]
+  },
+  {
+    "style": {
+	"images": {
+		"display":"flex",
+		"justifyContent":"space-evenly",
+		"alignItems":"center"
+	}
+    },
+    "title": "Limitations of Our Data",
+    "body": ["The data we archive and display on this site is list of observations made by a sensor over a period of time. ",
+	"These data are not always a perfect representation of reality, for instance purpleair sensors are sensitive to humidity, ",
+	"so we apply a transformation to the PM_2.5 and humidity readings to make them correlate better with more advanced EPA sensors. ",
+	"Most data you encounter in the real world has some transformation applied to it; even the 'raw data' we pull from the purpleair API is the average concentration the air monitor observed over a ten-minute period. ",
+	"We can see on the images below that this transformation occasionally produces slightly negative particulate concentrations, ",
+	"which is not physically possible. The following images also show how your perception of the data becomes more detailed as the sampling frequency increases. ",
+	"However, with a more detailed perception, it becomes harder to distinguish random impulses from cycles and trends. "  
+    ],
+    "images": ["/figs/sampling_artifacts_1.png", "/figs/sampling_artifacts_2.png", "/figs/sampling_artifacts_3.png", "/figs/sampling_artifacts_4.png", "/figs/sampling_artifacts_5.png", "/figs/sampling_artifacts_6.png"]
+  }
+]
