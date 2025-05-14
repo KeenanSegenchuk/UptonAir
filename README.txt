@@ -1,16 +1,17 @@
-
 Workflows:
 	Development:
 		open 2 command line windows
-		navigate to uptonair/flask-server and uptonair/client respectively
+		navigate to uptonair/flask-server and uptonair/client respectively using the cd command
 		in flask-server:
 			to install dependencies, run the command "pip install -r requirements.txt"
-			to run the server, run "python -m flask --app server run"
-			you will need to install pgAdmin to use the postgre database
-			to update data from dev environment, visit localhost:port/update
+			you will need to install pgAdmin to use the dev postgre database
+				to run the server with pg database, run "python -m flask --app server run"
+				to run the the server without pg databse, run "python -m flask --app server_nopg run"
+			once the client is launched you can update the data by visiting localhost:3000/update
 		in client:
 			to install dependencies, run the command "npm install"
 			to run launch the client, run "npm start"
+		type the url http//localhost:3000 in your browser to view the page
 	Production:
 		When installing:
 			install docker
