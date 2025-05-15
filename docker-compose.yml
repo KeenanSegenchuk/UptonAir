@@ -26,6 +26,7 @@ services:
       - pgdb
     volumes:
       - react-build:/app/flask-server/static 
+      - ./flask-server/data.txt:/app/flask-server/data.txt
 
   pgdb:
     image: postgres:17
@@ -50,10 +51,12 @@ services:
       - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
-      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
-      - LOOP=1 # 0 to disable update loop
+      - REINIT_DB=1 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
+      - LOOP=0 # 0 to disable update loop
     depends_on:
       - pgdb
+    volumes:
+      - ./flask-server/data.txt:/app/flask-server/data.txt
 
   nginx:
     build:
