@@ -1,0 +1,15 @@
+to generate pgdb image on RPi, run: 
+	docker run --name pgdb -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=passw0rd -e POSTGRES_DB=postgres -v data:/var/lib/postgresql/data -v ./pgdata:/var/lib/postgresql/data -p 5432:5432 -d arm64v8/postgres
+or maybe: 
+$ docker run -d \
+	--name pgdb \
+	-e POSTGRES_USER=postgres \
+	-e POSTGRES_PASSWORD=passw0rd \
+	-e POSTGRES_DB=postgres \
+	-v data:/var/lib/postgresql/data \
+	-v ./pgdata:/var/lib/postgresql/data \
+	-p 5432:5432 \
+	arm64v8/postgres
+
+and you might need this line:
+	-e PGDATA=/var/lib/postgresql/data/pgdata \

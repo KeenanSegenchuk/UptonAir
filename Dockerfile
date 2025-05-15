@@ -1,30 +1,16 @@
 # -------------------------------
-# Stage 1: Install Node modules
-# -------------------------------
-FROM node:16 AS base-client
-
-# Set the working directory for the npm install
-WORKDIR /app/client
-
-# Copy package files so that initial install can be cached 
-COPY client/package.json client/package-lock.json ./
-
-# Install dependencies
-RUN npm install
-
-# -------------------------------
-# Stage 2: Build React client
+# Stage 1: Build React client
 # -------------------------------
 FROM node:16 AS build-client
 
-# Set the working directory for the npm build
+# Set the working directory for the npm install
 WORKDIR /app/client
 
 # Copy over client code for building
 COPY client ./
 
-# Copy node_modules from base-client (so we don't reinstall)
-COPY --from=base-client /app/client/node_modules ./node_modules
+# Install dependencies
+RUN npm install
 
 # Build the React app
 RUN npm run build

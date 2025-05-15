@@ -31,9 +31,9 @@ from PMtoAQI import *
 
 def pgOpen():
 	DB_URL = os.getenv("DB_URL")
-	try:
+	if DB_URL:
 		conn = psycopg2.connect(DB_URL)
-	except:
+	else:
 		print("Failed connecting to postgre via env var, using local dev db instead.")
 		conn = psycopg2.connect(host="localhost", dbname="postgres", user="postgres", password="passwOrd", port=5432)
 
@@ -132,6 +132,8 @@ def pgPushData(cur, data):
 def pgInit(path, rebuild = False):
 	#pgInit: check connection to db/table and initialize data table if need be
 
+	print("	INIT ")
+
 	def check(conn, cur, table):        
 		# SQL query to check if the table exists
 		query = """
@@ -161,9 +163,8 @@ def pgInit(path, rebuild = False):
 
 	#check for/setup table
 	if rebuild or not check(conn, cur, "readings"):
-		if rebuild:
-			print(f"Forcing table rebuild from {path}.")
-			cur.execute("DROP TABLE IF EXISTS readings;")
+		print(f"Forcing table rebuild from {path}.")
+		cur.execute("DROP TABLE IF EXISTS readings;")
 		cur.execute("""CREATE TABLE IF NOT EXISTS readings (
 			time INT,
 			id INT,
