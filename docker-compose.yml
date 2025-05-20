@@ -10,6 +10,7 @@ services:
       - API_URL=raspberrypi.local/api
     ports:
       - "5000:5000"  # Expose port 5000 to the host
+    depends_on:
       - pgdb
     volumes:
       - react-build:/app/flask-server/static 
