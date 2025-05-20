@@ -1,16 +1,4 @@
 services:
-  react-client:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: build-client
-    working_dir: /app/client
-    ports:
-      - "3000:3000"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - API_URL=raspberrypi.local/api
-
   flask-server:
     build:
       context: .
@@ -19,10 +7,10 @@ services:
     environment:
       - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
+      - API_URL=raspberrypi.local/api
     ports:
       - "5000:5000"  # Expose port 5000 to the host
     depends_on:
-      - react-client
       - pgdb
     volumes:
       - react-build:/app/flask-server/static 
@@ -37,7 +25,6 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - data:/var/lib/postgresql/data
-      - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
