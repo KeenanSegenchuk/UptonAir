@@ -1,0 +1,8 @@
+#Base python
+FROM python:3.9-slim AS updater
+
+#might not be needed, but set working directory as app/flask-server
+WORKDIR /app/flask-server
+
+#install dependencies
+RUN pip install --no-cache-dir -r requirements.txt

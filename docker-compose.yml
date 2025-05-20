@@ -31,7 +31,7 @@ services:
   data-updater:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.updater
       target: flask-server
     command: python updateTask.py
     environment:   
