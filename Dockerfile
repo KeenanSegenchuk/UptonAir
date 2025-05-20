@@ -39,5 +39,5 @@ COPY --from=build-client /app/client/public/infodocs /app/flask-server/static/in
 # Expose the Flask app port
 EXPOSE 5000
 
-# Run the Flask app with Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "server:app"]
+# Run the Flask app with Gunicorn and updater task in default python
+CMD ["sh", "-c", "python updateTask.py & exec gunicorn -w 4 -b 0.0.0.0:5000 server:app"]

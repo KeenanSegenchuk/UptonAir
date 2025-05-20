@@ -5,9 +5,12 @@ services:
       dockerfile: Dockerfile
       target: flask-server
     environment:
+      - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
       - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
+      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
+      - LOOP=1 # 0 to disable update loop
     ports:
       - "5000:5000"  # Expose port 5000 to the host
     depends_on:
@@ -27,23 +30,6 @@ services:
       - data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
-  data-updater:
-    build:
-      context: .
-      dockerfile: Dockerfile.updater
-      target: flask-server
-    command: python updateTask.py
-    environment:   
-      - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
-      - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
-      - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
-      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
-      - LOOP=0 # 0 to disable update loop
-    depends_on:
-      - pgdb
-    volumes:
-      - ./flask-server/data.txt:/app/flask-server/data.txt
 
   nginx:
     build:
