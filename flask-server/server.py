@@ -206,13 +206,14 @@ def serve_react_app(path):
 # when when launching dev server, I now use "/update" to trigger a database update
 @app.route('/update')
 def update():
-	print("Update API called. This should not be in the production build.")
-	update_loop()
+	if debug:
+		print("Update API called. This should not be in the production build.")
+		update_loop()
+		return ""
 	return ""
-
 
 #test()
 
 if __name__ == "__main__":
 	#Development server:
-	app.run(debug=False)
+	app.run(debug=True)
