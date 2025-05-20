@@ -13,7 +13,7 @@ COPY client ./
 RUN npm install
 
 # Build the React app
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=1536" npm run build
 
 # -------------------------------
 # Stage 3: Launch Flask server (with built client)
