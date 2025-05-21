@@ -54,7 +54,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 			if(checkData())
 				return;
 				
-		api.get('api/aqi/time/' + start + "-" + end + '/' + sensor_id)
+		api.get('/api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				setError(null);
 				console.log("Existing Data:", data);

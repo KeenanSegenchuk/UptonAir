@@ -5,14 +5,16 @@ import Map from "../components/Map";
 import SensorInfo from "../components/SensorInfo";
 import LinkButton from "../components/LinkButton";
 import InfoContainer from "../components/InfoContainer";
+import { useAppContext } from "../AppContext";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
 
 
-function Home() {
+function Home() { 
+    const {API_URL} = useAppContext();
     const api = axios.create({
-      baseURL: process.env.API_URL,
+      baseURL: API_URL,
     });
 
     const [data, setData] = useState([]);
@@ -55,7 +57,7 @@ function Home() {
     useEffect(() => {
 	//init map button positions if data unavailable
 	setSensorPos(sensors)
-        api.get('api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
+        api.get('/api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
                 console.log("Homepage API Response:",response);
                 var temp_data = response.data;

@@ -33,7 +33,7 @@ function SensorInfo({ sensor_id, dummy }) {
     useEffect(() => {
 	setSensorName(getObj("$" + sensor_id));
         //console.log(sensor_id);
-        api.get('api/aqi/sensorinfo/'+sensor_id)
+        api.get('/api/aqi/sensorinfo/'+sensor_id)
             .then(response => {
                 //console.log(response);
                 setData(response.data);
