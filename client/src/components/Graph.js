@@ -12,8 +12,9 @@ function Graph({ sensor_id, start, end, dummy }) {
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
 
+	const {API_URL} = useAppContext();
 	const api = axios.create({
-          baseURL: process.env.API_URL,
+          baseURL: API_URL,
 	});
 
 	const [loading, setLoading] = useState(false);
@@ -53,7 +54,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 			if(checkData())
 				return;
 				
-		api.get('/aqi/time/' + start + "-" + end + '/' + sensor_id)
+		api.get('api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				setError(null);
 				console.log("Existing Data:", data);

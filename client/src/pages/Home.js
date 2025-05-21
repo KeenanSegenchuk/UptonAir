@@ -55,7 +55,7 @@ function Home() {
     useEffect(() => {
 	//init map button positions if data unavailable
 	setSensorPos(sensors)
-        api.get('/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
+        api.get('api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
                 console.log("Homepage API Response:",response);
                 var temp_data = response.data;
