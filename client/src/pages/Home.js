@@ -75,9 +75,9 @@ function Home() {
         return <h1>Loading... </h1>;
     }
 
-    if (error) {
-        return <h1>Error: {error.message}</h1>;
-    }
+    /*if (error) {
+	return <h1>Error: {error.message}</h1>;
+    }*/
 
     //calculate avg for banner
     var count = 0;
