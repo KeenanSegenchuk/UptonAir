@@ -12,9 +12,11 @@ COPY flask-server ./
 
 # Copy the React app build into the Flask app directory
 COPY client/build ./static
+
+# NOT NECESSARY SINCE BOTH FOLDERS ARE ALREADY IN BUILD
 # Copy the figs and infodocs folders manually from public/
-COPY client/public/figs ./static/figs
-COPY client/public/infodocs ./static/infodocs
+# COPY client/static/figs ./static/figs
+# COPY client/static/infodocs ./static/infodocs
 
 # Expose the Flask app port
 EXPOSE 5000
