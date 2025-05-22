@@ -16,7 +16,6 @@ services:
     depends_on:
       - pgdb
     volumes:
-      - react-build:/app/flask-server/static 
       - ./flask-server/data.txt:/app/flask-server/data.txt
 
   pgdb:
@@ -39,11 +38,7 @@ services:
       - "80:80"  # Exposes port 80 for web traffic
     depends_on:
       - flask-server  # Ensures Flask is up before Nginx
-    volumes:
-      - react-build:/usr/share/nginx/html  # Mount the shared volume here
 
 volumes:
   data:
-    driver: local
-  react-build:  # Define the shared volume here
     driver: local

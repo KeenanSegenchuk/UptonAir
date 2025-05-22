@@ -52,9 +52,9 @@ function SensorInfo({ sensor_id, dummy }) {
         return <h1>Loading...</h1>;
     }
 
-    if (error) {
+    /*if (error) {
         return <h1>Error: {error.message}, Sensor ID: {sensor_id}</h1>;
-    }
+    }*/
 
     if (data === null) {
         return (

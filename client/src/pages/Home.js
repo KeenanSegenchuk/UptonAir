@@ -60,6 +60,8 @@ function Home() {
         api.get('api/aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
             .then(response => {
                 console.log("Homepage API Response:",response);
+		if(!response.data)
+			{return;}
                 var temp_data = response.data;
                 setLoading(false);
 		setSensorPos(temp_data);

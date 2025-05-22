@@ -10,7 +10,7 @@ export const ContextProvider = ({ children }) => {
   const [hover, setHover] = useState("");
   const [switches, setSwitches] = useState(new Map());
   const [dataContext, setDataContext] = useState("7 days");
-  const API_URL = "http://raspberrypi.local/";
+  const API_URL = "http://localhost";
 
   const contextVals = {
 	getLine, setLine,

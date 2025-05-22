@@ -195,12 +195,13 @@ def test():
 
 # Catch all non-API routes and serve index.html
 @app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@app.route('/static/<path:path>')
 def serve_react_app(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
+    print("serving web build...")
+    print(f"path: {path}")
+    if path.startswith("static/"):
+        return send_from_directory(app.static_folder, path[len("static/"):])
+    return send_from_directory(app.static_folder, 'index.html')
 
 # Since updateTask is moved to it's own image for production launch, 
 # when when launching dev server, I now use "/update" to trigger a database update
