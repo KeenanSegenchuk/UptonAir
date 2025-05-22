@@ -18,10 +18,11 @@ function Graph({ sensor_id, start, end, dummy }) {
 	});
 
 	const [loading, setLoading] = useState(false);
-    	const [error, setError] = useState(null);
 	const ref = useRef(null);
-	const [width, setWidth] = useState(1000);
-	const [height, setHeight] = useState(300);
+	const width = 1000;
+	const height = 3000;
+	//const [width, setWidth] = useState(1000);
+	//const [height, setHeight] = useState(300);
 	const {dataContext} = useAppContext();
 
 	const [data, setData] = useState([]); //entry format: {"start": start time(in seconds), "data": [], "sensor": 0, "color": color, "show": False}
@@ -56,14 +57,12 @@ function Graph({ sensor_id, start, end, dummy }) {
 				
 		api.get('api/aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
-				setError(null);
 				console.log("Existing Data:", data);
 				//console.log("Sensor_id:", sensor_id);
 				//console.log("Server's Response", response);
 				setData(prev => [...prev, {context: dataContext, sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
 			}).catch(error => {
                     		console.error('Error fetching data:', error);
-                    		setError(error.message);
                     		setLoading(false);
                 	});
 	}, [sensor_id, start, end, dummy]);
@@ -106,7 +105,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 
   //average data into n bars
   const formatBars = (b, n) => {
-    if(b.data.length == n)
+    if(b.data.length === n)
 	return b.data
     //console.log("Formatting Bars:", b);
     const step = (end-start)/n;
@@ -226,8 +225,6 @@ function Graph({ sensor_id, start, end, dummy }) {
 
 if (loading)
 	{return (<div className="loading-message">Loading...</div>);}
-if (error)
-	{return (<div className="error-message">Error: {error}</div>);}
 
 return (
     <div className="Marginless">

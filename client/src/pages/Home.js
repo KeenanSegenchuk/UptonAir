@@ -19,13 +19,12 @@ function Home() {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [infoSensor, setInfoSensor] = useState(0);
     const [dummy, setDummy] = useState(false);
     const date = Date.now();
     const sec = 1000;
     const hour = sec * 60 * 60;
-    const week = hour * 24 * 7;
+    //const week = hour * 24 * 7;
 
     const setSensorPos = (temp_data) => {
 	//console.log("sensors:");
@@ -68,7 +67,6 @@ function Home() {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setError(error);
                 setLoading(false);
             });
     });
@@ -76,10 +74,6 @@ function Home() {
     if (loading) {
         return <h1>Loading... </h1>;
     }
-
-    /*if (error) {
-	return <h1>Error: {error.message}</h1>;
-    }*/
 
     //calculate avg for banner
     var count = 0;

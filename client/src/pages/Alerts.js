@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 //import "../App.css";
 import "../DeepseekCSSorcery/Alerts.css";
 import LinkButton from "../components/LinkButton";
-import { Link } from 'react-router-dom'
 
 function Alerts() {
     const [email, setEmail] = useState('');

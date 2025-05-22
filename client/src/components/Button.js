@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 import "../App.css";
@@ -23,7 +23,7 @@ function Button({ id, val, x, y, updateSensor }) {
     for (let i = 0; i < ranges.length; i++) {
         if (val < ranges[i]) {
             color = colors[i];
-	    if(i == 0)
+	    if(i === 0)
 		val = -1;
             break;
         }
@@ -91,7 +91,7 @@ function Button({ id, val, x, y, updateSensor }) {
                 {Math.round(val)}
                 {/* Button content can be added here */}
             </button>
-	    {(hover==hoverKey || bhover) ? (
+	    {(hover===hoverKey || bhover) ? (
 		<input type="text" placeholder={name} style={labelStyle}/>
 	    ):null}
         </div>

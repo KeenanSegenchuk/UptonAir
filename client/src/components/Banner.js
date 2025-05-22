@@ -17,7 +17,7 @@ function Banner({ avg }) {
     });
 
     return (
-        <div className="banner" style={{backgroundColor: color}}>
+        <div className="banner" style={{backgroundColor: color, color:textColor}}>
 	    <h1>Last Hour's Air Quality Average:</h1>
 	    <h1>({String(avg)} AQI)</h1>
 	    <h1><strong>{quality}</strong></h1>

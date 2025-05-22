@@ -1,9 +1,20 @@
 # Dockerfile.nginx
 FROM nginx:alpine
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Copy over config into image
+COPY nginx/default2.conf /etc/nginx/conf.d/default.conf
+
+# Copy https certificate and key into same directory
+#REMOVED SO KEYS AREN'T BAKED INTO DOCKER IMAGE
+# COPY cert.pem /etc/nginx/cert.pem
+# COPY key.pem /etc/nginx/key.pem
+
+# Copy over static react build
 COPY client/build /etc/nginx/html
 
+# Expose ports for http/https
+EXPOSE 443
 EXPOSE 80
 
+# Launch server
 CMD ["nginx", "-g", "daemon off;"]

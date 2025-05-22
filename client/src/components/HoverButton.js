@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { useAppContext } from "../AppContext";
 
 const HoverButton = React.memo(({ text, hoverKey, style }) => {

@@ -14,7 +14,6 @@ function SensorInfo({ sensor_id, dummy }) {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [sensorName, setSensorName] = useState('');
     const [contextIndex, setIndex] = useState(1);
     const {setDataContext} = useAppContext();
@@ -38,11 +37,9 @@ function SensorInfo({ sensor_id, dummy }) {
                 //console.log(response);
                 setData(response.data);
                 setLoading(false);
-                setError(null);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setError(error);
                 setLoading(false);
             }
 	);
