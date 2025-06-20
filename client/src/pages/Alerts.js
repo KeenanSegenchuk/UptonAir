@@ -3,137 +3,126 @@ import axios from 'axios';
 //import "../App.css";
 import "../DeepseekCSSorcery/Alerts.css";
 import LinkButton from "../components/LinkButton";
+import { useAppContext } from "../AppContext";
+const { getObj } = require("../getObj");
+const sensors = getObj("positions");
 
 function Alerts() {
+    const {API_URL} = useAppContext();
+    const api = axios.create({
+      baseURL: API_URL,
+    });
+
     const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [countryCode, setCountryCode] = useState('+1');
-    const [customCountryCode, setCustomCountryCode] = useState('');
-    const [showCustomCodeInput, setShowCustomCodeInput] = useState(false);
+    const [AQIcutoff, setAQIcutoff] = useState(75);
+    const defaultCutoff = 75;
+    const [alertName, setAlertName] = useState('');
+    const [alertSensors, setAlertSensors] = useState(["All"]);
+    const [cooldown, setCooldown] = useState(24);
+    const [avgWindow, setAvgWindow] = useState('20');
+
     const [notification, setNotification] = useState(null);
-    const [activeTab, setActiveTab] = useState('email');
+    const [activeTab, setActiveTab] = useState('add');
 
-    const handleEmailChange = (event) => {
-        setEmail(event.target.value);
-    };
+    const handleEmailChange = (event) => setEmail(event.target.value);
+    const handleCutoffChange = (event) => setAQIcutoff(event.target.value);
+    const handleNameChange = (e) => setAlertName(e.target.value);
+    const handleSensorSelectChange = (e) => {
+        const { value, checked } = e.target;
 
-    const handlePhoneChange = (event) => {
-        // Remove any non-digit characters
-        const cleanedValue = event.target.value.replace(/\D/g, '');
-        setPhone(cleanedValue);
-    };
+        setAlertSensors(prev => {
+            if (value === "All") {
+                return checked ? ["All"] : [];
+            }
 
-    const handleCountryCodeChange = (event) => {
-        const value = event.target.value;
-        if (value === 'other') {
-            setShowCustomCodeInput(true);
-            setCountryCode('+'); // Start with just the +
-        } else {
-            setShowCustomCodeInput(false);
-            setCountryCode(value);
-        }
-    };
+            let next = prev.includes("All") ? [] : [...prev];
 
-    const handleCustomCodeChange = (event) => {
-        let value = event.target.value;
-        // Ensure it starts with + and only contains numbers after
-        if (!value.startsWith('+')) {
-            value = '+' + value.replace(/\D/g, '');
-        } else {
-            value = '+' + value.slice(1).replace(/\D/g, '');
-        }
-        setCustomCountryCode(value);
-        setCountryCode(value);
+            if (checked) {
+                next.push(value);
+            } else {
+                next = next.filter(v => v !== value);
+            }
+
+            return next;
+        });
     };
+    const handleCooldownChange = (e) => setCooldown(e.target.value);
+    const handleWindowChange = (e) => setAvgWindow(Math.round(10*e.target.value)/10);
 
     const showNotification = (message, isSuccess = true) => {
         setNotification({ message, isSuccess });
         setTimeout(() => setNotification(null), 3000);
     };
+    //convert selection list to csv string
+    const L2S = (selected) => {
+        if (selected.includes("All")) return "All";
+        return selected.join(",");
+    };
 
     const addContact = () => {
-        const contactInfo = activeTab === 'email' 
-            ? email 
-            : `${showCustomCodeInput ? customCountryCode : countryCode}${phone}`;
+	const ids = L2S(alertSensors);
 
-        if (!contactInfo) {
-            showNotification('Please enter your contact information', false);
-            return;
-        }
-
-        if (activeTab === 'phone' && !phone) {
-            showNotification('Please enter a valid phone number', false);
-            return;
-        }
-
-        axios.post(`http://localhost:5000/alerts/${activeTab}/add/${contactInfo}`)
+        api.get(`alerts/add/${email}/${alertName}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
             .then(response => {
-                showNotification('Successfully added contact information!');
+                showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
                 console.log("Response from contact info add request:", response);
             }).catch(error => {
-                showNotification('Error adding contact information', false);
-                console.log("Error adding contact info to alerts:", error);
+		const serverMessage = error.response?.data?.error || "Unknown error occurred.";
+                showNotification(`Error adding alert: ${serverMessage}`, false);
             });
     };
 
     const removeContact = () => {
-        const contactInfo = activeTab === 'email' 
-            ? email 
-            : `${showCustomCodeInput ? customCountryCode : countryCode}${phone}`;
 
-        if (!contactInfo) {
-            showNotification('Please enter your contact information', false);
-            return;
-        }
-
-        axios.post(`http://localhost:5000/alerts/${activeTab}/remove/${contactInfo}`)
+        api.get(`alerts/remove/${email}/${alertName}`)
             .then(response => {
-                showNotification('Successfully removed contact information');
+                showNotification('Successfully removed contact information', true);
                 console.log("Response from contact info remove request:", response);
             }).catch(error => {
-                showNotification('Error removing contact information', false);
-                console.log("Error removing contact info from alerts:", error);
+		const serverMessage = error.response?.data?.error || "Unknown error occurred.";
+                showNotification(`Error removing alert: ${serverMessage}`, false);
             });
     };
 
     return (
       <div style={{width:"100%"}}>
 	{/*Header*/}
-	<div className="title" style={{display:"flex", height:"70px", aligItems:"center", flexDirection:"horizontal"}}>
+	<div className="title" style={{width:"100%", display:"flex", height:"70px"}}>
 	    <LinkButton style={{marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href="http://localhost:3000"/>
-            <h1 className="titleText" style={{position: "absolute"}}>Upton Air</h1>
+            <h1         style={{
+			marginTop:"10px",
+            		position: "absolute",
+            		left: "50%",
+            		transform: "translateX(-50%)"}}
+            >Upton Air</h1>
 	</div>
 	
         <div className="alerts-container">
-	        <center className="title">
-                    <h1>Air Quality Alerts</h1>
-                    <p className="subtitle">Stay informed about your local air quality</p>
-                </center>
+	    <center className="title">
+                <h1>Air Quality Alerts</h1>
+                <p className="subtitle">Stay informed about your local air quality</p>
+            </center>
 
             <div className="tabs">
                 <button 
-                    className={`tab-button ${activeTab === 'email' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('email')}
+                    className={`tab-button ${activeTab === 'add' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('add')}
                 >
-                    Email Alerts
+                    Add Alert
                 </button>
                 <button 
-                    className={`tab-button ${activeTab === 'phone' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('phone')}
+                    className={`tab-button ${activeTab === 'remove' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('remove')}
                 >
-                    SMS Alerts
+                    Remove Alert
                 </button>
             </div>
 
-            <div className="alert-description">
-                {activeTab === 'email' ? (
-                    <p>Enter your email address to receive notifications when the air quality in your area reaches unhealthy levels.</p>
-                ) : (
-                    <p>Enter your phone number to receive SMS alerts when the air quality in your area reaches unhealthy levels.</p>
-                )}
-            </div>
-
-            {activeTab === 'email' ? (
+            {activeTab === 'add' ? (
+		<div>
+                <div className="alert-description">
+                    <p>Configure your air quality alert. You must provide a unique alert name if you already have an alert setup with the given email.</p>
+                </div>
                 <div className="input-group">
                     <input 
                         type="email" 
@@ -142,55 +131,120 @@ function Alerts() {
                         placeholder="your.email@example.com" 
                         className="input-field"
                     />
-                </div>
-            ) : (
-                <div className="phone-input-group">
-                    <div className="country-code-selector">
-                        <select 
-                            value={showCustomCodeInput ? 'other' : countryCode} 
-                            onChange={handleCountryCodeChange}
-                            className="country-code-select"
-                        >
-                            <option value="+1">+1 (USA/Canada)</option>
-                            <option value="other">Other</option>
-                        </select>
-                        
-                        {showCustomCodeInput && (
-                            <input
-                                type="text"
-                                value={customCountryCode}
-                                onChange={handleCustomCodeChange}
-                                placeholder="+[country code]"
-                                className="custom-country-code"
-                                maxLength="5"
-                            />
-                        )}
-                    </div>
-                    <input 
-                        type="tel" 
-                        value={phone} 
-                        onChange={handlePhoneChange} 
-                        placeholder="5551234567" 
-                        className="input-field phone-number-input"
+		    <input
+                        type="text" 
+                        value={alertName} 
+                        onChange={handleNameChange} 
+                        placeholder="Unique Alert Name" 
+                        className="input-field"
                     />
+		</div>
+		<center> Select sensors to monitor. </center>
+                <div style={{   margin: "10px",
+				display: 'flex', 
+				flexDirection: 'column',
+				flexWrap: "wrap",
+				maxHeight: "130px" }}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="All"
+                            checked={alertSensors.includes("All")}
+                            onChange={handleSensorSelectChange}
+                        />
+                        All
+                    </label>
+                    {Object.values(sensors).filter(sensor => sensor.id !== "0").map(sensor => (
+                        <label key={sensor.id}>
+                            <input
+                                type="checkbox"
+                                value={sensor.id.toString()}
+                                checked={alertSensors.includes(sensor.id.toString())}
+                                onChange={handleSensorSelectChange}
+                            />
+                            {sensor.name || `Sensor ${sensor.id}`}
+                        </label>
+                    ))}
                 </div>
-            )}
-
-            <div className="button-group">
-                <button onClick={addContact} className="action-button add-button">
-                    Subscribe to Alerts
-                </button>
-                <button onClick={removeContact} className="action-button remove-button">
-                    Unsubscribe
-                </button>
-            </div>
-
+		<div style={{   justifyContent:"center",
+				width:"100%",
+				display: "flex",
+				gap: "10px",
+				flexDirection: "row"}}>
+                    <div style={{ flex: 1, margin:"10px" }}><center>AQI Threshold:</center>
+		    <input
+                        type="number"
+                        value={AQIcutoff}
+                        onChange={handleCutoffChange}
+                        placeholder="AQI alert trigger threshold"
+                        className="input-field"
+			style={{width:"100%", boxSizing: "border-box"}}
+                    /></div>
+		    <div style={{ flex: 1, margin:"10px"}}><center>Alert Cooldown:</center>
+		    <input
+                        type="number" 
+                        value={cooldown} 
+                        onChange={handleCooldownChange} 
+                        placeholder="Cooldown between alerts (in hours)" 
+                        className="input-field"
+			style={{width:"100%", boxSizing: "border-box"}}
+                    /></div>
+		</div>    
+		<div style={{   display: "flex",
+				flexDirection: "column"}}>
+		    <center>Averaging Window:</center>
+		    <input
+                        type="number" 
+                        value={avgWindow} 
+			step={10}
+                        onChange={handleWindowChange} 
+                        placeholder="Averaging window (in minutes)" 
+                        className="input-field"
+			style={{margin:"10px"}}
+                    />
+		    <center style={{marginTop:"0px", fontSize:"12px"}}>*Our data consists of 10-minute averages, so averaging windows will be rounded to the nearest 10s place.</center>
+                </div>
+		    <div style={{lineHeight:"1", paddingTop:"30px"}}>
+			<p>This alert is named "{alertName}" and is associated with the email: "{email}".</p> 
+			<p>A notification will be triggered if AQI readings from the selected sensors average over {AQIcutoff} for {avgWindow} minutes.</p>
+			<p>You will not recieve another notification from this alert if one has been issued in the past {cooldown} hours.</p>
+		    </div>
+		</div>
+	    ) : (
+		<div>
+                <div>
+                    <p>Enter an alert name and associated email to unsubscribe from an alert.</p>
+		    <p>!WIP!: You can also enter ALERT_SUMMARY in the name field to be emailed a summary of all alerts associated with that email.</p> 
+                </div>
+		<div className="input-group">
+                    <input 
+                        type="email" 
+                        value={email} 
+                        onChange={handleEmailChange} 
+                        placeholder="your.email@example.com" 
+                        className="input-field"
+                    />
+		    <input
+                        type="text" 
+                        value={alertName} 
+                        onChange={handleNameChange} 
+                        placeholder="Unique Alert Name" 
+                        className="input-field"
+                    />
+		</div>
+		</div>
+	    )}	
             {notification && (
                 <div className={`notification ${notification.isSuccess ? 'success' : 'error'}`}>
                     {notification.message}
                 </div>
             )}
-
+	    <button     onClick={activeTab === 'add' ? addContact : activeTab === 'remove' ? removeContact : undefined}
+			className={activeTab === 'add' ? 'add-button' : activeTab === 'remove' ? 'remove-button' : ''} 
+			style={{width:"100%", height:"50px", marginTop:"15px", margin:"auto"}}
+	    >
+		  Submit
+	    </button>
             <div className="disclaimer">
                 <small>We respect your privacy. Your contact information will only be used for air quality alerts.</small>
             </div>

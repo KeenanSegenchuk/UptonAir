@@ -19,8 +19,8 @@ function Graph({ sensor_id, start, end, dummy }) {
 
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);
-	const width = 1000;
-	const height = 3000;
+	const width = 3000;
+	const height = 1000;
 	//const [width, setWidth] = useState(1000);
 	//const [height, setHeight] = useState(300);
 	const {dataContext} = useAppContext();
@@ -55,7 +55,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 			if(checkData())
 				return;
 				
-		api.get('api/aqi/time/' + start + "-" + end + '/' + sensor_id)
+		api.get('aqi/time/' + start + "-" + end + '/' + sensor_id)
 			.then(response => {
 				console.log("Existing Data:", data);
 				//console.log("Sensor_id:", sensor_id);

@@ -6,13 +6,17 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.title h1 {
-    color: #2c3e50;
-    margin-bottom: 5px;
+body {
+    background-color: #e2eec9;
+}
+
+.title {
+    border:2px solid white;
+    background:#38ba5b;
 }
 
 .subtitle {
-    color: #7f8c8d;
+    color: #434545;
     margin-bottom: 30px;
 }
 
@@ -39,7 +43,6 @@
 
 .alert-description {
     margin-bottom: 20px;
-    color: #34495e;
     line-height: 1.5;
 }
 

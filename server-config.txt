@@ -1,0 +1,6 @@
+{
+	EMAIL_PASSWORD: "kkbu szwm engx xugf",	
+	REINIT_DB: 0,
+	LOOP: 1,
+	REBUILD_ALERTS: 0,
+}

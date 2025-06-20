@@ -10,13 +10,16 @@ services:
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
       - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
-      - LOOP=0 # 0 to disable update loop
+      - LOOP=1 # 0 to disable update loop
+      - REBUILD_ALERTS=0 # WARNING: this will fully wipe and rebuild alerts table
     ports:
       - "5000:5000"  # Expose port 5000 to the host
     depends_on:
       - pgdb
     volumes:
       - ./flask-server/data.txt:/app/flask-server/data.txt
+      - ./sensor-pos.json:/app/flask-server/sensor-pos.json
+      - ./config.txt:/app/flask-server/config.txt
 
   pgdb:
     image: postgres:17
@@ -40,8 +43,9 @@ services:
     depends_on:
       - flask-server  # Ensures Flask is up before Nginx
     volumes:
-      - ./cert.pem:/etc/nginx/cert.pem:ro
-      - ./key.pem:/etc/nginx/key.pem:ro
+      - ./cert.pem:/etc/nginx/cert.pem:ro #https certificate / private key
+      - ./key.pem:/etc/nginx/key.pem:ro #public key
+      - ./client/build:/etc/nginx/html:ro #static webpage
 
 volumes:
   data:

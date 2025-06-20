@@ -93,6 +93,7 @@
 .floatContainer {
     display: flex; 
     justify-content: center; 
+    align-items: stretch;
 }
 .floatButton {
     margin-top: 15%;
@@ -113,16 +114,17 @@
     display: inline-block;
 }
 .mapImg {
+    display: block;
     top: 0;
     left: 0;
     position:sticky;
-    width: 100%;
+    width: auto;
     height: 100%;
-    object-fit: cover;
     z-index:0;
 }
 .sensorInfo {
     background: #E7D2AB;
+    width: fill;
 }
 .sensorOverlay {
     position: relative;

@@ -21,9 +21,14 @@ def getSensors():
 	sensors = [int(sensor["id"]) for sensor in sensors]
 	return sensors
 
+def getSensorNames(ids):
+	#return list of ids and names
+	with open("sensor-pos.json", "r") as json_file:
+		sensors = json.load(json_file)
 
-
-
+	sensor_dict = {int(sensor["id"]): sensor["name"] for sensor in sensors}
+	names = [sensor_dict.get(id, f"Sensor {id}") for id in ids]
+	return names
 
 
 

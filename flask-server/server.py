@@ -1,6 +1,6 @@
 # This is our backend file
 import asyncio
-from flask import Flask, Blueprint, request, send_from_directory
+from flask import Flask, Blueprint, request, send_from_directory, jsonify, make_response
 from flask_cors import CORS
 from pullfn import *
 from fileUtil import getSensors, getLastTimestamp
@@ -22,7 +22,7 @@ def members():
 	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segenchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter Friedland is a passionate environmental activist with extensive experience in Air Quality. He runs the brains of the operation along with Laurie.", "Laurie Woodland is a passionate environmental activist with extensive experience in Air Quality. She runs the brains of the operation along with Peter."]}
 
 # API ROUTES
-alert_bp = Blueprint('alerts', __name__, url_prefix='/alerts') #API for submitting and withdrawing emails/phone #s from alerts system
+alert_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts') #API for submitting and withdrawing emails/phone #s from alerts system
 aqi_bp = Blueprint('aqi', __name__, url_prefix='/api/aqi') #API for pulling AQI readings
 raw_bp = Blueprint('raw', __name__, url_prefix='/api/raw') #API for pulling raw data
 sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo') #API for preformated sensorinfo JSON
@@ -34,65 +34,49 @@ def raw_data():
 		return data.read()
 
 # ALERTS
-@alert_bp.route("/<string:media>/<string:action>/<string:address>", methods=["POST"])
-def handle_contact_info(media, action, address):
-	#media specifices whether this contact info is your "phone" or "email", 
-	#action specifies whether you wanna add or remove that phone/email from the list,
-	#address is the email address or phone number
-	efile = "alerts/mailing list.txt"
-	pfile = "alerts/phone list.txt"
-	file = efile if media == "email" else pfile
-
-	with open(file, "r") as f:
-		list = f.read().splitlines()
-
-	if action == "add":
-		if address in list:
-			return "Entry already in list."
-		with open(file, "a") as f:
-			f.write(address + "\n")
-	if action == "remove":	
-		oldlen = len(list)	
-		list = [entry for entry in list if entry != address]
-		newlen = len(list)
-		list = "\n".join(list) + "\n"	
+# Add new email alert to database
+@alert_bp.route("add/<string:address>/<string:name>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>")
+def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
+	if ids == "All":
+		ids = [id for id in getSensors() if id != 0]
+	else:
+		ids = [int(id) for id in ids.split(",")]
+	DATA_ROW = (address, name, min_AQI, ids, cooldown, avg_window, 0, 0) #a row of data has this format, the last entries are the last time an alert has been issued to the given contact address, and how many times this alert has been triggered
 	
-		with open(file, "w") as f:
-			f.write(list)
-		if oldlen == newlen:
-			return f"Contact info not found in {media} list." 
-	return "Success updating contact info."
-
-@alert_bp.route("add/<string:address>/<int:min_AQI>/", methods=["POST"])
-def add_alert(address, min_AQI):
-	#action specifies whether you wanna add or remove that phone/email from the list,
-	#address is the email address or phone number
-	#min_AQI is the minimum aqi to trigger an alert
-	table = "alerts"
-	DATA_ROW = (address, min_AQI, 0) #a row of data has this format, the last entry is the last time an alert has been issued to the given contact address
 	conn, cur = pgOpen()
-	if pgCheck(cur, table):
-		print("Found alerts table...")
-	else:
-		pgBuildAlertsTable(cur)
-		print("Built new Alerts table because none was found...")
-	pgPushAddress(cur, DATA_ROW)
+	
+	#check for table
+	if not pgCheck(cur, "alerts"):
+		print("WARNING: Alert table not found when trying to add alert.")
+	
+	response = pgPushAddress(cur, DATA_ROW)
+	#commit new entry to table
+	conn.commit()
 	pgClose(conn, cur)
 
-@alert_bp.route("remove/<string:address>/", methods=["POST"])
-def remove_alert(address):
-	#action specifies whether you wanna add or remove that phone/email from the list,
-	#address is the email address or phone number
-	#min_AQI is the minimum aqi to trigger an alert
-	table = "alerts"
-	conn, cur = pgOpen()
-	if pgCheck(cur, table):
-		print("Found alerts table...")
-	else:
-		print("Could not find table to remove address from.")
+	responses = [
+		(jsonify(message="Email alert pushed to database."), 200),
+		(jsonify(error="Could not add the alert since name is not unique."), 400),
+		(jsonify(error="Unknown Error."), 500)
+	]
+	return responses[response]
 
-	pgRemoveAddress(cur, address)
+# Remove address from db
+@alert_bp.route("remove/<string:address>/<string:name>")
+def remove_alert(address, name):
+	#check for table
+	conn, cur = pgOpen()
+	if not pgCheck(cur, table):
+		print("WARNING: Alert table not found when trying to add alert.")
+
+	response = pgRemoveAddress(cur, address, name)
 	pgClose(conn, cur)
+	responses = [
+		(jsonify(message="Email alert removed database."), 200),
+		(jsonify(error="Could not find an alert with given email and name."), 400),
+		(jsonify(error="Unknown Error."), 500)
+	]
+	return responses[response]
 
 app.register_blueprint(alert_bp)
 
@@ -109,10 +93,10 @@ def avg_aqi(start, end):
 	response = []
 	#get avg for each sensor
 	for sensor in sensors:
-		pgQuery(cur, start, end, sensor, col = "AQI")
+		pgQuery(cur, start, end, sensor, col = "AVG(AQI)")
 		data = cur.fetchone()
 		try:
-			response += [{"avg": sum(data)/len(data), "id": sensor}]
+			response += [{"avg": float(sum(data)/len(data)), "id": sensor}]
 		except:
 			print(f"Error averaging aqi data: {data}")
 	pgClose(conn, cur) 
@@ -128,7 +112,7 @@ def aqi3(start, end, sensor_id):
 		pgQuery(cur, start, end, sensor_id, "time, AVG(AQI) AS average_AQI")
 		data = cur.fetchall()
 	else:
-		pgQuery(cur, start, end, sensor_id, "time, AQI")
+		pgQuery(cur, start, end, sensor_id, "time, AVG(AQI)")
 		data = cur.fetchall()
 
 	#type and sort(?) unsorted pg data	
@@ -144,11 +128,11 @@ def aqi3(start, end, sensor_id):
 #Get aqi averages for each sensor for past x days/hours
 @aqi_bp.route("/sensorinfo/<int:sensor_id>")
 def sensorinfo(sensor_id):	
-	averages = ["30 days","7 days", "1 day", "6 hours", "1 hour"]
+	averages = ["1 year","30 days", "1 week", "24 hours", "1 hour"]
 	hour = 60*60
 	day = 24*hour
 	end = datetime.now().timestamp()
-	starts = [end-day*30, end-day*7, end-day, end-6*hour, end-hour]
+	starts = [end-day*365, end-day*30, end-day*7, end-day, end-hour]
 	
 	conn, cur = pgOpen()
 	avgs = []		
@@ -156,7 +140,7 @@ def sensorinfo(sensor_id):
 		if sensor_id == 0:
 			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
 		else:
-			pgQuery(cur, start, end, sensor_id, col = "AQI")
+			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
 		avg = cur.fetchone()
 		if avg:
 			avgs += [avg] 

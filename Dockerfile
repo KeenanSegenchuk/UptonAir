@@ -10,10 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy Flask app files
 COPY flask-server ./
 
-# Copy the React app build into the Flask app directory
-#NOW SERVED VIA NGINX
-#COPY client/build ./static
-
 # Expose the Flask app port
 EXPOSE 5000
 

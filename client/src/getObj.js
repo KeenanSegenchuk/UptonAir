@@ -1,5 +1,6 @@
-function getObj(obj) {
-    const qualities = ["Air quality is impossibly good, this is showing up because of an internal error.",
+import positions from "./sensor-pos.json";
+export function getObj(obj) {
+    const qualities = ["Air quality is impossibly good, this is showing up because an error occured or the sensor has no readings in this timeframe.",
 			"It’s a great day to be active outside.",
 			"Unusually sensitive people: Consider making outdoor activities shorter and less intense. Go inside if you have symptoms such as coughing or shortness of breath.",
 			"Sensitive groups: Make outdoor activities shorter and less intense. It’s OK to be active outdoors but take more breaks. Watch for symptoms such as coughing or shortness of breath. People with asthma: Follow your asthma action plan and keep quick relief medicine handy. People with heart disease: Symptoms such as palpitations, shortness of breath, or unusual fatigue may indicate a serious problem. If you have any of these, contact your health care provider.",
@@ -38,7 +39,8 @@ function getObj(obj) {
 
     let sensor_id = obj.substring(1,7);
 
-    const positions = [
+
+    const positionsOld = [
     {
         "id": "128729",
 	"name": "Uxbridge",
@@ -51,8 +53,8 @@ function getObj(obj) {
     {
         "id": "221881",
 	"name": "Memorial",
-        "x": 33.9,
-        "y": 52.7,
+        "x": 38,
+        "y": 53.7,
 	"xLabelOffset": -1,
 	"yLabelOffset": -1.75,
 	"color": "green"
@@ -60,7 +62,7 @@ function getObj(obj) {
     {
         "id": "222641",
 	"name": "Mendon & Grove",
-        "x": 50.8,
+        "x": 53.8,
         "y": 63.7,
 	"xLabelOffset": 0,
 	"yLabelOffset": -1.75,
@@ -69,7 +71,7 @@ function getObj(obj) {
     {
         "id": "222275",
 	"name": "Kiwanis Stoplight",
-        "x": 46.7,
+        "x": 50.5,
         "y": 42.2,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -78,8 +80,8 @@ function getObj(obj) {
     {
         "id": "222537",
 	"name": "Coach Rd. Appts.",
-        "x": 26.3,
-        "y": 53,
+        "x": 30.7,
+        "y": 53.7,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
 	"color": "blue"
@@ -87,7 +89,7 @@ function getObj(obj) {
     {
 	"id": "221859",
 	"name": "Community Center",
-	"x": 47,
+	"x": 50.5,
 	"y": 52.5,
 	"xLabelOffset": 3,
 	"yLabelOffset": 0,
@@ -96,8 +98,8 @@ function getObj(obj) {
     {
 	"id": "222527",
 	"name": "Victoria Dr.",
-	"x": 28.4,
-	"y": 58.5,
+	"x": 31,
+	"y": 59,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
 	"color": "orange"
@@ -105,7 +107,7 @@ function getObj(obj) {
     {
         "id": "221905",
 	"name": "Nipmuc HS",
-        "x": 30.8,
+        "x": 34,
         "y": 63.9,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -123,11 +125,20 @@ function getObj(obj) {
     {
         "id": "222757",
 	"name": "Touchstone School",
-        "x": 4,
-        "y": 42.5,
+        "x": 8,
+        "y": 41,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
 	"color": "brown"
+    },
+    {
+        "id": "222531",
+	"name": "BVT HS",
+        "x": 36,
+        "y": 60,
+	"xLabelOffset": 0,
+	"yLabelOffset": -1.9,
+	"color": "cyan"
     },
     {
 	"id": "0",
@@ -139,6 +150,7 @@ function getObj(obj) {
 	"yLabelOffset": 2
     }
 ];
+
     /* CODES *//*
 	call getObj(code) to access static objects stored in this file
 	
@@ -207,6 +219,5 @@ function getObj(obj) {
     		return []
     }
 
-}
-
-module.exports = { getObj };
+} 
+//module.exports = { getObj };

@@ -6,7 +6,6 @@ import { ContextProvider } from "./AppContext";
 const Home = lazy(() => import('./pages/Home'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 const Test = lazy(() => import('./pages/Test'));
-const Update = lazy(() => import('./pages/Update'));
 
 function App() {
     return (
@@ -17,8 +16,6 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/alerts" element={<Alerts />} />
-                            <Route path="/test" element={<Test />} />
-                            <Route path="/update" element={<Update />} />
                         </Routes>
                     </Suspense>
                 </Router>

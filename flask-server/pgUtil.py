@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2 import errors
 import os
 from PMtoAQI import *
 
@@ -17,6 +18,7 @@ from PMtoAQI import *
 	 Data:
 	  pgTest: () => () :runs a basic test
 	  maxTimestamp: () => (int) :returns the maximum time stored in the database
+	  getTimestamp: (int) => (int) :returns max time in database for a given sensor
 	  pgQueryAvg: see fn :returns query for average of a given column for some time-sensor slice of the data
  	  pgQuery: see fn :returns qury for some time-sensor slice of the database a list of comma-delimited strings
 	  pgPushData: (cur, [tuple]) => () :pushes all rows in list of tuples to database
@@ -38,6 +40,7 @@ def pgOpen():
 		conn = psycopg2.connect(host="localhost", dbname="postgres", user="postgres", password="passwOrd", port=5432)
 
 	cur = conn.cursor()
+	conn.autocommit = True
 	#cur.execute("""SELECT * FROM Readings LIMIT 3;""")
 	#print(f"Defaulting to dev table: {cur.fetchone()}.")
 
@@ -91,6 +94,15 @@ def maxTimestamp():
 	pgClose(conn, cur)
 	return result[0] if result else None
 
+def getTimestamp(sensor_id):
+    conn, cur = pgOpen()
+    query = """SELECT MAX(time) FROM readings WHERE id = %s"""
+    cur.execute(query, (sensor_id,))
+    
+    result = cur.fetchone()
+    pgClose(conn, cur)
+    return result[0] if result else None
+
 def pgQueryAvg(cur, start, end, sensor, col = "*"):
 	query = """SELECT AVG({col}) FROM readings 
 		WHERE time >= %s AND time <= %s
@@ -109,6 +121,7 @@ def pgQuery(cur, start, end, sensor, col = "*"):
 
 	if sensor != 0:
 		query += " AND id = %s"
+		query += " GROUP BY time"
 		query += " ORDER BY time ASC"
 		cur.execute(query.format(col=col), (start, end, sensor))
 	else:
@@ -121,13 +134,15 @@ def pgQuery(cur, start, end, sensor, col = "*"):
 	
 
 def pgPushData(cur, data):
-	#print(f"Pushing data {data}")
-	#TODO: check for PM2.5 > 999 and humidity > .999 to filter out anamolous readings that don't fit database
-	cur.executemany("""
-		    INSERT INTO readings (time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA)
-		    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-		    ON CONFLICT (time, id) DO NOTHING
-		""", data)
+	for row in data:
+		try:
+			cur.execute("""
+			    INSERT INTO readings (time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA)
+			    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+			    ON CONFLICT (time, id) DO NOTHING
+			""", row)
+		except Exception as e:
+			print(f"Error inserting row {row}: {e}")
 
 def pgInit(path, rebuild = False):
 	#pgInit: check connection to db/table and initialize data table if need be
@@ -168,7 +183,7 @@ def pgInit(path, rebuild = False):
 		cur.execute("""CREATE TABLE IF NOT EXISTS readings (
 			time INT,
 			id INT,
-			humidity NUMERIC(3, 1),
+			humidity NUMERIC(4, 1),
 			PMA NUMERIC(6, 3),
 			PMB NUMERIC(6, 3),
 			PMEPA NUMERIC(6, 3),
@@ -198,6 +213,7 @@ def pgAlert(update_time_seconds):
 	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
 	lastTimestamp = maxTimestamp()
 	firstTimestamp = lastTimestamp - update_time_seconds
+	print(f"Timestamps: {firstTimestamp} {lastTimestamp}")
 
 	#open connection to database
 	conn, cur = pgOpen()
@@ -209,70 +225,149 @@ def pgAlert(update_time_seconds):
 	#check if average AQIEPA values are greater than the min_AQI of any rows in alerts table
 	# and retrieve address column from those rows
 	cur.execute("""
-		SELECT address
+		WITH avg_values AS (
+			SELECT 
+				a.address,
+				a.name,
+				(
+					SELECT AVG(r.AQIEPA)
+					FROM readings r
+					WHERE r.time BETWEEN (%s - a.avg_window * 60) AND %s
+						AND r.id = ANY(a.ids)
+				) AS avg_aqi
+			FROM alerts a
+		)
+		SELECT 
+			a.address,
+			a.name,
+			a.min_AQI,
+			a.ids,
+			a.cooldown,
+			a.avg_window,
+			a.last_alert,
+			a.n_triggered,
+			av.avg_aqi
+		FROM alerts a
+		JOIN avg_values av ON av.address = a.address AND av.name = a.name
+		WHERE av.avg_aqi >= a.min_AQI
+			AND (a.last_alert IS NULL OR a.last_alert < (%s - a.cooldown * 60 * 60))
+	""", (lastTimestamp, lastTimestamp, lastTimestamp))
+	
+	#^^^^^ might want to make it check if any sensor average exceeds min_AQI
+
+	alerts = cur.fetchall()
+
+	#TODO: vvvvv make sure this works
+	# Update each triggered alert
+	updates = [(lastTimestamp, alert[0], alert[1]) for alert in alerts]
+	cur.executemany("""
+		UPDATE alerts
+		SET
+			n_triggered = n_triggered + 1,
+			last_alert = %s
+		WHERE address = %s AND name = %s
+	""", updates)
+
+	conn.commit()
+	pgClose(conn, cur)
+
+	return alerts
+
+def pgAlert1(update_time_seconds):
+	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
+	lastTimestamp = maxTimestamp()
+	firstTimestamp = lastTimestamp - update_time_seconds
+
+	#open connection to database
+	conn, cur = pgOpen()
+	if not pgCheck(cur, "alerts"):
+		print("Failed to find alerts table, aborting pgAlert.")
+		pgClose(conn, cur)
+		return False
+
+	#check if average AQIEPA values are greater than the min_AQI of any rows in alerts table
+	# and retrieve address column from those rows
+	cur.execute("""
+		SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
 		FROM alerts
 		WHERE min_AQI <= (
 		    SELECT AVG(AQIEPA)
-		    FROM readings
-		    WHERE readings.time BETWEEN %s AND %s
+		    FROM readings 
+		    WHERE readings.time BETWEEN (%s - alerts.avg_window*60) AND %s
+		    AND readings.id = ANY(alerts.ids)
 		)
-	""", (firstTimestamp, lastTimestamp))
+		AND (last_alert IS NULL OR last_alert < (%s - alerts.cooldown*60*60))
+	""", (lastTimestamp, lastTimestamp, lastTimestamp))
 	
-	'''
-	#check if readings table has any AQIEPA values that are greater than the min_AQI of any rows in alerts table
-	# and retrieve address column from those rows
-	cur.execute("""
-	        SELECT alerts.address
-	        FROM readings
-	        JOIN alerts ON readings.address = alerts.address
-	        WHERE readings.timestamp BETWEEN to_timestamp(%s) AND to_timestamp(%s)
-	          AND readings.AQIEPA > alerts.min_AQI
-	""", (firstTimestamp, lastTimestamp))
-	'''
+	#^^^^^ might want to make it check if any sensor average exceeds min_AQI
 
-	addresses = cur.fetchone()
+	addresses = cur.fetchall()
 	pgClose(conn, cur)
 
 	return addresses
 
-def pgBuildAlertsTable(cur):
+def pgBuildAlertsTable(rebuild):
+	conn, cur = pgOpen()
+
 	#build new postgreSQL table to store alerts info
-	cur.execute(f"""CREATE TABLE IF NOT EXISTS alerts (
-		address TEXT PRIMARY KEY,
-		min_AQI INT,
-		last_alert INT
-	);""")
+	if rebuild or not pgCheck(cur, "alerts"):
+		print("Rebuilding alerts table...")
+		cur.execute("DROP TABLE IF EXISTS alerts;")
+		cur.execute(f"""CREATE TABLE IF NOT EXISTS alerts (
+			address TEXT,
+			name TEXT,
+			min_AQI INT,
+			ids INT[],
+			cooldown INT,
+			avg_window INT,
+			last_alert INT,
+			n_triggered INT,
+			CONSTRAINT unique_name_address UNIQUE (address, name)
+		);""")
+
+	pgClose(conn, cur)
 
 def pgPushAddress(cur, row):
 	#add new addresses or update their rows
 	try:
 		cur.execute("""
-			INSERT INTO alerts (address, min_AQI, last_alert)
-			VALUES (%s, %s, %s)
+			INSERT INTO alerts (address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s)	
 		""", row)
-	except:
-		print(f"Tried inserting existing address into alerts table, updating min_AQI, reseting last_alert: {row}")
+	except psycopg2.errors.UniqueViolation:
+		return 1
+	except Exception as e:
+		print("Unhandled DB error:", e)
+		return 2
+	return 0
+
+def pgRemoveAddress(cur, address, name):
+	try:
 		cur.execute("""
-			UPDATE alerts
-			SET min_AQI = %s,
-			    last_alert = %s,
-			WHERE address = %s
-		""", (row[1], row[2], row[0]))
+			DELETE FROM alerts
+			WHERE address = %s AND name = %s
+		""", (address, name))
 
-	#conn.comit()
-	#commit's rows to table
+		if cur.rowcount == 0:
+			return 1  # No row deleted (not found)
+		return 0  # Successful deletion
 
-def pgRemoveAddress(cur, address):
-	cur.execute("""
-		DELETE FROM alerts
-		WHERE address = %s
-	""", (address,))
+	except Exception as e:
+		print("Unhandled DB error during deletion:", e)
+	return 2
+
+def pgListAlerts(cur):
+	cur.execute("SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
+	rows = cur.fetchall()
+	
+	print(rows)
+
 
 if __name__ == "__main__":
 	#pgInit("data.txt")
 	conn, cur = pgOpen()
 	print(pgCheck(conn, cur, "alerts")) 
-	pgBuildTable(cur, "alerts")
+	pgBuildAlertsTable(cur)
 	print(pgCheck(conn, cur, "alerts"))
 	pgClose(conn, cur)
 	

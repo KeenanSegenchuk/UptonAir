@@ -29,11 +29,11 @@ Workflows:
 TODO:
 	Front End:
 		-Update aesthetic to be more modern
-		-Check map buttons and make sure the borders update properly when lines are added and removed
-		-Add field in alerts form that sets min_AQI value to trigger an alert notification
-		-Interface alerts form with new API for postgreSQL database
+		Done!-Check map buttons and make sure the borders update properly when lines are added and removed
+		Done!-Add field in alerts form that sets min_AQI value to trigger an alert notification
+		Done!-Interface alerts form with new API for postgreSQL database
 		-Clean up react warnings
 	Back End:
-		-Add functionality to detect if any specific sensor goes above min_AQI
+		Done!-Add functionality to detect if any specific sensor goes above min_AQI
 		-Setup automated text alerts
 		-Make tests

@@ -3,18 +3,16 @@ from cleanfn import cleanfn
 from time import time
 import asyncio
 import sys
+from pgUtil import getTimestamp
+from fileUtil import getSensors
 
 async def pullfn(return_data = False):
-    sensorf = open("sensors.txt")
-    sensorf = sensorf.read().splitlines()[1:]
-    sensors = []
     #get sensor IDs
-    for line in sensorf:
-        sensors.append(int(line.split(",")[1]))
+    sensors = [sensor for sensor in getSensors() if sensor != 0]
 
     #set max pull timespan to 2 weeks to avoid large api calls
     endtime = int(time())
-    twoweeks = 604800
+    twoweeks = 2*7*24*60*60
     starttime = time() - twoweeks
 
     #open data file
@@ -26,6 +24,9 @@ async def pullfn(return_data = False):
 
     #find the last data point from each sensor
     print(f"Checking for data pulled from sensors: {sensors}")
+    #lastSample = [getTimestamp(sensor) for sensor in sensors]
+    
+    #check for last entry in data.txt, replaced by checking database
     lastSample = [-1 for sensor in sensors]
     for i in range(len(file)-1, -1, -1):
         index = -1
@@ -49,7 +50,7 @@ async def pullfn(return_data = False):
     data = []
     for sensor in sensors:
         if lastSample[sensors.index(sensor)] == -1:
-            timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
+            timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
         else:
             timeurl = "start_timestamp=" + str(lastSample[sensors.index(sensor)]) + "&end_timestamp=" + str(endtime)
 	

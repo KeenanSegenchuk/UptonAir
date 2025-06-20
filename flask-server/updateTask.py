@@ -4,25 +4,21 @@ from pullfn import *
 from cleanfn import *
 from pgUtil import *
 from datetime import datetime
-from alerts.send_email import *
+from send_email import *
 
 #This python file is meant to be run as a thread that updates the data every x minutes
 
 update_time_minutes = 20
 update_time_seconds = update_time_minutes*60
+alert_delay = 30
 
 def alert_loop():
+    print("Checking if any alerts have been triggered...")
     triggered_alerts = pgAlert(update_time_seconds)
     if triggered_alerts:
-        #TODO:
-        #seperate out into phone numbers and emails
-        #send text and email alerts stating that the minimum AQI they specified in their alert has been exceded
-        for address in triggered_alerts:
-            isEmail = True
-            if isEmail:
-                print(f"Sending Email Alert to Address: {address}")
-            else:
-                print(f"Sending Text Alert to Address: {address}")
+        for alert in triggered_alerts:
+            print(f"Alert triggered: {alert}")
+            send_email(alert)
 
 def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
@@ -47,7 +43,7 @@ def update_loop():
 
 
         #wait so that data can finish updating before checking for alerts
-        sleep(60)
+        sleep(alert_delay)
 
         #check for alerts
         alert_loop()
@@ -60,25 +56,20 @@ if __name__ == "__main__":
 		print("pgInit could not connect to the database...")
 		print("Waiting 20 seconds then trying to connect again.")
 		sleep(20)
-	print("Successfully connected to db and readings table.")
-	
-	#make sure alerts table exists
-	print("Data-Updater checking for alerts table:")
-	conn, cur = pgOpen()
-	check = pgCheck(cur, "alerts")
-	print(f"Checked if alerts table exists, result: {check}") 
-	if check:
-		print("Found alerts table.")
-	else:
-		pgBuildAlertsTable(cur)
-		print("Counld not find alerts. Built new empty alerts table.")
-	pgClose(conn, cur)
+	print("Successfully connected to db and readings table.")	
 
+	#make sure alerts table exists
+	try:
+		pgBuildAlertsTable(os.getenv("REBUILD_ALERTS") == "1")
+	except:
+		print("WARNING: Alerts table does not exist and/or building failed.")
+	else:
+		print("Succesfully located alerts table.")
 
 	if os.getenv("LOOP") == "0":
 		print("LOOP env var is 0, data-updater returning.")
 	else:
 		while True:
 			update_loop()
-			sleep(update_time_seconds-60)
+			sleep(update_time_seconds-alert_delay)
 			print(f"{update_time_minutes} minutes passed, updating database...")

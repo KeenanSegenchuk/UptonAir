@@ -1,0 +1,110 @@
+[
+    {
+        "id": "128729",
+	"name": "Uxbridge",
+        "x": 0,
+        "y": 97,
+	"xLabelOffset": 0,
+	"yLabelOffset": -2,
+	"color": "black"
+    },
+    {
+        "id": "221881",
+	"name": "Memorial",
+        "x": 38,
+        "y": 53.7,
+	"xLabelOffset": -1,
+	"yLabelOffset": -1.75,
+	"color": "green"
+    },
+    {
+        "id": "222641",
+	"name": "Mendon & Grove",
+        "x": 53.8,
+        "y": 63.7,
+	"xLabelOffset": 0,
+	"yLabelOffset": -1.75,
+	"color": "khaki"
+    },
+    {
+        "id": "222275",
+	"name": "Kiwanis Stoplight",
+        "x": 50.5,
+        "y": 42.2,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color":"red"
+    },
+    {
+        "id": "222537",
+	"name": "Coach Rd. Appts.",
+        "x": 30.7,
+        "y": 53.7,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color": "blue"
+    },
+    {
+	"id": "221859",
+	"name": "Community Center",
+	"x": 50.5,
+	"y": 52.5,
+	"xLabelOffset": 3,
+	"yLabelOffset": 0,
+	"color": "purple"
+    },
+    {
+	"id": "222527",
+	"name": "Victoria Dr.",
+	"x": 31,
+	"y": 59,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color": "orange"
+    },
+    {
+        "id": "221905",
+	"name": "Nipmuc HS",
+        "x": 34,
+        "y": 63.9,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color": "slateblue"
+    },
+    {
+        "id": "222529",
+	"name": "Rockwood Meadows",
+        "x": 84,
+        "y": 34.5,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color": "sienna"
+    },
+    {
+        "id": "222757",
+	"name": "Touchstone School",
+        "x": 8,
+        "y": 41,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2,
+	"color": "brown"
+    },
+    {
+        "id": "222531",
+	"name": "BVT HS",
+        "x": 36,
+        "y": 60,
+	"xLabelOffset": 0,
+	"yLabelOffset": -1.9,
+	"color": "cyan"
+    },
+    {
+	"id": "0",
+	"name": "Upton Town Average",
+	"color": "white",
+	"x": 0,
+	"y": 0,
+	"xLabelOffset": 0,
+	"yLabelOffset": 2
+    }
+]

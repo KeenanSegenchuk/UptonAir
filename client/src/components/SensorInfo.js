@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import "../App.css";
-import Graph from './Graph';
+//import Graph from './Graph';
+import EGraph from './EGraph';
 import Banner from './Banner';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
@@ -32,7 +33,7 @@ function SensorInfo({ sensor_id, dummy }) {
     useEffect(() => {
 	setSensorName(getObj("$" + sensor_id));
         //console.log(sensor_id);
-        api.get('api/aqi/sensorinfo/'+sensor_id)
+        api.get('aqi/sensorinfo/'+sensor_id)
             .then(response => {
                 //console.log(response);
                 setData(response.data);
@@ -84,7 +85,7 @@ function SensorInfo({ sensor_id, dummy }) {
                     </div>
                 ))}
             </div>
-	    <Graph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
+	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	</center>
 	</div>
     );
