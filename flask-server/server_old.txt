@@ -93,7 +93,7 @@ def avg_aqi(start, end):
 	response = []
 	#get avg for each sensor
 	for sensor in sensors:
-		pgQuery(cur, start, end, sensor, col = "AVG(AQIEPA)")
+		pgQuery(cur, start, end, sensor, col = "AVG(AQI)")
 		data = cur.fetchone()
 		try:
 			response += [{"avg": float(sum(data)/len(data)), "id": sensor}]
@@ -109,10 +109,10 @@ def avg_aqi(start, end):
 def aqi3(start, end, sensor_id):
 	conn, cur = pgOpen()
 	if sensor_id == 0:
-		pgQuery(cur, start, end, sensor_id, "time, AVG(AQIEPA) AS average_AQI")
+		pgQuery(cur, start, end, sensor_id, "time, AVG(AQI) AS average_AQI")
 		data = cur.fetchall()
 	else:
-		pgQuery(cur, start, end, sensor_id, "time, AVG(AQIEPA)")
+		pgQuery(cur, start, end, sensor_id, "time, AVG(AQI)")
 		data = cur.fetchall()
 
 	#type and sort(?) unsorted pg data	
@@ -128,43 +128,25 @@ def aqi3(start, end, sensor_id):
 #Get aqi averages for each sensor for past x days/hours
 @aqi_bp.route("/sensorinfo/<int:sensor_id>")
 def sensorinfo(sensor_id):	
-	averages = ["30 days", "1 week", "24 hours", "6 hours", "1 hour"]
-	hour = 60 * 60
-	day = 24 * hour
+	averages = ["1 year","30 days", "1 week", "24 hours", "1 hour"]
+	hour = 60*60
+	day = 24*hour
 	end = datetime.now().timestamp()
-	starts = [end - day * 30, end - day * 7, end - day * 1, end - hour*6, end - hour]
+	starts = [end-day*365, end-day*30, end-day*7, end-day, end-hour]
 	
 	conn, cur = pgOpen()
-	avgs = []
-
+	avgs = []		
 	for i, start in enumerate(starts):
-		timespan = averages[i]
-		print(f"\n⏱️ Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
-
-		# Pull full AQI data for this sensor and time range
 		if sensor_id == 0:
-			query = f"""
-				SELECT AQIEPA FROM readings
-				WHERE time BETWEEN {start} AND {end}
-			"""
+			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
 		else:
-			query = f"""
-				SELECT AQIEPA FROM readings
-				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
-			"""
-		cur.execute(query)
-		rows = cur.fetchall()
-		aqis = [row[0] for row in rows]
-		print(f"📊 Retrieved {len(aqis)} AQI values: {aqis[:20]}{'...' if len(aqis) > 20 else ''}")  # only print first 20 for sanity
-
-		# Now calculate the average
-		if aqis:
-			avg_val = sum(aqis) / len(aqis)
-			avgs.append(avg_val)
+			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
+		avg = cur.fetchone()
+		if avg:
+			avgs += [[float(val) for val in avg]] 
 		else:
-			print(f"⚠️ No samples from sensor {sensor_id} in the past {timespan}.")
-			avgs.append(-1)
-
+			avgs += [-1]
+			print(f"No samples from sensor {sensor_id} in the past {averages[i]}.")
 	pgClose(conn, cur)
 
 	response = {
@@ -173,7 +155,7 @@ def sensorinfo(sensor_id):
 		"inputs": averages,
 		"banner_avg": avgs[-1]
 	}
-	print(f"\n✅ /api/sensorinfo outgoing response: {json.dumps(response, indent=4)}")
+	print(f"/api/sensorinfo outgoing response: {json.dumps(response, indent=4)}")
 	return response
 
 # Register Blueprint
