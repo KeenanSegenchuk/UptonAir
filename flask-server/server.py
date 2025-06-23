@@ -143,7 +143,7 @@ def sensorinfo(sensor_id):
 			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
 		avg = cur.fetchone()
 		if avg:
-			avgs += [float(avg)] 
+			avgs += [[float(val) for val in avg]] 
 		else:
 			avgs += [-1]
 			print(f"No samples from sensor {sensor_id} in the past {averages[i]}.")
