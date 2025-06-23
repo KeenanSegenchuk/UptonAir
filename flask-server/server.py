@@ -155,7 +155,7 @@ def sensorinfo(sensor_id):
 		"inputs": averages,
 		"banner_avg": avgs[-1]
 	}
-	print(f"/api/sensorinfo outgoing response: {json.dumps(response, indent=4)})
+	print(f"/api/sensorinfo outgoing response: {json.dumps(response, indent=4)}")
 	return response
 
 # Register Blueprint
