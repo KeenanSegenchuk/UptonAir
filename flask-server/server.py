@@ -101,7 +101,7 @@ def avg_aqi(start, end):
 			print(f"Error averaging aqi data: {data}")
 	pgClose(conn, cur) 
 	
-	print(f"outgoing response: {response}")
+	print(f"api/avg/ outgoing response: {response}")
 	return json.dumps(response, indent=4)
 
 #pull time, aqi data for given timespan and sensor for plotting
@@ -143,7 +143,7 @@ def sensorinfo(sensor_id):
 			pgQuery(cur, start, end, sensor_id, col = "AVG(AQI)")
 		avg = cur.fetchone()
 		if avg:
-			avgs += [avg] 
+			avgs += [float(avg)] 
 		else:
 			avgs += [-1]
 			print(f"No samples from sensor {sensor_id} in the past {averages[i]}.")
@@ -155,7 +155,7 @@ def sensorinfo(sensor_id):
 		"inputs": averages,
 		"banner_avg": avgs[-1]
 	}
-	#print(json.dumps(response, indent=4))
+	print(f"/api/sensorinfo outgoing response: {json.dumps(response, indent=4)})
 	return response
 
 # Register Blueprint
