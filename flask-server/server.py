@@ -152,6 +152,7 @@ def sensorinfo(sensor_id):
 				SELECT AQI FROM data
 				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
 			"""
+		cur.execute(query)
 		rows = cur.fetchall()
 		aqis = [row[0] for row in rows]
 		print(f"📊 Retrieved {len(aqis)} AQI values: {aqis[:20]}{'...' if len(aqis) > 20 else ''}")  # only print first 20 for sanity
