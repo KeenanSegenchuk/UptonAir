@@ -143,12 +143,12 @@ def sensorinfo(sensor_id):
 		# Pull full AQI data for this sensor and time range
 		if sensor_id == 0:
 			query = f"""
-				SELECT AQI FROM data
+				SELECT AQI FROM readings			
 				WHERE time BETWEEN {start} AND {end}
 			"""
 		else:
 			query = f"""
-				SELECT AQI FROM data
+				SELECT AQI FROM readings
 				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
 			"""
 		cur.execute(query)
