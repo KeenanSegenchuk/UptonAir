@@ -125,6 +125,7 @@ def aqi3(start, end, sensor_id):
 
 	return json.dumps(data, indent=4)
 
+#Get aqi averages for each sensor for past x days/hours
 @aqi_bp.route("/sensorinfo/<int:sensor_id>")
 def sensorinfo(sensor_id):	
 	averages = ["1 year","30 days", "1 week", "24 hours", "1 hour"]
@@ -141,17 +142,7 @@ def sensorinfo(sensor_id):
 		print(f"\n⏱️ Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
 		# Pull full AQI data for this sensor and time range
-		if sensor_id == 0:
-			query = f"""
-				SELECT AQI FROM readings			
-				WHERE time BETWEEN {start} AND {end}
-			"""
-		else:
-			query = f"""
-				SELECT AQI FROM readings
-				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
-			"""
-		cur.execute(query)
+		pgQuery(cur, start, end, sensor_id, col = "AQI")
 		rows = cur.fetchall()
 		aqis = [row[0] for row in rows]
 		print(f"📊 Retrieved {len(aqis)} AQI values: {aqis[:20]}{'...' if len(aqis) > 20 else ''}")  # only print first 20 for sanity
