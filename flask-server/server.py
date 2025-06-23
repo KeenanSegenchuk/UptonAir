@@ -142,7 +142,16 @@ def sensorinfo(sensor_id):
 		print(f"\n⏱️ Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
 		# Pull full AQI data for this sensor and time range
-		pgQuery(cur, start, end, sensor_id, col = "AQI")
+		if sensor_id == 0:
+			query = f"""
+				SELECT AQI FROM data
+				WHERE time BETWEEN {start} AND {end}
+			"""
+		else:
+			query = f"""
+				SELECT AQI FROM data
+				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
+			"""
 		rows = cur.fetchall()
 		aqis = [row[0] for row in rows]
 		print(f"📊 Retrieved {len(aqis)} AQI values: {aqis[:20]}{'...' if len(aqis) > 20 else ''}")  # only print first 20 for sanity
