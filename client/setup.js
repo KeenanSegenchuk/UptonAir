@@ -19,7 +19,7 @@ try {
 }
 
 // Configure env vars
-try {
+/*try {
   const configSource = path.resolve(__dirname, '../client-config.json');
 
   if (!fs.existsSync(configSource)) {
@@ -36,4 +36,4 @@ try {
 
 } catch (err) {
   console.error('❌ Error setting environment variables:', err.message);
-}
+}*/

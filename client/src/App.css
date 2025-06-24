@@ -80,9 +80,10 @@
 }
 /*Allignment styles*/
 .sinkBox {
-    width: 100%;
-    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
     word-wrap: break-word;
+    min-height: 0;
 }
 .floatBox {
     padding: 10px;
@@ -91,9 +92,10 @@
     word-wrap: break-word;
 }
 .floatContainer {
-    display: flex; 
-    justify-content: center; 
-    align-items: stretch;
+    display: flex;
+    justify-content: center;
+    height: auto;
+    overflow: hidden; /* Prevent overflow past viewport */
 }
 .floatButton {
     margin-top: 15%;
@@ -101,30 +103,30 @@
     height: 70%;
 }
 .sinkContainer {
-    width:90%;
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
+    flex: 1;
+    overflow-y: auto;  
+    overflow-x: hidden;   
+    height: 100%;
 }
 {/*----Component Styles----*/}
 {/*Map Styles*/}
 .mapContainer {
-    position: fixed;
-    height: 100vh;
-    display: inline-block;
+    height: 90vh;         /* or whatever max height you want */
+    width: auto;
+    aspect-ratio: 622 / 926;  /* match your image’s aspect ratio */
+    position: relative;
 }
 .mapImg {
     display: block;
-    top: 0;
-    left: 0;
-    position:sticky;
-    width: auto;
-    height: 100%;
-    z-index:0;
+    width: 100%;        /* or a fixed width like 600px */
+    height: 100%;  
+    aspect-ratio: 622 / 926;
 }
 .sensorInfo {
     background: #E7D2AB;
-    width: fill;
+    flex: 1;
+    height: 90vh;
+    aspect-ratio: 2023.1 / 774;
 }
 .sensorOverlay {
     position: relative;

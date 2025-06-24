@@ -1,0 +1,192 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-container {
+    background-color: #e2eec9; /* Background color */
+    min-height: 100vh; /* Full height */
+    margin: 0; /* Reset margin */
+    padding: 0; /* Reset padding */
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/*----Styles from pages----*/
+.MainBody {
+    height:856.25px;
+    overflow:hidden;
+}
+.Button {
+    border:1px solid black;
+    width:100%;
+    z-layer:10;
+}
+.Marginless {
+    margin:0px;
+    margin-top:0px;
+    margin-bottom:0px;
+    margin-right:0px;
+    margin-left:0px;
+    padding:0px;
+}
+/*Homepage Title*/
+.blue{
+    background:#4f99c6;
+}
+.green { 
+    background:#38ba5b;
+}
+.title {
+    border:2px solid white;
+    background:#38ba5b;
+}
+.titleText {
+    margin-top:8px;
+    width:100%;
+    text-align:center;
+    line-height:1.35;
+}
+/*Allignment styles*/
+.sinkBox {
+    width: 100%;
+    padding: 10px;
+    word-wrap: break-word;
+}
+.floatBox {
+    padding: 10px;
+    border: 1px solid #000;
+    white-space: normal;
+    word-wrap: break-word;
+}
+.floatContainer {
+    display: flex; 
+    justify-content: center; 
+    align-items: stretch;
+}
+.floatButton {
+    margin-top: 15%;
+    width: 100%;
+    height: 70%;
+}
+.sinkContainer {
+    width:90%;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+}
+{/*----Component Styles----*/}
+{/*Map Styles*/}
+.mapContainer {
+    position: fixed;
+    height: 100vh;
+    display: inline-block;
+}
+.mapImg {
+    display: block;
+    top: 0;
+    left: 0;
+    position:sticky;
+    width: auto;
+    height: 100%;
+    z-index:0;
+}
+.sensorInfo {
+    background: #E7D2AB;
+    width: fill;
+}
+.sensorOverlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index:1;
+}
+.mapButton {
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    text-align: center;
+    align-items: center;
+    border: none;
+    font-size: .6em;
+    cursor: pointer;
+}
+{/*Banner Styles*/}
+.banner {
+    width: 100%;
+    height: 30%;
+    text-align: center;
+    border: 5px solid black;
+}
+{/*Graph Styles*/}
+.graphContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+.graphElement {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    margin-bottom: 5px;
+    justify-content: space-between;
+}
+{/*Info*/}
+.infodiv{
+    margin: 20px;
+    background-color: "rgba(0,0,0,0)";
+}
+{/*Grid Layout for start of home page*/}
+.gridContainer{
+    display: grid;
+    gap: 0px;
+    grid-template-rows: 10% 90%;
+    grid-template-columns: 9fr 0fr;
+} 
+.gridHeader{
+    grid-column: 1 / span 2;
+    grid-row: 1;
+}
+.gridMap{
+    grid-colum: 1;
+    grid-row: 2;
+}
+.gridSensorInfo{
+    grid-column: 2 / span 2;
+    grid-row: 2;
+}

@@ -9,7 +9,7 @@ function Map({ buttons, updateSensor }) {
       console.log(`Button ${index + 1}:`, button);
     });
     return (
-        <div className="map-container">
+        <div className="mapContainer">
             <div className="sensorOverlay">
                 {buttons.map((button, index) => (
                     <Button key={index} val={button.avg} id={button.id} x={button.x} y={button.y} updateSensor={updateSensor} />

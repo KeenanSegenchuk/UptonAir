@@ -25,10 +25,10 @@ function SensorInfo({ sensor_id, dummy }) {
     const week = day * 7;
     const end = Math.floor(d/sec);
 
-    const dataContexts = [{context: "1-Year", timespan: "30 days", end: end, start: Math.floor((d-30*day)/sec)}, 
-		{context: "30-Day", timespan: "7 days", end: end, start: Math.floor((d-week)/sec)}, 
-		{context: "7-Day", timespan: "1 day", end: end, start: Math.floor((d-day)/sec)}, 
-		{context: "24-Hour", timespan: "6 hours", end: end, start: Math.floor(d/sec-6*60*60)}];
+    const dataContexts = [{context: "6-Month", end: end, start: Math.floor((d-180*day)/sec)}, 
+		{context: "30-Day", end: end, start: Math.floor((d-30*day)/sec)}, 
+		{context: "7-Day", end: end, start: Math.floor((d-week)/sec)}, 
+		{context: "24-Hour", end: end, start: Math.floor((d-day)/sec)}];
 
     useEffect(() => {
 	setSensorName(getObj("$" + sensor_id));

@@ -10,8 +10,8 @@ export const ContextProvider = ({ children }) => {
   const [hover, setHover] = useState("");
   const [switches, setSwitches] = useState(new Map());
   const [dataContext, setDataContext] = useState("7 days");
-  //const API_URL = "https://localhost/api";
-  const API_URL = process.env.API_URL;
+  const API_URL = "https://localhost/api";
+  //const API_URL = process.env.API_URL;
 
   const contextVals = {
 	getLine, setLine,

@@ -11,7 +11,7 @@
     {
         "id": "221881",
 	"name": "Memorial",
-        "x": 38,
+        "x": 35.5,
         "y": 53.7,
 	"xLabelOffset": -1,
 	"yLabelOffset": -1.75,
@@ -20,7 +20,7 @@
     {
         "id": "222641",
 	"name": "Mendon & Grove",
-        "x": 53.8,
+        "x": 50.8,
         "y": 63.7,
 	"xLabelOffset": 0,
 	"yLabelOffset": -1.75,
@@ -29,7 +29,7 @@
     {
         "id": "222275",
 	"name": "Kiwanis Stoplight",
-        "x": 50.5,
+        "x": 47.5,
         "y": 42.2,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -38,7 +38,7 @@
     {
         "id": "222537",
 	"name": "Coach Rd. Appts.",
-        "x": 30.7,
+        "x": 29.7,
         "y": 53.7,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -47,7 +47,7 @@
     {
 	"id": "221859",
 	"name": "Community Center",
-	"x": 50.5,
+	"x": 47,
 	"y": 52.5,
 	"xLabelOffset": 3,
 	"yLabelOffset": 0,
@@ -56,7 +56,7 @@
     {
 	"id": "222527",
 	"name": "Victoria Dr.",
-	"x": 31,
+	"x": 30,
 	"y": 59,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -65,7 +65,7 @@
     {
         "id": "221905",
 	"name": "Nipmuc HS",
-        "x": 34,
+        "x": 33,
         "y": 63.9,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -74,7 +74,7 @@
     {
         "id": "222529",
 	"name": "Rockwood Meadows",
-        "x": 84,
+        "x": 81,
         "y": 34.5,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -83,7 +83,7 @@
     {
         "id": "222757",
 	"name": "Touchstone School",
-        "x": 8,
+        "x": 5,
         "y": 41,
 	"xLabelOffset": 0,
 	"yLabelOffset": 2,
@@ -92,7 +92,7 @@
     {
         "id": "222531",
 	"name": "BVT HS",
-        "x": 36,
+        "x": 34,
         "y": 60,
 	"xLabelOffset": 0,
 	"yLabelOffset": -1.9,

@@ -128,11 +128,11 @@ def aqi3(start, end, sensor_id):
 #Get aqi averages for each sensor for past x days/hours
 @aqi_bp.route("/sensorinfo/<int:sensor_id>")
 def sensorinfo(sensor_id):	
-	averages = ["30 days", "1 week", "24 hours", "6 hours", "1 hour"]
+	averages = ["6 months", "30 days", "1 week", "24 hours", "1 hour"]
 	hour = 60 * 60
 	day = 24 * hour
 	end = datetime.now().timestamp()
-	starts = [end - day * 30, end - day * 7, end - day * 1, end - hour*6, end - hour]
+	starts = [end - day*180, end - day * 30, end - day * 7, end - day * 1, end - hour]
 	
 	conn, cur = pgOpen()
 	avgs = []
