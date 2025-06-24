@@ -9,6 +9,7 @@ import { useAppContext } from "../AppContext";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
+//comment
 
 
 function Home() { 
@@ -109,7 +110,7 @@ function Home() {
             <div className="floatContainer" >
                 {/* Map */}
 		<Map className="floatBox" buttons={data} updateSensor={updateSensor} />
-                <div className="sinkContainer sensorInfo">
+                <div className="sensorInfo">
 		    {/* Summary and Graph */}
        		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
       		</div> 

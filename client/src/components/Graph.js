@@ -19,8 +19,8 @@ function Graph({ sensor_id, start, end, dummy }) {
 
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);
-	const width = 3000;
-	const height = 1000;
+	const width = 600;
+	const height = 400;
 	//const [width, setWidth] = useState(1000);
 	//const [height, setHeight] = useState(300);
 	const {dataContext} = useAppContext();
@@ -105,43 +105,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 
   //average data into n bars
   const formatBars = (b, n) => {
-    if(b.data.length === n)
-	return b.data
-    //console.log("Formatting Bars:", b);
-    const step = (end-start)/n;
-    let index = 0;
-    let cutoff = start + step
-    const X = new Array(n);
-    const Y = new Array(n);
-    let ty = 0;
-    let x;
-    let y;
-    let count = 0;
-    for(let i = 0; i < b.data.length; i++)
-    { //average data into n bars
-      x = b.data[i][0]; 
-      y = b.data[i][1];
-      if(x >= cutoff){
-        X[index] = cutoff*1000;
-	if(count !== 0){
-          Y[index] = ty/count;
-        }else{
-	  Y[index] = 0;
-	}
-	index++;
-        cutoff += step;
-        ty = 0;
-        count = 0;
-      }
-      ty += y;
-      count++;
-    }
-    if(ty > 0 && count > 0)
-    {
-        Y[index] = ty/count;
-        X[index] = cutoff*1000;	
-    }
-    return {"x": X, "y": Y, type: "bar", "marker": {"color": Y.map(v => colorMap(v))}};
+	return graphUtil("getBars")(b, n, start, end);
   }; 
 
   //apply some transformation or filter to data
@@ -214,14 +178,7 @@ function Graph({ sensor_id, start, end, dummy }) {
 	};
   };
 
-  const colorMap = (val) => {
-    const colors = getObj("c");
-    const ranges = getObj("r");
-    for(let i = 0; i < ranges.length; i++)
-	if(val<ranges[i])
-	    return colors[i];
-    return colors[colors.length-1];
-  };
+
 
 if (loading)
 	{return (<div className="loading-message">Loading...</div>);}
@@ -247,7 +204,7 @@ return (
 		        max={(end-start)/600} // 1 bar per sample
 		        value={nBars}
 		        onChange={handleSlider}
-		        style={{ width: '100%' }}
+		        style={{ width: '70%' }}
 		    />
 		    <Plot data={[getBars()]} layout={graphLayout}/>
 		<center>*Bar graph's times are not exact, may be off by up to 10 minutes.</center>

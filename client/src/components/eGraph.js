@@ -21,7 +21,7 @@ function EGraph({ sensor_id, start, end, dummy }) {
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);
 	
-	const graphStyle = {width: "1500px", height: "300px"};
+	const graphStyle = {width: "600px", height: "400px"};
 
 	//setup data management
 	const {dataContext} = useAppContext();
@@ -56,12 +56,12 @@ function EGraph({ sensor_id, start, end, dummy }) {
 	const [gradient, setGradient] = useState({});
 	const gradConf = {
 	      type: 'rect',
-	      left: 150,
+	      left: 60,
 	      top: 50,
 	      z: 0,
 	      shape: {
-	        width: 1200,
-	        height: 180,
+	        width: 480,
+	        height: 280,
 	      }
 	};
  	//Update daylight gradient when timespan changes
@@ -130,42 +130,7 @@ function EGraph({ sensor_id, start, end, dummy }) {
 
   //average data into n bars and format bar series
   const formatBars = (b, n) => {
-    if(b.data.length === n)
-	return b.data
-
-    const step = (end-start)/n;
-    let index = 0;
-    let cutoff = start + step
-    const data = new Array(n);
-    let total = 0;
-    let count = 0;
-    for(let i = 0; i < b.data.length; i++)
-    { //average data into n bars
-      if(b.data[i][0] >= cutoff){
-        data[index] = [cutoff*1000, 0];
-	if(count !== 0){
-          data[index][1] = Math.round(100*total/count)/100;
-        }
-	index++;
-        cutoff += step;
-        total = 0;
-        count = 0;
-      }
-      total += b.data[i][1];
-      count++;
-    }
-    //calculate last bar if bars/n has a remainder
-    if(total > 0 && count > 0)
-    {
-        data[index] = [cutoff * 1000, total / count];	
-    }
-    //format for echarts
-    return {type: "bar", name: getObj("$"+b.sensor), 
-      data: data.map(([timestamp, value]) => ({
-        value: [timestamp, value],
-        itemStyle: { color: colorMap(value) }
-      }))
-    };
+	return graphUtil("getBars")(b, n, start, end);
   };	
 
 
@@ -191,7 +156,10 @@ function EGraph({ sensor_id, start, end, dummy }) {
                 }
 	},
 	yAxis: {
- 		type: 'value'
+ 		type: 'value',
+		min: function (value) {
+		    return value.min < 0 ? -3 : 0;
+		  }
     	},
     	tooltip: {
         	trigger: 'axis'
@@ -228,7 +196,7 @@ return (
 		        max={(end-start)/600} // 1 bar per sample
 		        value={nBars}
 		        onChange={handleSlider}
-		        style={{ width: '100%' }}
+		        style={{ width: '60%' }}
 		    />
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}

@@ -4,6 +4,7 @@ import { ContextProvider } from "./AppContext";
 
 // Lazy-loaded components
 const Home = lazy(() => import('./pages/Home'));
+const Home2 = lazy(() => import('./pages/Home2'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 const Test = lazy(() => import('./pages/Test'));
 
@@ -15,6 +16,7 @@ function App() {
                     <Suspense fallback={<div>Loading...</div>}>
                         <Routes>
                             <Route path="/" element={<Home />} />
+			    <Route path="/2" element={<Home2 />} />
                             <Route path="/alerts" element={<Alerts />} />
                         </Routes>
                     </Suspense>
