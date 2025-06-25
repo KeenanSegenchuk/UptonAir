@@ -14,6 +14,8 @@ const sensors = getObj("positions");
 
 function Home() { 
     const {API_URL} = useAppContext();
+    const {BASE_URL} = useAppContext();
+    const alerts_url = BASE_URL + "alerts";
     const api = axios.create({
       baseURL: API_URL,
     });
@@ -103,7 +105,7 @@ function Home() {
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", aligItems:"center", flexDirection:"horizontal"}}>
                 <h1 className="titleText">Upton Air</h1>
-	        <LinkButton style={{marginLeft:"auto", marginRight: "0"}} text="Get Notified" href="http://localhost:3000/alerts"/>
+	        <LinkButton style={{marginLeft:"auto", marginRight: "0"}} text="Get Notified" href={alerts_url}/>
 	    </div>
 
 	    {/*Page Body*/}

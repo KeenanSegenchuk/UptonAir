@@ -163,7 +163,7 @@ function graphUtil(func) {
         // Bin the values by time
         for (const [x, y] of b.data) {
             const binIndex = Math.min(Math.floor((x - start) / step), n - 1);
-            Y[binIndex] += y;
+	    Y[binIndex] += y;
             counts[binIndex]++;
         }
 

@@ -128,10 +128,21 @@ function EGraph({ sensor_id, start, end, dummy }) {
     return response;
   };
 
-  //average data into n bars and format bar series
-  const formatBars = (b, n) => {
-	return graphUtil("getBars")(b, n, start, end);
-  };	
+  //avg data into n bins of equal time-length
+    const formatBars = (b, n) => {
+        let bars = graphUtil("getBars")(b, n, start, end);
+        bars = {
+            type: "bar",
+            name: getObj("$" + b.sensor),
+            data: bars.x.map((timestamp, i) => ({
+                value: [timestamp, bars.y[i]],
+                itemStyle: { color: bars.marker.color[i] }
+            }))
+        };
+	return bars;
+
+    };
+
 
 
     const colorMap = (val) => {

@@ -9,6 +9,7 @@ const sensors = getObj("positions");
 
 function Alerts() {
     const {API_URL} = useAppContext();
+    const {BASE_URL} = useAppContext();
     const api = axios.create({
       baseURL: API_URL,
     });
@@ -88,7 +89,7 @@ function Alerts() {
       <div style={{width:"100%"}}>
 	{/*Header*/}
 	<div className="title" style={{width:"100%", display:"flex", height:"70px"}}>
-	    <LinkButton style={{marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href="http://localhost:3000"/>
+	    <LinkButton style={{marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href={BASE_URL}/>
             <h1         style={{
 			marginTop:"10px",
             		position: "absolute",

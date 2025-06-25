@@ -10,7 +10,8 @@ export const ContextProvider = ({ children }) => {
   const [hover, setHover] = useState("");
   const [switches, setSwitches] = useState(new Map());
   const [dataContext, setDataContext] = useState("7 days");
-  const API_URL = "https://localhost/api";
+  const BASE_URL = "https://upton-air.com/";
+  const API_URL = BASE_URL + "api";
   //const API_URL = process.env.API_URL;
 
   const contextVals = {
@@ -19,6 +20,7 @@ export const ContextProvider = ({ children }) => {
 	hover, setHover,
 	switches, setSwitches,
 	dataContext, setDataContext,
+	BASE_URL,
 	API_URL
   };
 
