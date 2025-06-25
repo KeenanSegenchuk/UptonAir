@@ -22,10 +22,7 @@ async def pullfn(return_data = False):
         del file[-1]
     file = [x.split(",") for x in file]
 
-    #find the last data point from each sensor
-    print(f"Checking for data pulled from sensors: {sensors}")
-    #lastSample = [getTimestamp(sensor) for sensor in sensors]
-    
+
     #check for last entry in data.txt, replaced by checking database
     lastSample = [-1 for sensor in sensors]
     for i in range(len(file)-1, -1, -1):
@@ -37,6 +34,10 @@ async def pullfn(return_data = False):
             lastSample[index] = file[i][0]
         if -1 not in lastSample or int(file[i][0]) < starttime:
             break
+    #find the last data point from each sensor
+    print(f"Checking for data pulled from sensors: {sensors}")
+    lastSample = [getTimestamp(sensor) for sensor in sensors]
+
     print(f"Pulling data after last entry: {lastSample}...")
 
     #init constants for building api call 
