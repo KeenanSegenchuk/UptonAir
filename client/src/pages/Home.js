@@ -13,8 +13,7 @@ const sensors = getObj("positions");
 
 
 function Home() { 
-    const {API_URL} = useAppContext();
-    const {BASE_URL} = useAppContext();
+    const {API_URL, BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
     const api = axios.create({
       baseURL: API_URL,
@@ -23,6 +22,7 @@ function Home() {
     //other vars
     const [loading, setLoading] = useState(false);
     const [infoSensor, setInfoSensor] = useState(0);
+    const {sensor_id} = useAppContext();
     const [dummy, setDummy] = useState(false);
 
     //times

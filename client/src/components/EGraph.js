@@ -20,6 +20,7 @@ function EGraph({ }) {
 
 	//setup data management
 	const {dataContext, sensor_id, data, setData} = useAppContext(); 
+	const contexts = getObj("DataContexts");
 
 	//times
 	const [end] = useState(() => Math.floor(Date.now() / 1000));
@@ -29,7 +30,6 @@ function EGraph({ }) {
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);	
 	const graphStyle = {width: "600px", height: "400px"};
-	const contexts = getObj("DataContexts");
 
         //filter for current data context
         const filteredData = () => {

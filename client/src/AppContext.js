@@ -26,7 +26,8 @@ export const ContextProvider = ({ children }) => {
 	data, setData,
 	BASE_URL,
 	API_URL,
-	showPopup, setPopup
+	showPopup, setPopup,
+	sensor_id, setSensor_id
   };
 
 
