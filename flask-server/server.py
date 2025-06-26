@@ -162,6 +162,7 @@ def sensorinfo(sensor_id):
 
 		pgQueryAvg(cur, start, end, sensor_id, "AQIEPA")
 		res = cur.fetchall()
+		print(f"Response: {res}")
 		avgs[i] = res[0][0]
 
 	pgClose(conn, cur)
