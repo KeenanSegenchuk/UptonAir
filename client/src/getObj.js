@@ -32,10 +32,12 @@ export function getObj(obj) {
 
     const ranges = [0, 50, 100, 150, 200, 300, 10000];
 
-    const dataContexts=["30-Day",
-			"7-Day",
-			"1-Day",
-			"6-Hour"];
+    const dataContexts={
+	  "6-Month": { secs: 6 * 30 * 86400 },
+	  "30-Day": { secs: 30 * 86400 },
+	  "7-Day": { secs: 7 * 86400 },
+	  "24-Hour": { secs: 1 * 86400 },
+	};
 
     let sensor_id = obj.substring(1,7);
 

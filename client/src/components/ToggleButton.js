@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import { useAppContext } from "../AppContext";
 
-const ToggleButton = React.memo(({ text, toggleKey, style }) => {
-  //This type of button allows the setting of a global var to key when the button is hovered on so that other components can read that key
+const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style }) => {
+  //This dual button allows for setting hashmap values and hover keys
   const {switches, setSwitches} = useAppContext();
   
   useEffect(() => {
@@ -12,7 +12,7 @@ const ToggleButton = React.memo(({ text, toggleKey, style }) => {
       return current;
     });
   }, [toggleKey, setSwitches]);
-
+  
   const toggle=()=>{
     setSwitches(prev => {
 	const current = new Map(prev);
@@ -21,10 +21,11 @@ const ToggleButton = React.memo(({ text, toggleKey, style }) => {
     });
   };
 
+
   return (
     <div>
 	<button onClick={toggle} style={style}>
-	{text}	
+	    {switches.get(toggleKey) ? textOn : textOff}
 	</button>
     </div>
   );

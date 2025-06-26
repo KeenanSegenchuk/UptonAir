@@ -11,6 +11,7 @@ function EGraph({ sensor_id, start, end, dummy }) {
 	 * Author: Keenan
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
+	console.log("dummy:", dummy);
 
 	//Copy api url from appcontext 
 	const {API_URL} = useAppContext();
@@ -26,12 +27,7 @@ function EGraph({ sensor_id, start, end, dummy }) {
 	//setup data management
 	const {dataContext} = useAppContext();
 	const [data, setData] = useState([]); //entry format: {"start": start time(in seconds), "data": [], "sensor": 0, "color": color, "show": False}
-        //check if data already exists for current sensor
-        const checkData = () => {
-            console.log(`Checking if data already exists; sensor = ${sensor_id} and context = ${dataContext}`)
-            console.log("Result: " + data.some(entry => entry.sensor === sensor_id && entry.context === dataContext));
-            return data.some(entry => entry.sensor === sensor_id && entry.context === dataContext);
-        };
+
         //filter for current data context
         const filteredData = () => {
   	    const fd = data.filter(entry => entry.context === dataContext);  
@@ -74,39 +70,15 @@ function EGraph({ sensor_id, start, end, dummy }) {
 	              },
 		    }]
 		});
-		console.log("New gradient: ", gradient);
+		//console.log("New gradient: ", gradient);
 	}, [start, end]);
- 
-
-	//Handle data changes
-	useEffect(() => {
-		if (lineBool)
-			if(checkData()){
-				if(sensor_id !== 0)
-					setData(prev => prev.map(entry => entry.sensor===sensor_id ? ({...entry, showline:!entry.showline}):(entry)));
-				return;
-			}
-		else
-			if(checkData())
-				return;
-				
-		api.get('aqi/time/' + start + "-" + end + '/' + sensor_id)
-			.then(response => {
-				console.log("Existing Data:", data);
-				//console.log("Sensor_id:", sensor_id);
-				//console.log("Server's Response", response);
-				setData(prev => [...prev, {context: dataContext, sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
-			}).catch(error => {
-                    		console.error('Error fetching data:', error);
-                    		setLoading(false);
-                	});
-	}, [sensor_id, start, end, dummy]);
 
   //Format data series for each line
 	const formatLine = (l) => {
 		return {
 			type: "line",
 			name: getObj("$"+l.sensor),
+			symbol: "none",
 			lineStyle: {
 				color: l.color
 			},
@@ -209,6 +181,8 @@ return (
 		        onChange={handleSlider}
 		        style={{ width: '60%' }}
 		    />
+    		    {/* Log changes before render for debugging */}
+		    
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}
 				opts={{renderer:"svg"}}
@@ -223,22 +197,3 @@ return (
 }
 
 export default EGraph;
-/*<ReactECharts
-  option={{...graphFormat,
-    graphic: [{
-      type: 'rect',
-      left: 0,
-      top: 0,
-      z: 10,
-      shape: {
-        width: 200,
-        height: 200,
-      },
-      style: {
-        fill: 'red',
-      },
-    }],
-  }}
-  style={{ width: 400, height: 300 }}
-  opts={{ renderer: 'svg' }}
-/>*/

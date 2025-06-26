@@ -56,10 +56,10 @@ function graphUtil(func) {
 	};
 
 	const getMidnights = (start, end) => {
-		console.log("Entering getMidnights...");
+		//console.log("Entering getMidnights...");
 		let clock = new Date(start*1000).toLocaleString("en-us", {timeZone: "America/New_york", hour: '2-digit',minute: '2-digit',second: '2-digit',hour12: false});
 		clock = clock.split(":");
-		console.log("clock: " + clock);
+		//console.log("clock: " + clock);
 		let midnights = [];
 		
 		var midnight = start;

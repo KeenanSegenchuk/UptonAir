@@ -20,14 +20,19 @@ function Home() {
       baseURL: API_URL,
     });
 
+    //other vars
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [infoSensor, setInfoSensor] = useState(0);
     const [dummy, setDummy] = useState(false);
+
+    //times
     const date = Date.now();
     const sec = 1000;
     const hour = sec * 60 * 60;
-    //const week = hour * 24 * 7;
+
+    //logic for mobile popup
+    const {showPopup, setPopup} = useAppContext();
 
     const setSensorPos = (temp_data) => {
 	//console.log("sensors:");
@@ -51,7 +56,7 @@ function Home() {
     
 
     const updateSensor = useCallback((newSensorValue) => {
-	console.log("Entering updateSensor... Dummy: ", dummy);
+	//console.log("Entering updateSensor... Dummy: ", dummy);
         setInfoSensor(newSensorValue);
 	setDummy(prev => !prev); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
     }, [dummy]);
@@ -59,19 +64,7 @@ function Home() {
     useEffect(() => {
 	//init map button positions if data unavailable
 	setSensorPos(sensors)
-        api.get('aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)))
-            .then(response => {
-                console.log("Homepage API Response:",response);
-		if(!response.data)
-			{return;}
-                var temp_data = response.data;
-                setLoading(false);
-		setSensorPos(temp_data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setLoading(false);
-            });
+
     });
 
     if (loading) {
@@ -112,9 +105,12 @@ function Home() {
             <div className="floatContainer" >
                 {/* Map */}
 		<Map className="floatBox" buttons={data} updateSensor={updateSensor} />
-                <div className="sensorInfo">
+                <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
-       		    <SensorInfo className="sinkBox" id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
+       		    <SensorInfo id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
+		    <button className="closePopup" onClick={() => setPopup(false)}>
+			✕ Close
+		    </button>
       		</div> 
             </div>
 	    

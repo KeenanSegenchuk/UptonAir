@@ -82,7 +82,7 @@ app.register_blueprint(alert_bp)
 
 # AQI
 
-# Average the AQI of all sensors in for given timespan
+# Average the AQI of all sensors for given timespan
 @aqi_bp.route("/avg/<int:start>-<int:end>")
 def avg_aqi(start, end):
 	print(f"Avg AQI from {start} to {end} Requested...")
@@ -102,6 +102,25 @@ def avg_aqi(start, end):
 	pgClose(conn, cur) 
 	
 	print(f"api/avg/ outgoing response: {response}")
+	return json.dumps(response, indent=4)
+
+# Average the AQI of given sensor for given timespan
+@aqi_bp.route("/avg/<int:start>-<int:end>/<int:sensor_id>")
+def avg_aqi(start, end):
+	print(f"Avg AQI from {start} to {end} Requested for Sensor {sensor_id}...")
+	res = -1
+
+	#connect to postgres database
+	conn, cur = pgOpen()
+	pgQueryAvg(cur, start, end, sensor_id, col = "AQIEPA")
+	data = cur.fetchone()
+	try:
+		res = data[0][0]
+	except:
+		print(f"Error averaging aqi data: {data}")
+	pgClose(conn, cur) 
+	
+	print(f"api/avg/ outgoing response: {res}")
 	return json.dumps(response, indent=4)
 
 #pull time, aqi data for given timespan and sensor for plotting
@@ -139,31 +158,11 @@ def sensorinfo(sensor_id):
 
 	for i, start in enumerate(starts):
 		timespan = averages[i]
-		print(f"\n⏱️ Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
+		#print(f"\Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
-		# Pull full AQI data for this sensor and time range
-		if sensor_id == 0:
-			query = f"""
-				SELECT AQIEPA FROM readings
-				WHERE time BETWEEN {start} AND {end}
-			"""
-		else:
-			query = f"""
-				SELECT AQIEPA FROM readings
-				WHERE time BETWEEN {start} AND {end} AND sensor_id = {sensor_id}
-			"""
-		cur.execute(query)
-		rows = cur.fetchall()
-		aqis = [row[0] for row in rows]
-		print(f"📊 Retrieved {len(aqis)} AQI values: {aqis[:20]}{'...' if len(aqis) > 20 else ''}")  # only print first 20 for sanity
-
-		# Now calculate the average
-		if aqis:
-			avg_val = sum(aqis) / len(aqis)
-			avgs.append(avg_val)
-		else:
-			print(f"⚠️ No samples from sensor {sensor_id} in the past {timespan}.")
-			avgs.append(-1)
+		pgQueryAvg(sensor_id)
+		res = cur.fetchall()
+		avgs[i] = res[0][0]
 
 	pgClose(conn, cur)
 

@@ -13,6 +13,18 @@
   }
 }
 
+@media (max-width: 767px) {
+  .hideMobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hideDesktop {
+    display: none !important;
+  }
+}
+
 .App-container {
     background-color: #e2eec9; /* Background color */
     min-height: 100vh; /* Full height */
@@ -41,6 +53,53 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+/*----Styles for mobile----*/
+.hideMobile {
+  display: block;
+}
+.showMobile {
+  display: none;
+}
+.closePopup {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hideMobile {
+    display: none !important;
+  }
+  .showMobile {
+    display: block !important;
+  }
+
+  /* Mobile overlay mode */
+  .mobileOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #E7D2AB;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 1rem;
+    display: none; /* default off */
+  }
+
+  .mobileOverlay.open {
+    display: block;
+  }
+
+  .closePopup {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 }
 /*----Styles from pages----*/
@@ -174,6 +233,13 @@
 .infodiv{
     margin: 20px;
     background-color: "rgba(0,0,0,0)";
+}
+{/*Styles for Button-Type Components*/}
+.pressed {
+  background-color: #ccc;
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 10px; 
 }
 {/*Grid Layout for start of home page*/}
 .gridContainer{

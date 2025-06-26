@@ -23,6 +23,11 @@ from PMtoAQI import *
  	  pgQuery: see fn :returns qury for some time-sensor slice of the database a list of comma-delimited strings
 	  pgPushData: (cur, [tuple]) => () :pushes all rows in list of tuples to database
 	  pgInit: (str, bool) => (bool) :tries to connect to database, returns False if cannot, then checks for, and if not there, initializes data table
+	  pgFindGaps: (int = 1200, int = 300) => ([(int, int)]) :
+  	    Scans the readings table for gaps in the timestamp sequence where the difference 
+  	    between adjacent entries exceeds `min_gap` seconds (default 1200). 
+  	    Returns a list of (start, end) tuples with a buffer (default 300 sec) 
+  	    added after the start and before the end of each gap.
 	 Alerts:
 	  pgAlert: (int) => ([str]) :checks if any alerts have been triggered in the last <int> seconds, returns addresses of triggered alerts
 	  pgBuildAlertsTable: (cur) => () :initializes alerts table
@@ -205,6 +210,33 @@ def pgInit(path, rebuild = False):
 	
 	return True
 
+def pgFindGaps(min_gap=1200, buffer=300):
+	"""
+	Returns a list of (start, end) tuples representing gaps in the readings table 
+	where the time difference between consecutive entries exceeds `min_gap` seconds.
+	Each tuple is adjusted by `buffer` seconds on both sides.
+	"""
+	conn, cur = pgOpen()
+
+	# Fetch ordered list of timestamps
+	cur.execute("""
+		SELECT time FROM readings 
+		GROUP BY time 
+		ORDER BY time ASC
+	""")
+	times = [row[0] for row in cur.fetchall()]
+	pgClose(conn, cur)
+
+	# Scan for gaps
+	gaps = []
+	for i in range(1, len(times)):
+		diff = times[i] - times[i - 1]
+		if diff > min_gap:
+			start = times[i - 1] + buffer
+			end = times[i] - buffer
+			gaps.append((start, end))
+
+	return gaps
 
 # ^^^^^^ Data Table "readings"
 # vvvvvv Contact Table "alerts"
