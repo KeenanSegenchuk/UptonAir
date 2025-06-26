@@ -29,7 +29,7 @@ function Button({ id, x, y }) {
     const end = date/sec;
 
     //track selected data range
-    const {dataContext} = useAppContext();
+    const {dataContext, setSensor_id} = useAppContext();
     const contexts = getObj("DataContexts");
     const [contextToggles, setContextToggles] = useState(new Array(contexts.length).fill(false));
 
@@ -52,6 +52,7 @@ function Button({ id, x, y }) {
 			return;
 		}
 	else
+		setSensor_id(id);
 		if(checkData())
 			return;
 	const start = end - contexts[dataContext];

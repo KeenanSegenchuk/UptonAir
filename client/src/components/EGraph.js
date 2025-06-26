@@ -6,12 +6,11 @@ import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
 import "../App.css";
 
-function EGraph({ sensor_id, start, end, dummy }) {
+function EGraph({ }) {
 	/* Graph sensor_id's readings from times start to end.
 	 * Author: Keenan
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
-	console.log("dummy:", dummy);
 
 	//Copy api url from appcontext 
 	const {API_URL} = useAppContext();
@@ -19,14 +18,18 @@ function EGraph({ sensor_id, start, end, dummy }) {
           baseURL: API_URL,
 	});
 
-	const [loading, setLoading] = useState(false);
-	const ref = useRef(null);
-	
-	const graphStyle = {width: "600px", height: "400px"};
-
 	//setup data management
-	const {dataContext} = useAppContext();
-	const [data, setData] = useState([]); //entry format: {"start": start time(in seconds), "data": [], "sensor": 0, "color": color, "show": False}
+	const {dataContext, sensor_id, data, setData} = useAppContext(); 
+
+	//times
+	const [end] = useState(() => Math.floor(Date.now() / 1000));
+	const [start, setStart] = useState(end - contexts[dataContext]);
+	useEffect(() => {setStart(end - contexts[dataContext]);}, [dataContext, end]);
+
+	const [loading, setLoading] = useState(false);
+	const ref = useRef(null);	
+	const graphStyle = {width: "600px", height: "400px"};
+	const contexts = getObj("DataContexts");
 
         //filter for current data context
         const filteredData = () => {
