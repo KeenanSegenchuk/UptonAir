@@ -154,7 +154,7 @@ def sensorinfo(sensor_id):
 	starts = [end - day*180, end - day * 30, end - day * 7, end - day * 1, end - hour]
 	
 	conn, cur = pgOpen()
-	avgs = []
+	avgs = [-1 for avg in averages]
 
 	for i, start in enumerate(starts):
 		timespan = averages[i]
@@ -163,7 +163,7 @@ def sensorinfo(sensor_id):
 		pgQueryAvg(cur, start, end, sensor_id, "AQIEPA")
 		res = cur.fetchall()
 		print(f"Response: {res}")
-		avgs[i] = res[0][0]
+		avgs[i] = int(res[0][0])
 
 	pgClose(conn, cur)
 
