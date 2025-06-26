@@ -121,7 +121,7 @@ def avg_aqi2(start, end, sensor_id):
 	pgClose(conn, cur) 
 	
 	print(f"api/avg/ outgoing response: {res}")
-	return json.dumps(response, indent=4)
+	return json.dumps(res, indent=4)
 
 #pull time, aqi data for given timespan and sensor for plotting
 @aqi_bp.route("/time/<int:start>-<int:end>/<int:sensor_id>")

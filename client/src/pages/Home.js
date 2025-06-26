@@ -55,16 +55,16 @@ function Home() {
     };
     
 
+    /* OLD 
     const updateSensor = useCallback((newSensorValue) => {
 	//console.log("Entering updateSensor... Dummy: ", dummy);
         setInfoSensor(newSensorValue);
 	setDummy(prev => !prev); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
-    }, [dummy]);
+    }, [dummy]);*/
 
     useEffect(() => {
-	//init map button positions if data unavailable
+	//init map button positions while data loading/unavailable
 	setSensorPos(sensors)
-
     });
 
     if (loading) {
@@ -104,10 +104,10 @@ function Home() {
 	    {/*Page Body*/}
             <div className="floatContainer" >
                 {/* Map */}
-		<Map className="floatBox" buttons={data} updateSensor={updateSensor} />
+		<Map className="floatBox" buttons={data}/>
                 <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
-       		    <SensorInfo id="infoBox" sensor_id={infoSensor} dummy={dummy}/>
+       		    <SensorInfo id="infoBox" sensor_id={infoSensor}/>
 		    <button className="closePopup" onClick={() => setPopup(false)}>
 			✕ Close
 		    </button>
