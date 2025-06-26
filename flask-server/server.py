@@ -106,7 +106,7 @@ def avg_aqi(start, end):
 
 # Average the AQI of given sensor for given timespan
 @aqi_bp.route("/avg/<int:start>-<int:end>/<int:sensor_id>")
-def avg_aqi(start, end):
+def avg_aqi2(start, end):
 	print(f"Avg AQI from {start} to {end} Requested for Sensor {sensor_id}...")
 	res = -1
 
