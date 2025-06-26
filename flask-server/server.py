@@ -160,7 +160,7 @@ def sensorinfo(sensor_id):
 		timespan = averages[i]
 		#print(f"\Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
-		pgQueryAvg(sensor_id)
+		pgQueryAvg(cur, start, end, sensor_id, "AQIEPA")
 		res = cur.fetchall()
 		avgs[i] = res[0][0]
 

@@ -21,7 +21,6 @@ function Home() {
     });
 
     //other vars
-    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [infoSensor, setInfoSensor] = useState(0);
     const [dummy, setDummy] = useState(false);
@@ -34,63 +33,10 @@ function Home() {
     //logic for mobile popup
     const {showPopup, setPopup} = useAppContext();
 
-    const setSensorPos = (temp_data) => {
-	//console.log("sensors:");
-	//console.log(sensors);
-	const ids = temp_data.map(sensors => sensors.id.toString());
-	//console.log(ids);
-	for (let i = 0; i <sensors.length; i++) {
-		const id = sensors[i]["id"];
-		const index = ids.indexOf(id); 
-		//console.log("id,index");
-		//console.log(id);
-		//console.log(index);
-		if(index >= 0)
-			sensors[i].avg = temp_data[index].avg;
-		else
-			sensors[i].avg = -1;
-	}
-	setData(sensors);
-	//console.log("SETTING BUTTONS", sensors);
-    };
-    
-
-    /* OLD 
-    const updateSensor = useCallback((newSensorValue) => {
-	//console.log("Entering updateSensor... Dummy: ", dummy);
-        setInfoSensor(newSensorValue);
-	setDummy(prev => !prev); //Required to make repeated button clicks refresh graph since sensor_id could remain the same
-    }, [dummy]);*/
-
-    useEffect(() => {
-	//init map button positions while data loading/unavailable
-	setSensorPos(sensors)
-    });
 
     if (loading) {
         return <h1>Loading... </h1>;
     }
-
-    //calculate avg for banner
-    var count = 0;
-    var total = 0;
-    const averages = data.map(sensor => sensor.avg);
-    //console.log("averages"  + averages);
-    averages.forEach(avg => {
-	if(!isNaN(avg)) {
-		total = total + avg;
-		count = count + 1;}
-    })
-    //console.log(total + ", " + count);
-
-    //BAKCGROUND GRADIENT
-    /* currently not used *
-    const gradient = {
-	background: "rgb(34,193,195)",
-	background: "#E7D2AB",
-	background: "linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)",
-    };                    */
-
 
     return (
 	<div className="blue" style = {{ height: '100vh', overflow: 'scroll' }}>
@@ -104,7 +50,7 @@ function Home() {
 	    {/*Page Body*/}
             <div className="floatContainer" >
                 {/* Map */}
-		<Map className="floatBox" buttons={data}/>
+		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
        		    <SensorInfo id="infoBox" sensor_id={infoSensor}/>
