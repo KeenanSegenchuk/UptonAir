@@ -115,7 +115,7 @@ def avg_aqi2(start, end, sensor_id):
 	pgQueryAvg(cur, start, end, sensor_id, col = "AQIEPA")
 	data = cur.fetchone()
 	try:
-		res = data[0]
+		res = float(data[0])
 	except:
 		print(f"Error averaging aqi data: {data}")
 	pgClose(conn, cur) 
