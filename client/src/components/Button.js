@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
@@ -12,7 +12,7 @@ function Button({ id, x, y }) {
     });
 
     //setup vars and static vals
-    const [val, setVal] = useState("-1");
+    const [val, setVal] = useState(-1);
     const ranges = getObj("r");
     const colors = getObj("c");
     const [color, setColor] = useState("default");
@@ -23,17 +23,12 @@ function Button({ id, x, y }) {
     const hoverKey = "labels";
 
     //times
-    const date = Date.now();
-    const sec = 1000;
-    const hour = sec * 60 * 60;
-    const end = date/sec;
+    const [end] = useState(() => Math.floor(Date.now() / 1000));
 
     //track selected data range
     const {dataContext, setSensor_id} = useAppContext();
-    const contexts = getObj("DataContexts");
-    const [contextToggles, setContextToggles] = useState(new Array(contexts.length).fill(false));
-
-
+    const [contexts] = useState(() => getObj("DataContexts"));
+    const [contextToggles, setContextToggles] = useState(new Array(Object.keys(contexts).length).fill(false));
 
     //----Data update handling----//
 
@@ -45,23 +40,31 @@ function Button({ id, x, y }) {
     };
 
     //pull data from API when clicked
-    const getData= () => {
+    const getData = () => {
 	if (globalLineBool)
 		if(checkData()){
-			setData(prev => prev.map(entry => entry.sensor===id ? ({...entry, showline:!entry.showline}):(entry)));
+			console.log("Toggling line graph line for sensor:", id);
+			setData(prev => prev.map(entry => entry.sensor===id && entry.context===dataContext? ({...entry, showline:!entry.showline}):(entry)));
 			return;
 		}
 	else
 		setSensor_id(id);
 		if(checkData())
 			return;
+	//console.log(contexts);
+	//console.log(contexts[dataContext]);
 	const start = end - contexts[dataContext];
 	api.get('aqi/time/' + start + "-" + end + '/' + id)
 		.then(response => {
 			//console.log("Existing Data:", data);
 			//console.log("Sensor_id:", id);
 			//console.log("Server's Response", response);
-			setData(prev => [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool||id===0}]);
+			if(!checkData())
+				setData(prev => {if(prev.some(entry => entry.sensor === id && entry.context === dataContext))
+							return prev;
+						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool||id==="0"}];
+					});
+
 		}).catch(error => {
         		console.error('Error fetching data:', error);
                	});
@@ -69,27 +72,58 @@ function Button({ id, x, y }) {
     };
 
 
+    //fetch updated data and handle border changes when context changes
+    const [seenContexts, setSeenContexts] = useState(new Set());
+    useEffect(() => {
+	const cidx = Object.keys(contexts).indexOf(dataContext);
+	const ctoggle = contextToggles[cidx];
+	if(id === "0" && !seenContexts.has(dataContext))
+	{
+		console.log("here", ctoggle);
+		getData()
+        	const borderColor = getObj("C" + id);
+        	setBorderStyle("5px solid " + borderColor);
+		setSeenContexts(prev => prev.add(dataContext));
+		setContextToggles(prev => {
+			const next = [...prev];
+			next[cidx] = true;
+			return next;
+		});
 
+	}else{
+		console.log("here2", ctoggle);
+		if (!ctoggle) {
+		    setBorderStyle("none");
+		} else {
+	            const borderColor = getObj("C" + id);
+	            setBorderStyle("5px solid " + borderColor);
+		}
+	}
+    }, [dataContext]);
 
-
-
+    if(id === "0"){
+	console.log(contextToggles);
+	console.log(borderStyle);
+    }
 
     //----Setup Button Element----//
     useEffect(() => {
-        api.get('aqi/avg/'+(Math.floor((date-hour)/sec)+"-"+Math.floor(date / sec)+"/"+id))
+        api.get('aqi/avg/'+(end-60*60+"-"+end+"/"+id))
             .then(response => {
-                console.log("/aqi/avg API Response:",response);
+                //console.log("/aqi/avg API Response:",response);
 		if(!response.data)
-			{return;}
-		setVal(data);
+			{console.log("Error getting button value."); 
+			return;}
+		setVal(response.data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    });
+    }, []);
 
     // Calculate the color based on val
     useEffect(() => {
+	//console.log(val);
 	for (let i = 0; i < ranges.length; i++) {
 	    if (val < ranges[i]) {
                 setColor(colors[i]);
@@ -104,6 +138,7 @@ function Button({ id, x, y }) {
 	    const cidx = Object.keys(contexts).indexOf(dataContext);
 	    const ctoggle = contextToggles[cidx];
 	    if (ctoggle) {
+		console.log(id);
 		setBorderStyle("none");
 	    }
 	    else {
@@ -143,7 +178,7 @@ function Button({ id, x, y }) {
                 id={id}
                 style={{
 		    backgroundColor: color,
-		    outline: borderStyle,
+		    outline: globalLineBool ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
 		    zIndex: 10,
@@ -151,7 +186,6 @@ function Button({ id, x, y }) {
                 onClick={(event) => handleButtonClick(id, event)}  
             >
                 {Math.round(val)}
-                {/* Button content can be added here */}
             </button>
 	    {(hover===hoverKey || switches.get(hoverKey)) ? (
 		<input type="text" placeholder={name} style={labelStyle}/>

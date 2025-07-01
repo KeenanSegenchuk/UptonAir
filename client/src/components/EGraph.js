@@ -33,7 +33,10 @@ function EGraph({ }) {
 
         //filter for current data context
         const filteredData = () => {
+	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
+	    //console.log("Given context:", dataContext);
   	    const fd = data.filter(entry => entry.context === dataContext);  
+	    console.log("Result:", fd);
 	    return fd;
         };
 
@@ -81,6 +84,7 @@ function EGraph({ }) {
 		return {
 			type: "line",
 			name: getObj("$"+l.sensor),
+			id: l.sensor,
 			symbol: "none",
 			lineStyle: {
 				color: l.color
@@ -96,10 +100,12 @@ function EGraph({ }) {
 
   //get the bars for graphing current sensor
   const getBars = () => {
-    const selectedData = filteredData().find(entry => entry.sensor === sensor_id);
+    const selectedData = filteredData().find(entry => entry.sensor == sensor_id);
+    //console.log("Selected Data:", selectedData);
     let response = { data: [[1,1]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
     if(selectedData)
 	response = formatBars(selectedData, nBars);
+    //console.log("Bar-Formatted Data:", response);
     return response;
   };
 
@@ -170,6 +176,7 @@ return (
 		    <center>*Click a button on the map to toggle displaying it on the line graph</center> 
 		    <ReactECharts option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
     				style={graphStyle}
+				notMerge={true}
 				opts={{renderer:"svg"}}
 		    />
 		</div>

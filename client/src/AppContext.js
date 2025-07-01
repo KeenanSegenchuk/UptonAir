@@ -9,7 +9,7 @@ export const ContextProvider = ({ children }) => {
   const [globalLineBool, setGlobalLineBool] = useState(false);
   const [hover, setHover] = useState("");
   const [switches, setSwitches] = useState(new Map());
-  const [dataContext, setDataContext] = useState("7 days");
+  const [dataContext, setDataContext] = useState("7-Day");
   const [data, setData] = useState([]);
   const [showPopup, setPopup] = useState(false);
   const [sensor_id, setSensor_id] = useState(0);
