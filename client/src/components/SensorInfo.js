@@ -12,12 +12,14 @@ function SensorInfo({ sensor_id, dummy }) {
     const api = axios.create({
       baseURL: API_URL,
     });
+    //give option to close sensorinfo popup on mobile
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sensorName, setSensorName] = useState('');
     const [contextIndex, setIndex] = useState(1);
-    const {setDataContext} = useAppContext();
+    const {setDataContext, setPopup} = useAppContext();
 
     const d = Date.now();
     const sec = 1000;
@@ -71,22 +73,20 @@ function SensorInfo({ sensor_id, dummy }) {
     };
 
     return (
-	<div style = {{textAlign: "center",border: "5px solid black", width: "100%"}}>
-	<center>
-	    <h1 className="Marginless">Sensor: {sensorName}</h1>
+	<div style = {{textAlign: "center", border: "5px solid black", width: "100%"}}>		    
+	    <h1 className="headerText">Sensor: {sensorName}</h1>
 	    <Banner avg={Math.round(100*data.banner_avg) / 100}/>
 
-    	    <h1 className="Marginless">Recent AQI Averages:</h1>
+    	    <h1 className="headerText">Recent AQI Averages:</h1>
             <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', gap: '0'}}>
                 {data.avgs.map((avg, index) => (
                     <div key={index} style={{ margin: "0", display: 'flex', flexDirection: 'column', width: "22%"}}>
-                        <button className="floatBox" onClick={() => infoClick(index)} style={{fontSize: "24px", marginBottom: '0', height: '55px' }}>{dataContexts[index].context}</button>
-                        <h1 className="floatBox" style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}findcolorofAQI`), marginTop: '0', height: '35px' }}>{Math.round(100 * avg) / 100}</h1>
+                        <button className="floatBox avgButton" onClick={() => infoClick(index)}>{dataContexts[index].context}</button>
+                        <h1 className="floatBox avgBox" style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}findcolorofAQI`)}}>{Math.round(100 * avg) / 100}</h1>
                     </div>
                 ))}
             </div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
-	</center>
 	</div>
     );
 }

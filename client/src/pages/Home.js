@@ -30,7 +30,7 @@ function Home() {
     const hour = sec * 60 * 60;
 
     //logic for mobile popup
-    const {showPopup, setPopup} = useAppContext();
+    const {showPopup, setPopup, setGlobalLineBool} = useAppContext();
 
 
     if (loading) {
@@ -52,10 +52,10 @@ function Home() {
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
+		    <button className="closePopup" onClick={() => {setPopup(false); setGlobalLineBool(false);}}>
+		        Return to Map
+	    	    </button>
        		    <SensorInfo id="infoBox" sensor_id={sensor_id}/>
-		    <button className="closePopup" onClick={() => setPopup(false)}>
-			✕ Close
-		    </button>
       		</div> 
             </div>
 	    

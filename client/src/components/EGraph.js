@@ -18,6 +18,7 @@ function EGraph({ }) {
           baseURL: API_URL,
 	});
 
+
 	//setup data management
 	const {dataContext, sensor_id, data, setData} = useAppContext(); 
 	const contexts = getObj("DataContexts");
@@ -29,7 +30,32 @@ function EGraph({ }) {
 
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);	
-	const graphStyle = {width: "600px", height: "400px"};
+
+	//set graph style for mobile/desktop
+	const isMobile = window.matchMedia("(max-width: 767px)").matches;
+	const graphStyle = isMobile
+	  ? { width: "300px", height: "200px" }
+	  : { width: "600px", height: "400px" };
+	const gradConf = isMobile
+	  ? {
+	      type: 'rect',
+	      left: 30,
+	      top: 60,
+	      z: 0,
+	      shape: {
+	        width: 240,
+	        height: 70,
+	      }
+	}  :  {
+	      type: 'rect',
+	      left: 60,
+	      top: 50,
+	      z: 0,
+	      shape: {
+	        width: 480,
+	        height: 280,
+	      }
+	};
 
         //filter for current data context
         const filteredData = () => {
@@ -41,7 +67,8 @@ function EGraph({ }) {
         };
 
 	//setup nBars slider functionality
-	const [nBars, setN] = useState(50); 
+	const iNit = isMobile ? 240 : 50;
+	const [nBars, setN] = useState(iNit); 
 	const handleSlider = (e) => {
 	    setN(parseInt(e.target.value));
 	};
@@ -56,16 +83,6 @@ function EGraph({ }) {
         };
 
 	const [gradient, setGradient] = useState({});
-	const gradConf = {
-	      type: 'rect',
-	      left: 60,
-	      top: 50,
-	      z: 0,
-	      shape: {
-	        width: 480,
-	        height: 280,
-	      }
-	};
  	//Update daylight gradient when timespan changes
 	useEffect(() => {
 		setGradient({
@@ -157,7 +174,7 @@ function EGraph({ }) {
         	trigger: 'axis'
 	},
 	legend: {
-		show: lineBool
+		show: !isMobile && lineBool
 	}
     };
 
@@ -166,14 +183,14 @@ if (loading)
 
 return (
     <div className="Marginless">
-        <h1 className="Marginless">{dataContext} AQI Readings</h1>
+        <h1 className="headerText">{dataContext} AQI Readings</h1>
         <div className="graphContainer" ref={ref}>
-            <button className="Button" onClick={toggleLineBool} style={{width:"30%"}}>
+            <button className="Button" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>
             {lineBool ? (
 		<div>
-		    <center>*Click a button on the map to toggle displaying it on the line graph</center> 
+		    {!isMobile && <center>*Click a button on the map to toggle displaying it on the line graph</center>} 
 		    <ReactECharts option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
@@ -182,15 +199,15 @@ return (
 		</div>
             ) : (
 		<div>
-		    <h2>Use slider to set number of bars:</h2>
-		    <input
+		    <h2 className="hideMobile">Use slider to set number of bars:</h2>
+		    <center><input className="hideMobile"
 		        type="range"
 		        min="7" //1 bar per day
 		        max={(end-start)/600} // 1 bar per sample
 		        value={nBars}
 		        onChange={handleSlider}
 		        style={{ width: '60%' }}
-		    />
+		    /></center>
     		    {/* Log changes before render for debugging */}
 		    
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
@@ -199,7 +216,7 @@ return (
 		    />
 		</div>
             )}    
-	    <center>*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
+	    <center className="bodyText">*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
         </div>
     </div>
 );

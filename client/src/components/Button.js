@@ -10,6 +10,8 @@ function Button({ id, x, y }) {
     const api = axios.create({
       baseURL: API_URL,
     });
+    //check if mobile to let buttons enable sensorinfo popup
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     //setup vars and static vals
     const [val, setVal] = useState(-1);
@@ -18,7 +20,7 @@ function Button({ id, x, y }) {
     const [color, setColor] = useState("default");
     const name = getObj("$" + id);
     const labelOffsets = getObj("O" + id);
-    const { globalLineBool, hover, switches, data, setData } = useAppContext();
+    const { globalLineBool, hover, switches, data, setData, setPopup } = useAppContext();
     const [borderStyle, setBorderStyle] = useState("none");
     const hoverKey = "labels";
 
@@ -62,7 +64,7 @@ function Button({ id, x, y }) {
 			if(!checkData())
 				setData(prev => {if(prev.some(entry => entry.sensor === id && entry.context === dataContext))
 							return prev;
-						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool||id==="0"}];
+						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool||id==="0"|| switches.get("select")}];
 					});
 
 		}).catch(error => {
@@ -133,8 +135,8 @@ function Button({ id, x, y }) {
     }, [val]);
 
     const handleButtonClick = (sensorValue, event) => {
-	//update button border
-        if (globalLineBool) {
+        if (globalLineBool || switches.get("select")) {
+	    console.log(dataContext);
 	    const cidx = Object.keys(contexts).indexOf(dataContext);
 	    const ctoggle = contextToggles[cidx];
 	    if (ctoggle) {
@@ -144,6 +146,7 @@ function Button({ id, x, y }) {
 	    else {
             	const borderColor = getObj("C" + id);
             	setBorderStyle("5px solid " + borderColor);
+		console.log("Enabled border");
 	    }
 	    setContextToggles(prev => {
 		const next = [...prev];
@@ -152,6 +155,9 @@ function Button({ id, x, y }) {
 	    });
         }else{
 	    setSensor_id(id);
+	    if(isMobile) {
+		setPopup(true);
+	    }
 	}
         event.preventDefault(); 
         //check if new data needs to be pulled
@@ -180,7 +186,7 @@ function Button({ id, x, y }) {
                 id={id}
                 style={{
 		    backgroundColor: color,
-		    outline: globalLineBool ? borderStyle : "none",
+		    outline: globalLineBool || switches.get("select") || isMobile ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
 		    zIndex: 10,

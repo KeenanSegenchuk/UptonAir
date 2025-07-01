@@ -13,17 +13,7 @@
   }
 }
 
-@media (max-width: 767px) {
-  .hideMobile {
-    display: none !important;
-  }
-}
 
-@media (min-width: 768px) {
-  .hideDesktop {
-    display: none !important;
-  }
-}
 
 .App-container {
     background-color: #e2eec9; /* Background color */
@@ -56,14 +46,17 @@
   }
 }
 /*----Styles for mobile----*/
-.hideMobile {
-  display: block;
-}
-.showMobile {
-  display: none;
-}
-.closePopup {
-  display: none;
+@media (min-width: 768px) {
+  .headerText {}
+  .hideMobile {
+    display: block;
+  }
+  .showMobile {
+    display: none;
+  }
+  .closePopup {
+    display: none;
+  }
 }
 
 @media (max-width: 767px) {
@@ -72,6 +65,17 @@
   }
   .showMobile {
     display: block !important;
+  }
+
+  .headerText {
+    font-size: 1.2em;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .bodyText {
+    font-size: .7em;
+    margin-top: 2px;
+    margin-bottom: 2px;
   }
 
   /* Mobile overlay mode */
@@ -93,13 +97,8 @@
   }
 
   .closePopup {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 1.5rem;
-    background: none;
-    border: none;
-    cursor: pointer;
+    width:100%;
+    height: 35px;
   }
 }
 /*----Styles from pages----*/
@@ -109,8 +108,13 @@
 }
 .Button {
     border:1px solid black;
-    width:100%;
+    width:30%;
     z-layer:10;
+}
+@media (max-width: 767px) {
+  .Button {
+    width:100%;
+  }
 }
 .Marginless {
     margin:0px;
@@ -164,6 +168,7 @@
     overflow-y: auto;  
     overflow-x: hidden; 
 }
+
 {/*----Component Styles----*/}
 {/*Map Styles*/}
 .mapContainer {
@@ -208,12 +213,64 @@
     font-size: .6em;
     cursor: pointer;
 }
+@media (max-width: 767px) {
+  .mapImg {
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    max-width: 100%;
+  }
+  .mapContainer {
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+  }
+}
+{/*SensorInfo Styles*/}
+.avgBox{
+  margin-top: 0px;
+}
+.avgButton{
+  margin-bottom: 0px;
+}
+@media (min-width: 768px) {
+  .avgButton {
+    font-size: 24px;
+    height: 55px;
+  }
+  .avgBox {
+    height: 35px;
+  }
+}
+@media (max-width: 767px) {
+  .avgButton {
+    padding: 0px;
+    height: 30px;
+    font-size: 1em;
+  }
+  .avgBox {
+    padding: 0px;
+    height: 30px;
+    font-size: 1em;
+  }
+}
 {/*Banner Styles*/}
 .banner {
     width: 100%;
     height: 30%;
     text-align: center;
     border: 5px solid black;
+}
+@media (min-width: 768px) {
+  .bannerText {
+  }
+}
+@media (max-width: 767px) {
+  .bannerText {
+    margin-bottom: 2px;
+    margin-top: 2px;
+    font-size: .8em;
+  }
 }
 {/*Graph Styles*/}
 .graphContainer {
@@ -240,23 +297,4 @@
   transform: translateY(2px);
   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 10px; 
-}
-{/*Grid Layout for start of home page*/}
-.gridContainer{
-    display: grid;
-    gap: 0px;
-    grid-template-rows: 10% 90%;
-    grid-template-columns: 9fr 0fr;
-} 
-.gridHeader{
-    grid-column: 1 / span 2;
-    grid-row: 1;
-}
-.gridMap{
-    grid-colum: 1;
-    grid-row: 2;
-}
-.gridSensorInfo{
-    grid-column: 2 / span 2;
-    grid-row: 2;
 }
