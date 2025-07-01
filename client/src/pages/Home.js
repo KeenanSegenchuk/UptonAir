@@ -21,7 +21,6 @@ function Home() {
 
     //other vars
     const [loading, setLoading] = useState(false);
-    const [infoSensor, setInfoSensor] = useState(0);
     const {sensor_id} = useAppContext();
     const [dummy, setDummy] = useState(false);
 
@@ -53,7 +52,7 @@ function Home() {
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
-       		    <SensorInfo id="infoBox" sensor_id={infoSensor}/>
+       		    <SensorInfo id="infoBox" sensor_id={sensor_id}/>
 		    <button className="closePopup" onClick={() => setPopup(false)}>
 			✕ Close
 		    </button>

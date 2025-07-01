@@ -163,8 +163,11 @@ def sensorinfo(sensor_id):
 		pgQueryAvg(cur, start, end, sensor_id, "AQIEPA")
 		res = cur.fetchall()
 		print(f"Response: {res}")
-		avgs[i] = int(res[0][0])
-
+		try:
+			avgs[i] = round(float(res[0][0]), 2)
+		except:
+			print(f"Error finding {averages[i]} avg for sensor {sensor_id}, defaulting to -1.") 
+			avgs[i] = -1
 	pgClose(conn, cur)
 
 	response = {

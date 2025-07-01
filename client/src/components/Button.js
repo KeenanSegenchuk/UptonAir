@@ -150,7 +150,9 @@ function Button({ id, x, y }) {
 		next[cidx] = !ctoggle;
 		return next;
 	    });
-        }
+        }else{
+	    setSensor_id(id);
+	}
         event.preventDefault(); 
         //check if new data needs to be pulled
 	getData();
