@@ -2,7 +2,7 @@ import "../App.css";
 function Banner({ avg }) {
     const { getObj } = require("../getObj");
     const qualities = getObj("qualities");
-    const colors = getObj("v");
+    const colors = getObj("c");
     const textColors= getObj("t");
     const ranges = getObj("r");
 

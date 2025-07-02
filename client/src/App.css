@@ -47,7 +47,10 @@
 }
 /*----Styles for mobile----*/
 @media (min-width: 768px) {
-  .headerText {}
+  .headerText {
+    margin-top: 10px;
+    margin-bottom: 10px; 
+  }
   .hideMobile {
     display: block;
   }
@@ -86,10 +89,19 @@
     right: 0;
     bottom: 0;
     background: #E7D2AB;
+    text-align: center;
     z-index: 1000;
     overflow-y: auto;
-    padding: 1rem;
+    margin: .5rem;
     display: none; /* default off */
+
+    /* Hide scrollbar cross-browser */
+    scrollbar-width: none;     /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+  }
+
+  .mobileOverlay::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, Edge */
   }
 
   .mobileOverlay.open {
@@ -97,8 +109,29 @@
   }
 
   .closePopup {
+    position: sticky;
+    top: 0;
+    z-index: 10; /* make sure it stays above content */
     width:100%;
+    border: 2px solid black;
     height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    background-color: #daa;
+    cursor: pointer;
+  }
+
+  .closePopup .label {
+    font-weight: bold;
+  }
+
+  .closePopup .closeIcon {
+    margin-left: 1rem;
+    font-size: 1.2rem;
+    line-height: 1;
   }
 }
 /*----Styles from pages----*/
@@ -214,6 +247,9 @@
     cursor: pointer;
 }
 @media (max-width: 767px) {
+  .mapButton {
+    font-size: .5em;
+  }
   .mapImg {
     width: 100%;
     height: auto;
@@ -229,6 +265,7 @@
 {/*SensorInfo Styles*/}
 .avgBox{
   margin-top: 0px;
+  margin-bottom:0px;
 }
 .avgButton{
   margin-bottom: 0px;
@@ -243,6 +280,9 @@
   }
 }
 @media (max-width: 767px) {
+  .sensorDiv{
+    width: 97% !important;
+  }
   .avgButton {
     padding: 0px;
     height: 30px;
@@ -256,16 +296,20 @@
 }
 {/*Banner Styles*/}
 .banner {
-    width: 100%;
     height: 30%;
     text-align: center;
     border: 5px solid black;
 }
 @media (min-width: 768px) {
   .bannerText {
+    margin-bottom: 5px;
+    margin-top: 5px;
   }
 }
 @media (max-width: 767px) {
+  .banner {
+    width: 97%;
+  }
   .bannerText {
     margin-bottom: 2px;
     margin-top: 2px;
@@ -290,6 +334,22 @@
 .infodiv{
     margin: 20px;
     background-color: "rgba(0,0,0,0)";
+}
+.imgContainer{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+@media (max-width: 767px) {
+  .staticImg{
+      max-width: 90%;
+  }
+}
+@media (min-width:768px) {
+  .staticImg{
+	max-width: 45%;
+  }
 }
 {/*Styles for Button-Type Components*/}
 .pressed {

@@ -2,7 +2,7 @@
   {
     "all": {
       "title": {
-	"font-size": "1.25em"
+	"fontSize": "1.25em"
       },
       "both": {
         "backgroundColor": "#E7D2AB",
@@ -12,7 +12,7 @@
     },
     "style": {
 	"both": {
-		"text-align": "center"
+		"textAlign": "center"
     	}
     },
     "title": "Particulate Pollution Patterns",

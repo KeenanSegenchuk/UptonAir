@@ -52,9 +52,10 @@ function Home() {
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
-		    <button className="closePopup" onClick={() => {setPopup(false); setGlobalLineBool(false);}}>
-		        Return to Map
-	    	    </button>
+		    <button className="closePopup" onClick={() => { setPopup(false); /*setGlobalLineBool(false);*/ }}>
+			  <span className="label">Return to Map</span>
+			  <span className="closeIcon">✖</span>
+		    </button>
        		    <SensorInfo id="infoBox" sensor_id={sensor_id}/>
       		</div> 
             </div>

@@ -27,14 +27,20 @@ const InfoContainer = ({ infodoc }) => {
   return (
     <div>
 	{infolist ? (infolist.map((info, index) => (
-	    <InfoBox id={index} images={info.images && info.images} title={info.title} body={info.body && info.body} style={{
-		title: {...(allStyle.title || {}),
+	    <InfoBox 
+		className={info.type === "image" ? "staticImage" : undefined}
+		id={index} 
+		images={info.images && info.images} 
+		title={info.title} 
+		body={info.body && info.body} 
+		style={{
+		    title: {...(allStyle.title || {}),
 			...(info.style?.title || {})},
-		both:  {...(allStyle.both || {}),
+		    both:  {...(allStyle.both || {}),
 			...(info.style?.both || {})},
-		body:  {...(allStyle.body || {}),
+		    body:  {...(allStyle.body || {}),
 			...(info.style?.body || {})},
-		images:{...(allStyle.images || {}),
+		    images:{...(allStyle.images || {}),
 			...(info.style?.images || {})}
 	    }}/>
         ))):(null)}

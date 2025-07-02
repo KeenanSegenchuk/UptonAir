@@ -10,9 +10,9 @@ const InfoBox = ({ title, body, style, images }) => {
 	<div style={style.body}>
 		{body}
 	</div>
-	<div style={style.images}>
+	<div className="imgContainer" style={style.images}>
 		{images && images.map((image, index) => (
-				<img src={image} key={index} alt="Cannot load image." loading="eager"/>
+				<img src={image} className="staticImg" key={index} alt="Cannot load image." loading="eager"/>
 		))}
 	</div>
     </div>

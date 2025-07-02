@@ -28,7 +28,7 @@ function Button({ id, x, y }) {
     const [end] = useState(() => Math.floor(Date.now() / 1000));
 
     //track selected data range
-    const {dataContext, setSensor_id} = useAppContext();
+    const {dataContext, setSensor_id, sensor_id} = useAppContext();
     const [contexts] = useState(() => getObj("DataContexts"));
     const [contextToggles, setContextToggles] = useState(new Array(Object.keys(contexts).length).fill(false));
 
@@ -41,9 +41,18 @@ function Button({ id, x, y }) {
         return data.some(entry => entry.sensor === id && entry.context === dataContext);
     };
 
+    //Load sensor avg on mount for desktop
+    useEffect(() => {
+	console.log("Mounting with global sensor: ", sensor_id); 
+	if(id === sensor_id) {
+		console.log("Loading default sensor on mount.");
+		getData();
+	}
+    }, []);
+
     //pull data from API when clicked
     const getData = () => {
-	if (globalLineBool)
+	if (globalLineBool || switches.get("select"))
 		if(checkData()){
 			console.log("Toggling line graph line for sensor:", id);
 			setData(prev => prev.map(entry => entry.sensor===id && entry.context===dataContext? ({...entry, showline:!entry.showline}):(entry)));
@@ -64,7 +73,7 @@ function Button({ id, x, y }) {
 			if(!checkData())
 				setData(prev => {if(prev.some(entry => entry.sensor === id && entry.context === dataContext))
 							return prev;
-						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool||id==="0"|| switches.get("select")}];
+						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline:globalLineBool || switches.get("select")}];
 					});
 
 		}).catch(error => {
@@ -74,26 +83,69 @@ function Button({ id, x, y }) {
     };
 
 
-    //fetch updated data and handle border changes when context changes
-    const [seenContexts, setSeenContexts] = useState(new Set());
+    //maybe easier to just have global showLine Map of bools to decide what sensors to show
+    //set showline true for this sensor
+    const showline = () => {
+      setData(prev =>
+        prev.map(item =>
+          item.context === dataContext && item.sensor === id
+           ? { ...item, showline: true }
+           : item
+        )
+      );
+    };
+    const hideline = () => {
+      setData(prev =>
+        prev.map(item =>
+          item.context === dataContext && item.sensor === id
+           ? { ...item, showline: false }
+           : item
+        )
+      );
+    };
+
+    //TODO insert useEffect to listen to global line bool and put selected sensor as first selected line
+    //check for id == sensor_id during swap to globallinebool and update showline for that data series
     useEffect(() => {
-	const cidx = Object.keys(contexts).indexOf(dataContext);
-	const ctoggle = contextToggles[cidx];
-	if(id === "0" && !seenContexts.has(dataContext))
+	if(id === sensor_id && globalLineBool)
 	{
-		console.log("here", ctoggle);
-		getData()
+		//set line
+		showline();
+
+		//set border
+		const cidx = Object.keys(contexts).indexOf(dataContext);
+		const ctoggle = contextToggles[cidx];
         	const borderColor = getObj("C" + id);
         	setBorderStyle("5px solid " + borderColor);
-		setSeenContexts(prev => prev.add(dataContext));
 		setContextToggles(prev => {
 			const next = [...prev];
 			next[cidx] = true;
 			return next;
 		});
+	}
+    }, [globalLineBool]);
 
+    //fetch updated data and handle border changes when context changes
+    const [seenContexts, setSeenContexts] = useState(new Set());
+    useEffect(() => {
+	const cidx = Object.keys(contexts).indexOf(dataContext);
+	const ctoggle = contextToggles[cidx];
+	if(id === sensor_id && !seenContexts.has(dataContext))
+	{
+		getData()
+		setSeenContexts(prev => prev.add(dataContext));
+		if(globalLineBool) {
+			console.log("Loading initial sensor for given dataContext:", sensor_id);
+        		const borderColor = getObj("C" + id);
+        		setBorderStyle("5px solid " + borderColor);
+		
+			setContextToggles(prev => {
+				const next = [...prev];
+				next[cidx] = true;
+				return next;
+			});
+		}
 	}else{
-		console.log("here2", ctoggle);
 		if (!ctoggle) {
 		    setBorderStyle("none");
 		} else {
@@ -102,11 +154,6 @@ function Button({ id, x, y }) {
 		}
 	}
     }, [dataContext]);
-
-    if(id === "0"){
-	console.log(contextToggles);
-	console.log(borderStyle);
-    }
 
     //----Setup Button Element----//
     useEffect(() => {
@@ -140,8 +187,15 @@ function Button({ id, x, y }) {
 	    const cidx = Object.keys(contexts).indexOf(dataContext);
 	    const ctoggle = contextToggles[cidx];
 	    if (ctoggle) {
-		console.log(id);
-		setBorderStyle("none");
+		//don't disable line when mobile layout in summary mode
+		if(isMobile && !switches.get("select")) {
+			setSensor_id(id);
+			setPopup(true);
+			return;
+		}else{
+			console.log(id);
+			setBorderStyle("none");
+		}
 	    }
 	    else {
             	const borderColor = getObj("C" + id);
@@ -153,7 +207,8 @@ function Button({ id, x, y }) {
 		next[cidx] = !ctoggle;
 		return next;
 	    });
-        }else{
+        }
+	if(!switches.get("select")) {
 	    setSensor_id(id);
 	    if(isMobile) {
 		setPopup(true);

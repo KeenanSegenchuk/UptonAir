@@ -30,7 +30,7 @@
   {
     "style": {
       "both": {
-        "backgroundColor": "rgb(0,228,0)"
+        "backgroundColor": "rgb(158, 255, 145)"
       }
     },
     "title": "Good (0-50)",
@@ -53,7 +53,7 @@
   {
     "style": {
       "both": {
-        "backgroundColor": "rgb(255,126,0)"
+        "backgroundColor": "rgb(255,130,0)"
       }
     },
     "title": "Unhealthy for Sensitive Groups (101-150)",
@@ -84,7 +84,7 @@
   {
     "style": {
       "both": {
-        "backgroundColor": "rgb(143,63,151)",
+        "backgroundColor": "rgb(137, 9, 151)",
 	"color": "white"
       }
     },
@@ -101,7 +101,7 @@
   {
     "style": {
       "both": {
-        "backgroundColor": "rgb(126,0,35)",
+        "backgroundColor": "rgb(100, 0, 21)",
 	"color": "white"
       }
     },

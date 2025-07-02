@@ -12,7 +12,7 @@ export const ContextProvider = ({ children }) => {
   const [dataContext, setDataContext] = useState("7-Day");
   const [data, setData] = useState([]);
   const [showPopup, setPopup] = useState(false);
-  const [sensor_id, setSensor_id] = useState(0);
+  const [sensor_id, setSensor_id] = useState("0");
   const BASE_URL = "https://upton-air.com/";
   const API_URL = BASE_URL + "api";
   //const API_URL = process.env.API_URL;

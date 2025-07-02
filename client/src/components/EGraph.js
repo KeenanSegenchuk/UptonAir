@@ -62,7 +62,7 @@ function EGraph({ }) {
 	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
 	    //console.log("Given context:", dataContext);
   	    const fd = data.filter(entry => entry.context === dataContext);  
-	    console.log("Result:", fd);
+	    console.log("Filter Result:", fd);
 	    return fd;
         };
 
@@ -119,7 +119,7 @@ function EGraph({ }) {
   const getBars = () => {
     const selectedData = filteredData().find(entry => entry.sensor == sensor_id);
     //console.log("Selected Data:", selectedData);
-    let response = { data: [[1,1]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
+    let response = { data: [[0,0]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
     if(selectedData)
 	response = formatBars(selectedData, nBars);
     //console.log("Bar-Formatted Data:", response);
@@ -190,8 +190,8 @@ return (
             </button>
             {lineBool ? (
 		<div>
-		    {!isMobile && <center>*Click a button on the map to toggle displaying it on the line graph</center>} 
-		    <ReactECharts option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
+		    {!isMobile && <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center>} 
+		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}
@@ -199,8 +199,8 @@ return (
 		</div>
             ) : (
 		<div>
-		    <h2 className="hideMobile">Use slider to set number of bars:</h2>
-		    <center><input className="hideMobile"
+		    <h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
+		    <center><input className="Marginless hideMobile"
 		        type="range"
 		        min="7" //1 bar per day
 		        max={(end-start)/600} // 1 bar per sample

@@ -194,8 +194,8 @@ export function getObj(obj) {
 		const value = parseFloat(obj.substring(1,7));
 		//console.log("GETOBJ  X VALUE:", value);
 		const index = ranges.findIndex(item => item > value);
-		//console.log("RETURNING COLOR FROM GETOBJ", vibrColors[index]);
-		return vibrColors[index];
+		//console.log("RETURNING COLOR FROM GETOBJ", colors[index]);
+		return colors[index];
 	case "V":
 	case "v":
 		return vibrColors;
