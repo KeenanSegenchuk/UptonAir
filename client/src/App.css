@@ -171,14 +171,28 @@
     background:#157a25;
 }
 .title {
-    border:2px solid white;
-    background:#38ba5b;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 2px solid white;
+  background: #38ba5b;
+  padding: 0 1rem; /* optional padding for spacing */
 }
+
 .titleText {
-    margin-top:8px;
-    width:100%;
-    text-align:center;
-    line-height:1.35;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 8px 0 8px 0;
+  text-align: center;
+  line-height: 1.35;
+  width: auto; /* remove width: 100% */
+  pointer-events: none; /* optional, so text doesn't block button clicks */
+}
+
+/* The LinkButton can keep margin-left:auto inline or via CSS */
+.title > a {
+  margin-left: auto;
 }
 /*Allignment styles*/
 .sinkBox {
@@ -219,7 +233,7 @@
 .mapContainer {
     width: auto;               /* OR fixed width like 300px */
     height: auto;
-    flex: 0 0 auto;            /* do not grow/shrink in flex */
+    flex: 1 0 auto;            /* do not grow/shrink in flex */
     aspect-ratio: 622 / 926;   /* maintain image ratio */
     position: relative;
     display: flex;
@@ -232,7 +246,7 @@
     aspect-ratio: 622 / 926;
 }
 .sensorInfo {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;

@@ -34,25 +34,25 @@ function EGraph({ }) {
 	//set graph style for mobile/desktop
 	const isMobile = window.matchMedia("(max-width: 767px)").matches;
 	const graphStyle = isMobile
-	  ? { width: "300px", height: "200px" }
-	  : { width: "600px", height: "400px" };
+	  ? { width: "400px", height: "250px" }
+	  : { width: "900px", height: "400px" };
 	const gradConf = isMobile
 	  ? {
 	      type: 'rect',
-	      left: 30,
+	      left: 40,
 	      top: 60,
 	      z: 0,
 	      shape: {
-	        width: 240,
-	        height: 70,
+	        width: 320,
+	        height: 120,
 	      }
 	}  :  {
 	      type: 'rect',
-	      left: 60,
+	      left: 90,
 	      top: 50,
 	      z: 0,
 	      shape: {
-	        width: 480,
+	        width: 720,
 	        height: 280,
 	      }
 	};

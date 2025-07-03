@@ -41,7 +41,7 @@ function Home() {
 	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll' }}>
 
 	    {/*Header*/}
-	    <div className="title" style={{display:"flex", aligItems:"center", flexDirection:"horizontal"}}>
+	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row"}}>
                 <h1 className="titleText">Upton Air</h1>
 	        <LinkButton style={{marginLeft:"auto", marginRight: "0"}} text="Get Notified" href={alerts_url}/>
 	    </div>
