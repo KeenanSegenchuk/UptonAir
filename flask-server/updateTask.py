@@ -5,6 +5,7 @@ from cleanfn import *
 from pgUtil import *
 from datetime import datetime
 from send_email import *
+from log import log
 
 #This python file is meant to be run as a thread that updates the data every x minutes
 
@@ -18,8 +19,10 @@ def alert_loop():
     if triggered_alerts:
         for alert in triggered_alerts:
             print(f"Alert triggered: {alert}")
-            send_email(alert)
-
+            try:
+                send_email(alert)
+            except Exception as e:
+                log(e);
 def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
         cutoff, new_lines = asyncio.run(pullfn(return_data=True))

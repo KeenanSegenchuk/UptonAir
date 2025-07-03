@@ -25,7 +25,7 @@ const InfoContainer = ({ infodoc }) => {
   }, []);
 
   return (
-    <div>
+    <div className="contentBackground">
 	{infolist ? (infolist.map((info, index) => (
 	    <InfoBox 
 		className={info.type === "image" ? "staticImage" : undefined}

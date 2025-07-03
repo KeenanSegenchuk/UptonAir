@@ -38,7 +38,7 @@ function Home() {
     }
 
     return (
-	<div className="blue" style = {{ height: '100vh', overflow: 'scroll' }}>
+	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll' }}>
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", aligItems:"center", flexDirection:"horizontal"}}>
@@ -47,10 +47,10 @@ function Home() {
 	    </div>
 
 	    {/*Page Body*/}
-            <div className="floatContainer" >
+            <div className="container" >
                 {/* Map */}
 		<Map className="floatBox" buttons={sensors}/>
-                <div className={`sensorInfo sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
+                <div className={`sensorInfo contentBackground sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
 		    <button className="closePopup" onClick={() => { setPopup(false); /*setGlobalLineBool(false);*/ }}>
 			  <span className="label">Return to Map</span>

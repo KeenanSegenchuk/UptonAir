@@ -14,8 +14,7 @@
 	"font-size": "3em"
       },
       "both": {
-	"text-align": "center",
-        "backgroundColor": "#E7D2AB"
+	"text-align": "center"
       }
     },
     "title": "What is AQI?",

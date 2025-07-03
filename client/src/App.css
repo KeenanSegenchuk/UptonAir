@@ -105,7 +105,7 @@
   }
 
   .mobileOverlay.open {
-    display: block;
+    display: inline-block;
   }
 
   .closePopup {
@@ -164,6 +164,12 @@
 .green { 
     background:#38ba5b;
 }
+.contentBackground {
+    background:#E7D2AB;
+}
+.darkgreen {
+    background:#157a25;
+}
 .title {
     border:2px solid white;
     background:#38ba5b;
@@ -187,10 +193,16 @@
     white-space: normal;
     word-wrap: break-word;
 }
+.container {
+    display: flex;
+    justify-content: center;
+    overflow: hidden; /* Prevent overflow past viewport */
+}
 .floatContainer {
     display: flex;
     justify-content: center;
     overflow: hidden; /* Prevent overflow past viewport */
+    width: auto;
 }
 .floatButton {
     margin-top: 15%;
@@ -220,11 +232,11 @@
     aspect-ratio: 622 / 926;
 }
 .sensorInfo {
-    background: #E7D2AB;
-    flex: 1 1 0;
+    flex: 0 0 auto;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;
+    border: 5px solid black;
 }
 .sensorOverlay {
     position: relative;
@@ -234,6 +246,11 @@
     height: 100%;
     z-index:1;
     aspect-ratio: 622 / 926;
+}  
+.sensorDiv{
+  box-sizing: border-box;
+  text-align: center;
+  width: auto;
 }
 .mapButton {
     position: absolute;
@@ -280,9 +297,6 @@
   }
 }
 @media (max-width: 767px) {
-  .sensorDiv{
-    width: 97% !important;
-  }
   .avgButton {
     padding: 0px;
     height: 30px;
@@ -296,20 +310,25 @@
 }
 {/*Banner Styles*/}
 .banner {
-    height: 30%;
-    text-align: center;
-    border: 5px solid black;
+  height: auto;
+  text-align: center;
+  border: 5px solid black;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 @media (min-width: 768px) {
   .bannerText {
     margin-bottom: 5px;
     margin-top: 5px;
+    padding-left: 20px;
+    padding-right:20px; 
+  }
+  .banner {
+    width: 80%;
   }
 }
 @media (max-width: 767px) {
-  .banner {
-    width: 97%;
-  }
   .bannerText {
     margin-bottom: 2px;
     margin-top: 2px;

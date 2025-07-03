@@ -5,7 +5,6 @@
 	"font-size": "1.25em"
       },
       "both": {
-        "backgroundColor": "#E7D2AB",
 	"border": "2px solid black",
         "padding": "10px"
       }
@@ -22,18 +21,23 @@
     "body": "We have noticed some patterns in the air quality data that we've archived. This section of the website discusses those patterns."
   },
   {
-    "title": "Temperature Inversion",
-    "body": ["The temperature inversion phenomenon is when sunlight heats up the ground and in turn the air closest to the ground, causing it ", 
-      "to rise up and disperse ground-level pollutants throughout the atmosphere. This causes air quality readings to improve despite higher ", 
-      "pollutant production throughout the day as the ground absorbs more heat from the sun. Due to this phenomenon, Upton tends to experience ",
-      "its best air quality in the evening while air temperature is dropping, but the ground is still holding some of the heat it absorbed throughout the day."
+    "title": "Quicker Daytime Particulate Dispersal",
+    "body": ["On sunny days, the heat absorbed by the ground will heat up air closest to it, causing it to rise. This causes air quality readings to improve despite higher ", 
+      "pollutant production throughout the day. Due to this phenomenon, Upton tends to experience its best air quality",
+      " in the evening when pollution production is reduced, but the ground is still warmer than the atmosphere."
     ]
+  },
+  {
+    "title": "Temperature Inversion",
+    "body": ["Conversely, when the ground is colder than the surrounding atmosphere, the layer of cold air near the ground can become trapped",
+      " and significantly reduce the dispersal of ground-level pollutants. This tends to happen on clear nights, when there are no clouds to trap heat;",
+      " in valleys, where colder, denser air accumulates; and in coastal regions or around other bodies of water, where the water can create a layer of cool air."]
   },
   {
     "title": "Seasonal Changes",
     "body": ["According Western Mass' Healthy Air Network (healthyairnetwork.org/measuring-air-quality/#SensorDataAnalysis), ",
       "air quality is generally worse in the middle of winter and summer. ",
-      "Their data shows the 5 months with the worst air quality are, in order: July, August, June, December, January. "
+      "Their data shows the 5 months with the worst air quality are, in order: July, August, June, December, January."
     ]
   },
   {

@@ -73,7 +73,7 @@ function SensorInfo({ sensor_id, dummy }) {
     };
 
     return (
-	<div className="sensorDiv" style = {{textAlign: "center", border: "5px solid black", width: "100%"}}>		    
+	<div className="sensorDiv">		    
 	    <h1 className="headerText">Sensor: {sensorName}</h1>
 	    <Banner avg={Math.round(100*data.banner_avg) / 100}/>
 
