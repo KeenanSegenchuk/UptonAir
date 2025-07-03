@@ -5,7 +5,7 @@ FROM nginx:alpine
 COPY nginx/default2.conf /etc/nginx/conf.d/default.conf
 
 # Copy over static react build
-COPY client/build /etc/nginx/html
+# COPY client/build /etc/nginx/html
 
 # Expose ports for http/https
 EXPOSE 443
