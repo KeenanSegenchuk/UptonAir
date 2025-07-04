@@ -141,8 +141,11 @@
 }
 .Button {
     border:1px solid black;
+    font: inherit;
     width:30%;
     z-layer:10;
+    -webkit-user-select: none;
+    user-select: none;
 }
 @media (max-width: 767px) {
   .Button {

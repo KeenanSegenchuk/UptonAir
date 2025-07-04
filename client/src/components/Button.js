@@ -195,7 +195,6 @@ function Button({ id, x, y }) {
         <div title={name} style={{top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>
             <button
 		className="mapButton"
-                type="button"
                 id={id}
                 style={{
 		    backgroundColor: color,
