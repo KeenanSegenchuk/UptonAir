@@ -62,7 +62,7 @@ function EGraph({ }) {
 	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
 	    //console.log("Given context:", dataContext);
   	    const fd = data.filter(entry => entry.context === dataContext);  
-	    console.log("Filter Result:", fd);
+	    //console.log("Filter Result:", fd);
 	    return fd;
         };
 
@@ -174,7 +174,7 @@ function EGraph({ }) {
         	trigger: 'axis'
 	},
 	legend: {
-		show: !isMobile && lineBool
+		show: lineBool //&& !isMobile
 	}
     };
 
@@ -217,6 +217,7 @@ return (
 		</div>
             )}    
 	    <center className="bodyText">*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
+	    {isMobile && <center className="bodyText">*Opening a popup while in line graph mode will automatically select that that sensor to be shown on the line graph.</center>}
         </div>
     </div>
 );

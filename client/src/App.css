@@ -194,6 +194,10 @@
 .title > a {
   margin-left: auto;
 }
+.alertLinkButton {
+    margin-left:auto;
+    margin-right:0px;
+}
 /*Allignment styles*/
 .sinkBox {
     flex: 1;
@@ -339,7 +343,7 @@
     padding-right:20px; 
   }
   .banner {
-    width: 80%;
+    width: 100%;
   }
 }
 @media (max-width: 767px) {

@@ -1,32 +1,66 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { useAppContext } from "../AppContext";
 
-const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style }) => {
-  //This dual button allows for setting hashmap values and hover keys
-  const {switches, setSwitches} = useAppContext();
-  
+const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style = {} }) => {
+  const { switches, setSwitches } = useAppContext();
+
   useEffect(() => {
     setSwitches(prev => {
       const current = new Map(prev);
-      current.set(toggleKey, false); // Initialize toggle state to false
+      if (!current.has(toggleKey)) {
+        current.set(toggleKey, false); // Initialize toggle state to false if not already set
+      }
       return current;
     });
   }, [toggleKey, setSwitches]);
-  
-  const toggle=()=>{
+
+  const toggle = () => {
     setSwitches(prev => {
-	const current = new Map(prev);
-	current.set(toggleKey, !current.get(toggleKey));
-	return current;
+      const current = new Map(prev);
+      current.set(toggleKey, !current.get(toggleKey));
+      return current;
     });
   };
 
+  const isOn = switches.get(toggleKey);
 
   return (
-    <div>
-	<button onClick={toggle} style={style}>
-	    {switches.get(toggleKey) ? textOn : textOff}
-	</button>
+    <div
+      onClick={toggle}
+      style={{
+        display: 'inline-flex',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        border: '1px solid #ccc',
+        cursor: 'pointer',
+        userSelect: 'none',
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          padding: '8px 16px',
+          backgroundColor: !isOn ? '#606060' : '#e0e0e0',
+          color: !isOn ? 'white' : 'black',
+          fontWeight: !isOn ? 'bold' : 'normal',
+          transition: 'background-color 0.2s',
+        }}
+      >
+        {textOff}
+      </div>
+      <div
+        style={{
+          padding: '8px 16px',
+          backgroundColor: isOn ? '#606060' : '#e0e0e0',
+          color: isOn ? 'white' : 'black',
+          fontWeight: isOn ? 'bold' : 'normal',
+          transition: 'background-color 0.2s',
+        }}
+      >
+        {textOn}
+      </div>
     </div>
   );
 });

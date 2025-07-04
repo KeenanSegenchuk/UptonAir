@@ -43,11 +43,11 @@ function Home() {
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row"}}>
                 <h1 className="titleText">Upton Air</h1>
-	        <LinkButton style={{marginLeft:"auto", marginRight: "0"}} text="Get Notified" href={alerts_url}/>
+	        <LinkButton className="alertLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Get Notified"} href={alerts_url}/>
 	    </div>
 
 	    {/*Page Body*/}
-            <div className="container" >
+            <div className="container">
                 {/* Map */}
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo contentBackground sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>

@@ -25,7 +25,7 @@ function Map({ buttons, updateSensor }) {
 		<img className="mapImg" src="/figs/upton.png" alt="Map"/>
 		<div style={{display:"flex", justifyContent: "center", aligItems:"center", top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>
 		    {isMobile ? 
-		        (<ToggleButton className="Button"  textOn={"Click to enable sensor summary."} textOff={"Click to enable sensor selection."} toggleKey="select" style={{height:"30px"}}/>)
+		        (<ToggleButton className="Button"  textOn={"Select Sensors."} textOff={"Show Popup."} toggleKey="select" style={{height:"30px"}}/>)
 			:
 		        (<DButton className="Button" text={"Hover/Click here to show location names."} dkey="labels" style={{height:"30px"}}/>)
 		    }
