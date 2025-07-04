@@ -141,14 +141,8 @@
 }
 .Button {
     border:1px solid black;
-    font: inherit;
     width:30%;
     z-layer:10;
-    -webkit-user-select: none;
-    user-select: none;
-    padding: 0;
-    margin: 0;
-    color: black;
 }
 @media (max-width: 767px) {
   .Button {
@@ -286,6 +280,11 @@
     border: none;
     font-size: .6em;
     cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    padding: 0;
+    margin: 0;
+    color: black;
 }
 @media (max-width: 767px) {
   .mapButton {

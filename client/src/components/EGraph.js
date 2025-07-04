@@ -156,12 +156,23 @@ function EGraph({ }) {
 	xAxis: {
 		type: 'time',
                 axisLabel: {
-                  formatter: function (value) {
-                    const date = new Date(value);
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // months are 0-based
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${month}/${day}`;
-                  }
+                    formatter: function (value) {
+                        const date = new Date(value);
+
+                        if (dataContext === "24-Hour") {
+                            let hours = date.getHours();
+                            const minutes = date.getMinutes().toString().padStart(2, '0');
+                            const ampm = hours >= 12 ? 'PM' : 'AM';
+                            hours = hours % 12;
+                            hours = hours === 0 ? 12 : hours;
+
+                            return `${hours}:${minutes}${ampm}`;
+                        } else {
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            return `${month}/${day}`;
+                        }
+                    }
                 }
 	},
 	yAxis: {
