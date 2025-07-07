@@ -6,15 +6,15 @@
         "padding": "10px"
       },
       "title": {
-	"font-size": "1.25em"
+	"fontSize": "1.25em"
       }
     },
     "style": {
       "title": {
-	"font-size": "3em"
+	"fontSize": "3em"
       },
       "both": {
-	"text-align": "center"
+	"textAlign": "center"
       }
     },
     "title": "What is AQI?",

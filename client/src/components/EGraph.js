@@ -1,42 +1,70 @@
 import ReactECharts from 'echarts-for-react';
 import React, { useEffect, useRef, useState } from 'react';
-import axios from "axios";
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
 import "../App.css";
 
-function EGraph({ }) {
+function EGraph() {
 	/* Graph sensor_id's readings from times start to end.
 	 * Author: Keenan
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
 
-	//Copy api url from appcontext 
-	const {API_URL} = useAppContext();
-	const api = axios.create({
-          baseURL: API_URL,
-	});
-
-
 	//setup data management
-	const {dataContext, sensor_id, data, setData} = useAppContext(); 
+	const {dataContext, sensor_id, data, hover, switches, setPopup} = useAppContext(); 
 	const contexts = getObj("DataContexts");
 
 	//times
 	const [end] = useState(() => Math.floor(Date.now() / 1000));
 	const [start, setStart] = useState(end - contexts[dataContext]);
-	useEffect(() => {setStart(end - contexts[dataContext]);}, [dataContext, end]);
+	useEffect(() => {setStart(end - contexts[dataContext]);}, [dataContext, end, contexts]);
 
-	const [loading, setLoading] = useState(false);
-	const ref = useRef(null);	
+	//communicate graph mode with map via app context
+	const {setGlobalLineBool} = useAppContext();
+	const [lineBool, setLineBool] = useState(false);
+        const toggleLineBool = () => {
+	    let prevState = lineBool;
+	    setLineBool(!prevState); 
+	    setGlobalLineBool(!prevState);
+        };
+
+	//show line graph on mobile
+	//use hover instead 
+	useEffect(() => {
+	    if(isMobile)
+		if(hover === "Graph Multiple") {
+		    setGlobalLineBool(true);
+		    setLineBool(true);
+		    setPopup(true);
+		}
+	}, [hover]);
+
+	useEffect(() => {
+	    if(isMobile) 
+		if(!switches.get("select")) {
+		    setGlobalLineBool(false);
+		    setLineBool(false);
+		}
+	}, [switches]);
+
 
 	//set graph style for mobile/desktop
 	const isMobile = window.matchMedia("(max-width: 767px)").matches;
 	const graphStyle = isMobile
-	  ? { width: "400px", height: "250px" }
+	  ? { width: "100%", height: "250px" }
 	  : { width: "900px", height: "400px" };
-	const gradConf = isMobile
+
+	
+	const gradConf = {
+		type:"rect",
+		z: 0,
+		coords: [
+		  ["min","min"],
+		  ["max","max"]
+		]
+	};
+	/*const gradConf = isMobile
 	  ? {
 	      type: 'rect',
 	      left: 40,
@@ -55,8 +83,7 @@ function EGraph({ }) {
 	        width: 720,
 	        height: 280,
 	      }
-	};
-
+	};*/
         //filter for current data context
         const filteredData = () => {
 	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
@@ -67,23 +94,14 @@ function EGraph({ }) {
         };
 
 	//setup nBars slider functionality
-	const iNit = isMobile ? 240 : 50;
+	const iNit = isMobile ? 480 : 50;
 	const [nBars, setN] = useState(iNit); 
 	const handleSlider = (e) => {
 	    setN(parseInt(e.target.value));
 	};
 
-	//communicate graph mode with map via app context
-	const {setGlobalLineBool} = useAppContext();
-	const [lineBool, setLineBool] = useState(false);
-        const toggleLineBool = () => {
-	    let prevState = lineBool;
-	    setLineBool(!prevState); 
-	    setGlobalLineBool(!prevState);
-        };
-
-	const [gradient, setGradient] = useState({});
  	//Update daylight gradient when timespan changes
+	const [gradient, setGradient] = useState({});
 	useEffect(() => {
 		setGradient({
 		    graphic: [{
@@ -117,7 +135,7 @@ function EGraph({ }) {
 
   //get the bars for graphing current sensor
   const getBars = () => {
-    const selectedData = filteredData().find(entry => entry.sensor == sensor_id);
+    const selectedData = filteredData().find(entry => entry.sensor === sensor_id);
     //console.log("Selected Data:", selectedData);
     let response = { data: [[0,0]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
     if(selectedData)
@@ -128,8 +146,14 @@ function EGraph({ }) {
 
   //avg data into n bins of equal time-length
     const formatBars = (b, n) => {
-        let bars = graphUtil("getBars")(b, n, start, end);
-        bars = {
+	let bars = ["init"];
+	try {
+            bars = graphUtil("getBars")(b, n, start, end);
+        } catch(error) {
+	    console.log("Error binning data into bars.");
+	    return bars;
+	}
+	bars = {
             type: "bar",
             name: getObj("$" + b.sensor),
             data: bars.x.map((timestamp, i) => ({
@@ -139,17 +163,6 @@ function EGraph({ }) {
         };
 	return bars;
 
-    };
-
-
-
-    const colorMap = (val) => {
-	const colors = getObj("c");
-	const ranges = getObj("r");
-	for(let i = 0; i < ranges.length; i++)
-		if(val<ranges[i])
-			return colors[i];
-	return colors[colors.length-1];
     };
 
     const graphFormat = {
@@ -189,18 +202,15 @@ function EGraph({ }) {
 	}
     };
 
-if (loading)
-	{return (<div className="loading-message">Loading...</div>);}
-
 return (
     <div className="Marginless">
         <h1 className="headerText">{dataContext} AQI Readings</h1>
-        <div className="graphContainer" ref={ref}>
-            <button className="Button" onClick={toggleLineBool}>
+        <div className="graphContainer">
+            <button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>
             {lineBool ? (
-		<div>
+		<div className="graphDiv">
 		    {!isMobile && <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center>} 
 		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
     				style={graphStyle}
@@ -209,7 +219,7 @@ return (
 		    />
 		</div>
             ) : (
-		<div>
+		<div className="graphDiv">
 		    <h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
 		    <center><input className="Marginless hideMobile"
 		        type="range"

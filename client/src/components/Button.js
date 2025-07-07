@@ -198,7 +198,7 @@ function Button({ id, x, y }) {
                 id={id}
                 style={{
 		    backgroundColor: color,
-		    outline: globalLineBool || switches.get("select") || isMobile ? borderStyle : "none",
+		    outline: globalLineBool || switches.get("select") ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
 		    zIndex: 10,

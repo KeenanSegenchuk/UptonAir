@@ -21,7 +21,7 @@ function Home() {
 
     //other vars
     const [loading, setLoading] = useState(false);
-    const {sensor_id} = useAppContext();
+    const {sensor_id, setHover} = useAppContext();
     const [dummy, setDummy] = useState(false);
 
     //times
@@ -52,7 +52,7 @@ function Home() {
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo contentBackground sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>
 		    {/* Summary and Graph */}
-		    <button className="closePopup" onClick={() => { setPopup(false); /*setGlobalLineBool(false);*/ }}>
+		    <button className="closePopup" onClick={() => { setPopup(false); setHover("closed"); /*setGlobalLineBool(false);*/ }}>
 			  <span className="label">Return to Map</span>
 			  <span className="closeIcon">✖</span>
 		    </button>

@@ -30,6 +30,7 @@ const InfoContainer = ({ infodoc }) => {
 	    <InfoBox 
 		className={info.type === "image" ? "staticImage" : undefined}
 		id={index} 
+		key={index}
 		images={info.images && info.images} 
 		title={info.title} 
 		body={info.body && info.body} 

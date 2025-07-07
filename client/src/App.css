@@ -6,7 +6,6 @@
   height: 40vmin;
   pointer-events: none;
 }
-
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -133,6 +132,9 @@
     font-size: 1.2rem;
     line-height: 1;
   }
+  .graphDiv {
+    width: 100%;
+  }
 }
 /*----Styles from pages----*/
 .MainBody {
@@ -143,6 +145,39 @@
     border:1px solid black;
     width:30%;
     z-layer:10;
+}
+.toggleOn {
+  background: #cbcbcb;
+  color: black;
+  font-weight: bold;
+  border: 2px solid #b4b4b4;
+  box-shadow: 0 0 8px rgba(156, 186, 191, 0.5);
+  transition: all 0.3s ease;
+}
+
+.toggleOff {
+  background: #ACABAD;
+  color: black;
+  font-weight: normal;
+  border: 2px solid #919191;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.toggleOnClickable {
+  background: #38ba5b;
+  color: white;
+  font-weight: bold;
+  border: 2px solid #2e994a;
+  box-shadow: 0 0 8px rgba(56, 186, 91, 0.5);
+  transition: all 0.3s ease;
+}
+.toggleOffClickable { 
+  background: #FA5A54;
+  color: black;
+  font-weight: normal;
+  border: 2px solid #d94a45;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 @media (max-width: 767px) {
   .Button {
@@ -252,9 +287,9 @@
 .sensorInfo {
     flex: 1 1 auto;
     height: auto;
+    border: 5px solid black;
     overflow-y: auto;
     overflow-x: hidden;
-    border: 5px solid black;
 }
 .sensorOverlay {
     position: relative;
@@ -269,6 +304,8 @@
   box-sizing: border-box;
   text-align: center;
   width: auto;
+}
+.graphDiv{
 }
 .mapButton {
     position: absolute;

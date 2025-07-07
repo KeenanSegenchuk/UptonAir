@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppContext } from "../AppContext";
 
 const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style = {} }) => {
-  const { switches, setSwitches } = useAppContext();
+  const { switches, setSwitches, setHover } = useAppContext();
 
   useEffect(() => {
     setSwitches(prev => {
@@ -14,19 +14,31 @@ const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style = {} }) => 
     });
   }, [toggleKey, setSwitches]);
 
-  const toggle = () => {
+  const toggle = (key) => {
+    console.log("Switching key:", key);
     setSwitches(prev => {
+      console.log("Setting to:", !prev);
       const current = new Map(prev);
-      current.set(toggleKey, !current.get(toggleKey));
+      current.set(key, !current.get(key));
       return current;
     });
   };
-
+  
   const isOn = switches.get(toggleKey);
+
+
+  //you can use a pipe character to show different text when one side of the toggle is selected
+  //check for different text on toggle
+  const partsOn = textOn.split('|').map(p => p.trim());
+  const partsOff = textOff.split('|').map(p => p.trim());
+
+  const txtOff = partsOff.length === 1 ? partsOff[0] : (isOn ? partsOff[1] : partsOff[0]);
+  const txtOn  = partsOn.length === 1  ? partsOn[0]  : (isOn ? partsOn[1]  : partsOn[0]);
+  const clickOff = partsOff.length === 1 ? () => toggle(toggleKey) : () => setHover(partsOff[1]);
+  const clickOn = partsOn.length === 1 ? () => toggle(toggleKey) : () => setHover(partsOn[1]);
 
   return (
     <div
-      onClick={toggle}
       style={{
         display: 'inline-flex',
         borderRadius: '8px',
@@ -40,26 +52,26 @@ const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style = {} }) => 
       }}
     >
       <div
+        onClick={!switches.get(toggleKey) ? clickOff : () => toggle(toggleKey)}
+	className = { `${!isOn ? "toggleOn":"toggleOff"}
+		       ${!isOn && partsOff.length === 2 ? 'toggleOnClickable' : ''}` }
         style={{
           padding: '8px 16px',
-          backgroundColor: !isOn ? '#606060' : '#e0e0e0',
-          color: !isOn ? 'white' : 'black',
-          fontWeight: !isOn ? 'bold' : 'normal',
           transition: 'background-color 0.2s',
         }}
       >
-        {textOff}
+        {txtOff}
       </div>
       <div
+        onClick={switches.get(toggleKey) ? clickOn : () => toggle(toggleKey)}
+	className = { `${isOn ? "toggleOn":"toggleOff"}
+		       ${isOn && partsOn.length === 2 ? 'toggleOnClickable' : ''}` }
         style={{
           padding: '8px 16px',
-          backgroundColor: isOn ? '#606060' : '#e0e0e0',
-          color: isOn ? 'white' : 'black',
-          fontWeight: isOn ? 'bold' : 'normal',
           transition: 'background-color 0.2s',
         }}
       >
-        {textOn}
+        {txtOn}
       </div>
     </div>
   );
