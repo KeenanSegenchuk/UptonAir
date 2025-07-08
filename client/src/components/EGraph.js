@@ -1,5 +1,5 @@
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
@@ -49,41 +49,60 @@ function EGraph() {
 	}, [switches]);
 
 
+	//track component width
+	const containerRef = useRef(null);
+	const [width, setWidth] = useState(0);
+	useEffect(() => {
+	  const element = containerRef.current;
+	  console.log("here");
+	  if (!element) return;
+	  const ro = new ResizeObserver(([entry]) => {
+	    const newWidth = entry.contentRect.width;
+	    setWidth(prevWidth => {
+	      // Only update if width changed to avoid rerenders
+	      if (Math.abs(prevWidth - newWidth) > 30) {
+	        return newWidth;
+	      }
+	      return prevWidth; // No change → no rerender
+	    });
+	  });
+	  ro.observe(element);
+	  return () => ro.disconnect();
+	}, []);
+	console.log("rerendered");
+
+
 	//set graph style for mobile/desktop
 	const isMobile = window.matchMedia("(max-width: 767px)").matches;
 	const graphStyle = isMobile
-	  ? { width: "100%", height: "250px" }
-	  : { width: "900px", height: "400px" };
+	  ? { width: `${width}px`, height: "250px" }
+	  : { width: `${width}px`, height: "400px" };
 
 	
-	const gradConf = {
-		type:"rect",
-		z: 0,
-		coords: [
-		  ["min","min"],
-		  ["max","max"]
-		]
-	};
-	/*const gradConf = isMobile
-	  ? {
-	      type: 'rect',
-	      left: 40,
-	      top: 60,
-	      z: 0,
-	      shape: {
-	        width: 320,
-	        height: 120,
+	const gradConf = useMemo(() => (
+	  isMobile
+	    ? {
+	        type: 'rect',
+	        left: width / 10,
+	        top: 60,
+	        z: 0,
+	        shape: {
+	          width: 8 * width / 10,
+	          height: 120,
+	        }
 	      }
-	}  :  {
-	      type: 'rect',
-	      left: 90,
-	      top: 50,
-	      z: 0,
-	      shape: {
-	        width: 720,
-	        height: 280,
+	    : {
+	        type: 'rect',
+	        left: width / 10,
+	        top: 50,
+	        z: 0,
+	        shape: {
+	          width: 8 * width / 10,
+	          height: 280,
+	        }
 	      }
-	};*/
+	), [width]);
+
         //filter for current data context
         const filteredData = () => {
 	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
@@ -112,7 +131,7 @@ function EGraph() {
 		    }]
 		});
 		//console.log("New gradient: ", gradient);
-	}, [start, end]);
+	}, [start, end, gradConf]);
 
   //Format data series for each line
 	const formatLine = (l) => {
@@ -210,7 +229,7 @@ return (
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>
             {lineBool ? (
-		<div className="graphDiv">
+		<div className="graphDiv" ref={containerRef}>
 		    {!isMobile && <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center>} 
 		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
     				style={graphStyle}
@@ -219,7 +238,7 @@ return (
 		    />
 		</div>
             ) : (
-		<div className="graphDiv">
+		<div className="graphDiv" ref={containerRef}>
 		    <h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
 		    <center><input className="Marginless hideMobile"
 		        type="range"

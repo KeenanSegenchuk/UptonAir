@@ -4,7 +4,7 @@ import "../App.css";
 //import Graph from './Graph';
 import EGraph from './EGraph';
 import Banner from './Banner';
-import { useAppContext } from "../AppContext";
+import { useAppContext, AppContext } from "../AppContext";
 import { getObj } from "../getObj";
 
 function SensorInfo({ sensor_id, dummy }) {
@@ -19,7 +19,8 @@ function SensorInfo({ sensor_id, dummy }) {
     const [loading, setLoading] = useState(true);
     const [sensorName, setSensorName] = useState('');
     const [contextIndex, setIndex] = useState(1);
-    const {setDataContext, setPopup} = useAppContext();
+    const {setDataContext, setPopup, switches} = useAppContext();
+    const mobileMultiSelect = switches.get("select");
 
     const d = Date.now();
     const sec = 1000;
@@ -73,19 +74,25 @@ function SensorInfo({ sensor_id, dummy }) {
     };
 
     return (
-	<div className="sensorDiv">		    
-	    <h1 className="headerText">Sensor: {sensorName}</h1>
-	    <Banner avg={Math.round(100*data.banner_avg) / 100}/>
+	<div className="sensorDiv">
+	    <div className={mobileMultiSelect ? "hideMobile" : ""}>		    
+	        <h1 className="headerText">Sensor: {sensorName}</h1>
+	        <Banner avg={Math.round(100*data.banner_avg) / 100}/>
 
-    	    <h1 className="headerText">Recent AQI Averages:</h1>
+    	        <h1 className="headerText">Recent AQI Averages:</h1>
+	    </div>
+
+	    <h1 className={`headerText ${mobileMultiSelect ? "showMobile" : "hide"}`}>Choose Timeframe</h1>
+
             <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', gap: '0'}}>
                 {data.avgs.map((avg, index) => (
                     <div key={index} style={{ margin: "0", display: 'flex', flexDirection: 'column', width: "22%"}}>
                         <button className="floatBox avgButton" onClick={() => infoClick(index)}>{dataContexts[index].context}</button>
-                        <h1 className="floatBox avgBox" style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}findcolorofAQI`)}}>{Math.round(100 * avg) / 100}</h1>
+                        <h1 className={`floatBox avgBox ${mobileMultiSelect ? "hideMobile" : ""}`} style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}findcolorofAQI`)}}>{Math.round(100 * avg) / 100}</h1>
                     </div>
                 ))}
             </div>
+	    <div className={mobileMultiSelect ? "showMobile" : "hide"} style={{height:"25px"}}> </div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	</div>
     );
