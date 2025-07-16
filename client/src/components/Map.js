@@ -20,7 +20,7 @@ function Map({ buttons, updateSensor }) {
         <div className="mapContainer">
             <div className="sensorOverlay">
                 {buttons.map((button, index) => (
-                    <Button onClick={() => triggerPopup()} key={index} val={button.avg} id={button.id} x={button.x} y={button.y} updateSensor={updateSensor} />
+                    <Button onClick={() => triggerPopup()} key={index} val={button.avg} id={button.id} x={button.x} y={button.y}/>
                 ))}
 		<img className="mapImg" src="/figs/upton.png" alt="Map"/>
 		<div style={{display:"flex", justifyContent: "center", aligItems:"center", top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>

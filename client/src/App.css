@@ -348,7 +348,7 @@
 }
 @media (min-width: 768px) {
   .avgButton {
-    font-size: 24px;
+    font-size: clamp(2px, 2vw, 24px);
     height: 55px;
   }
   .avgBox {
