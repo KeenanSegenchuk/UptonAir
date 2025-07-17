@@ -202,6 +202,11 @@ function Button({ id, x, y }) {
                     top: y+"%",
                     left: x+"%",
 		    zIndex: 10,
+        	    clipPath: id === "0"
+        	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
+       	              : "none"
+		    ,width: id === "0" ? "35px" : undefined
+		    ,height: id === "0" ? "35px" : undefined
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >

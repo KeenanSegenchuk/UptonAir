@@ -1,13 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 
-function LeafletButton({ button, children }) {
+function LeafletButton({ button, children, clipOnBoundary = true }) {
   const map = useMap();
   const [pos, setPos] = useState(null);
 
+  const hasValidCoords = Number.isFinite(button?.lat) && Number.isFinite(button?.lon);
+
   const updatePosition = () => {
-    const point = map.latLngToContainerPoint([button.lat, button.lon]);
-    setPos({ x: point.x, y: point.y });
+    if (!hasValidCoords) {
+      setPos(null);
+      return;
+    }
+
+    try {
+      let point = map.latLngToContainerPoint([button.lat, button.lon]);
+
+      if (clipOnBoundary) {
+        const size = map.getSize();
+        point.x = Math.max(0, Math.min(point.x, size.x));
+        point.y = Math.max(0, Math.min(point.y, size.y));
+
+	//set 
+      }
+
+      setPos({ x: point.x, y: point.y });
+    } catch (error) {
+      console.error('LeafletButton projection error:', error);
+      setPos(null);
+    }
   };
 
   useEffect(() => {
@@ -18,15 +39,15 @@ function LeafletButton({ button, children }) {
     };
   }, [map, button.lat, button.lon]);
 
-  if (!pos) return null;
+  if (!hasValidCoords || !pos) return null;
 
   return (
     <div
       style={{
         position: 'absolute',
-        left: pos.x - 20,  // center it
-        top: pos.y - 20,
-        pointerEvents: 'auto',  // make sure it can be clicked
+        left: pos.x,
+        top: pos.y,
+        pointerEvents: 'auto',
         zIndex: 500,
       }}
     >

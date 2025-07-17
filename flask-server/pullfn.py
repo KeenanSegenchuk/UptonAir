@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import ConnectionError
 from cleanfn import cleanfn
 from time import time
 import asyncio
@@ -60,7 +61,15 @@ async def pullfn(return_data = False):
         url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
         header = {"X-API-Key": key}
 	#pull from purpleair's api
-        response = requests.get(url, headers=header)
+        try:
+            response = requests.get(url, headers=header)
+            response.raise_for_status()
+        except ConnectionError as ce:
+            print(f"Connection error occurred: {ce}")
+            return []
+        except requests.HTTPError as he:
+            print(f"HTTP error occurred: {he}")
+            return []
         for line in response.content.decode('utf-8').splitlines():
             data.append(line)
             print(f'line: {line}')

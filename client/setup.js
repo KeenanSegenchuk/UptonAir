@@ -2,38 +2,72 @@
 
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
-// Copy sensor-pos.json to src
-try {
-  const sensorSource = path.resolve(__dirname, '../sensor-pos.json');
-  const sensorDestination = path.resolve(__dirname, 'src/sensor-pos.json');
+const sensorSource = path.resolve(__dirname, '../sensor-pos.json');
+const sensorDestination = path.resolve(__dirname, 'src/sensor-pos.json');
 
-  if (!fs.existsSync(sensorSource)) {
-    throw new Error(`Source file not found: ${sensorSource}`);
+async function fetchLatLon(sensorId) {
+  if(sensorId == "0")
+    return {
+      lat: 42.174540,
+      lon: -71.602290
+    };
+
+  const url = `https://api.purpleair.com/v1/sensors/${sensorId}?fields=latitude,longitude`;
+  const options = {
+    headers: {
+      'X-API-Key': "A52182AD-3030-11F0-81BE-42010A80001F"
+    }
+  };
+
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`API request failed: ${res.status} ${res.statusText}`);
   }
 
-  fs.copyFileSync(sensorSource, sensorDestination);
-  console.log('✅ sensor-pos.json copied to src/');
-} catch (err) {
-  console.error('❌ Failed to copy sensor-pos.json:', err.message);
+  const data = await res.json();
+
+  // DEBUG print raw API response (to see what's happening)
+  console.log(`Raw API response for sensor ${sensorId}:`, JSON.stringify(data));
+
+  if (!data.sensor || data.sensor.latitude == null || data.sensor.longitude == null) {
+    throw new Error(`Missing latitude/longitude in API response for sensor ${sensorId}`);
+  }
+
+  return {
+    lat: data.sensor.latitude,
+    lon: data.sensor.longitude
+  };
 }
 
-// Configure env vars
-/*try {
-  const configSource = path.resolve(__dirname, '../client-config.json');
+async function main() {
+  try {
+    if (!fs.existsSync(sensorSource)) {
+      throw new Error(`Source file not found: ${sensorSource}`);
+    }
 
-  if (!fs.existsSync(configSource)) {
-    throw new Error(`client-config.json not found at ${configSource}`);
+    const sensorsRaw = fs.readFileSync(sensorSource, 'utf-8');
+    const sensors = JSON.parse(sensorsRaw);
+
+    // Fetch lat/lon for each sensor
+    for (const obj of sensors) {
+      try {
+        const { lat, lon } = await fetchLatLon(obj.id);
+        obj.lat = lat;
+        obj.lon = lon;
+        console.log(`✅ Sensor ${obj.id} updated with lat: ${lat}, lon: ${lon}`);
+      } catch (fetchErr) {
+        console.error(`❌ Failed to fetch lat/lon for sensor ${obj.id}:`, fetchErr.message);
+      }
+    }
+
+    // Save updated sensors to destination file
+    fs.writeFileSync(sensorDestination, JSON.stringify(sensors, null, 2));
+    console.log(`✅ sensor-pos.json copied and updated at src/`);
+  } catch (err) {
+    console.error('❌ Setup failed:', err.message);
   }
+}
 
-  const configRaw = fs.readFileSync(configSource, 'utf-8');
-  const config = JSON.parse(configRaw); // ensure valid JSON
-
-  for (const [key, value] of Object.entries(config)) {
-    process.env[key] = value;
-    console.log(`🌱 ENV set: ${key}=${value}`);
-  }
-
-} catch (err) {
-  console.error('❌ Error setting environment variables:', err.message);
-}*/
+main();
