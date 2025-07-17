@@ -54,7 +54,6 @@ function EGraph() {
 	const [width, setWidth] = useState(0);
 	useEffect(() => {
 	  const element = containerRef.current;
-	  console.log("here");
 	  if (!element) return;
 	  const ro = new ResizeObserver(([entry]) => {
 	    const newWidth = entry.contentRect.width;
@@ -69,7 +68,6 @@ function EGraph() {
 	  ro.observe(element);
 	  return () => ro.disconnect();
 	}, []);
-	console.log("rerendered");
 
 
 	//set graph style for mobile/desktop
