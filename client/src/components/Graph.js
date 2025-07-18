@@ -178,10 +178,12 @@ function Graph({ sensor_id, start, end, dummy }) {
 	};
   };
 
-
+useEffect(() => {
+    window.dispatchEvent(new Event('resize'));
+}, []); 
 
 if (loading)
-	{return (<div className="loading-message">Loading...</div>);}
+    {return (<div className="loading-message">Loading...</div>);}
 
 return (
     <div className="Marginless">

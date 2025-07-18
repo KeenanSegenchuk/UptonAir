@@ -219,6 +219,10 @@ function EGraph() {
 	}
     };
 
+useEffect(() => {
+    window.dispatchEvent(new Event('resize'));
+}, []); 
+
 return (
     <div className="Marginless">
         <h1 className="headerText">{dataContext} AQI Readings</h1>

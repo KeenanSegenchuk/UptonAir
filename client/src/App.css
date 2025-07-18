@@ -268,6 +268,7 @@
 {/*Map Styles*/}
 .mapContainer {
     width: auto;               /* OR fixed width like 300px */
+    width: 30vw;
     height: auto;
     flex: 1 0 auto;            /* do not grow/shrink in flex */
     aspect-ratio: 622 / 926;   /* maintain image ratio */
@@ -301,6 +302,7 @@
   box-sizing: border-box;
   text-align: center;
   width: auto;
+  width: 70vw;
 }
 .graphDiv{
   width:100%;

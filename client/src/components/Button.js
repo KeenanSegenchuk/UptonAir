@@ -205,8 +205,9 @@ function Button({ id, x, y }) {
         	    clipPath: id === "0"
         	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
        	              : "none"
-		    ,width: id === "0" ? "35px" : undefined
-		    ,height: id === "0" ? "35px" : undefined
+		    ,width: id === "0" ? "70px" : undefined
+		    ,height: id === "0" ? "70px" : undefined
+		    ,fontSize: id === "0" ? "1.5em" : undefined
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >

@@ -35,7 +35,7 @@ function Map({ buttons }) {
   };
 
   return (
-    <div className="mapContainer" style={{ position: 'relative', width:"30vw" }}>
+    <div className="mapContainer" style={{ position: 'relative' }}>
       <MapContainer
         center={[42.173996, -71.60191]} // Choose your map center
         zoom={13}

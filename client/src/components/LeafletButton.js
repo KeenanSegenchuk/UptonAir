@@ -41,15 +41,17 @@ function LeafletButton({ button, children, clipOnBoundary = true }) {
 
   if (!hasValidCoords || !pos) return null;
 
+  const style = {
+    position: 'absolute',
+    left: button.id === "0" ? map.getSize().x-70: pos.x - 10, // or whatever value
+    top: button.id === "0" ? 0 : pos.y - 10,
+    pointerEvents: 'auto',
+    zIndex: 500,
+  };
+
   return (
     <div
-      style={{
-        position: 'absolute',
-        left: pos.x,
-        top: pos.y,
-        pointerEvents: 'auto',
-        zIndex: 500,
-      }}
+      style={style}
     >
       {children}
     </div>
