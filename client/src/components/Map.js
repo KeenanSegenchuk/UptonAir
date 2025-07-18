@@ -35,7 +35,9 @@ function Map({ buttons }) {
   };
 
   return (
-    <div className="mapContainer" style={{ position: 'relative' }}>
+    <div className="mapContainer" style={{ position: 'relative',
+					   height: isMobile ? '70vh' : undefined,
+        				   width: isMobile ? '90vw' : undefined }}>
       <MapContainer
         center={[42.173996, -71.60191]} // Choose your map center
         zoom={13}
@@ -71,7 +73,7 @@ function Map({ buttons }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          zIndex: 1000
+          zIndex: 999
         }}
       >
         {isMobile ? (

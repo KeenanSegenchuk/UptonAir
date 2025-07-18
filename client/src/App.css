@@ -302,7 +302,11 @@
   box-sizing: border-box;
   text-align: center;
   width: auto;
-  width: 70vw;
+}
+@media (min-width: 768px) {
+  .sensorDiv{
+    width: 70vw;
+  }
 }
 .graphDiv{
   width:100%;

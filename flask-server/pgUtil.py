@@ -394,6 +394,87 @@ def pgListAlerts(cur):
 	
 	print(rows)
 
+import time
+from collections import defaultdict
+
+def pgCheckAlerts():
+    conn, cur = pgOpen()
+    now = int(time.time())
+    
+    # Get all alerts that are eligible to trigger
+    cur.execute("""
+        SELECT * FROM alerts
+        WHERE %s - last_alert >= cooldown
+    """, (now,))
+    alerts = cur.fetchall()
+
+    triggered_alerts = []
+
+    for alert in alerts:
+        address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+
+        window_start = now - avg_window * 60
+
+        # Get AQI averages for readings from relevant ids in the time window
+        cur.execute("""
+            SELECT id, AVG(AQI) as avg_aqi
+            FROM readings
+            WHERE id = ANY(%s)
+              AND time >= %s
+            GROUP BY id
+        """, (ids, window_start))
+        
+        results = cur.fetchall()
+
+        # Check if any average exceeds the threshold
+        triggered_ids = []
+        for id_val, avg_aqi in results:
+            if avg_aqi > min_AQI:
+                triggered_ids.append((id_val, float(avg_aqi)))
+
+        # If any triggers occurred, update alert and record the result
+        if triggered_ids:
+            cur.execute("""
+                UPDATE alerts
+                SET last_alert = %s,
+                    n_triggered = n_triggered + 1
+                WHERE address = %s AND name = %s
+            """, (now, address, name))
+
+            for id_val, avg_aqi in triggered_ids:
+                triggered_alerts.append({
+                    "alert": {
+                        "address": address,
+                        "name": name,
+                        "min_AQI": min_AQI,
+                        "ids": ids,
+                        "cooldown": cooldown,
+                        "avg_window": avg_window,
+                        "last_alert": now,
+                        "n_triggered": n_triggered + 1  # this is what it *will* be after the update
+                    },
+                    "triggered_id": id_val,
+                    "average_aqi": avg_aqi
+                })
+
+    conn.commit()
+    conn.close()
+    return triggered_alerts
+
+import json
+from datetime import datetime
+
+#convenient to print useful stuff to logs
+def pgLog(triggered_alerts, filename="log.txt"):
+    with open(filename, "a") as f:
+        for alert_entry in triggered_alerts:
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "triggered_id": alert_entry["triggered_id"],
+                "average_aqi": alert_entry["average_aqi"],
+                "alert": alert_entry["alert"]
+            }
+            f.write(json.dumps(log_entry) + "\n")
 
 if __name__ == "__main__":
 	#pgInit("data.txt")

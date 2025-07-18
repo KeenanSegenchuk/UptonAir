@@ -162,6 +162,7 @@ function Button({ id, x, y }) {
 	    }
 	    return;
         }
+	console.log(sensorValue);
 	setSensor_id(id);
 	if(isMobile) {
 	    setPopup(true);
@@ -201,7 +202,7 @@ function Button({ id, x, y }) {
 		    outline: globalLineBool || switches.get("select") ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
-		    zIndex: 10,
+		    zIndex: 1000,
         	    clipPath: id === "0"
         	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
        	              : "none"
