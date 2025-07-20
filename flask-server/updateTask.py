@@ -27,7 +27,10 @@ def alert_loop():
                 log(e);
 def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
-        cutoff, new_lines = asyncio.run(pullfn(return_data=True))
+        try:
+            cutoff, new_lines = asyncio.run(pullfn(return_data=True))
+        except:
+            log("Error pulling data. pullfn returned empty")
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
             os.environ['CLEANING'] = "true"
