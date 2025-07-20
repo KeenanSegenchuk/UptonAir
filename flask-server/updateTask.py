@@ -31,6 +31,7 @@ def update_loop():
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
         except:
             log("Error pulling data. pullfn returned empty")
+            return
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
             os.environ['CLEANING'] = "true"
