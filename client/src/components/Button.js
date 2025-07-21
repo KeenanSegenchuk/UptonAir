@@ -91,7 +91,7 @@ function Button({ id, x, y }) {
     };
     const syncBorder = () => {
 	if(selected)
-		setBorderStyle("5px solid " + borderColor);
+		setBorderStyle(`0 0 0 5px ${borderColor}`);
 	else
 		setBorderStyle("none");
     };
@@ -198,11 +198,12 @@ function Button({ id, x, y }) {
 		className="mapButton"
                 id={id}
                 style={{
+		    color: (id === "0" && selected && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
 		    backgroundColor: color,
-		    outline: globalLineBool || switches.get("select") ? borderStyle : "none",
+		    boxShadow: globalLineBool || switches.get("select") ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
-		    zIndex: 1000,
+		    zIndex: selected ? 2000 : 1000,
         	    clipPath: id === "0"
         	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
        	              : "none"
