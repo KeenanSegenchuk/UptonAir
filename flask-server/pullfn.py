@@ -46,7 +46,7 @@ async def pullfn(return_data = False):
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
     datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
-    key = "A52182AD-3030-11F0-81BE-42010A80001F"
+    key = "97AFA31E-6D6C-11F0-AF66-42010A800028"
 
     #populate data with responses from purpleair's api
     data = []
