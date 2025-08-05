@@ -438,15 +438,8 @@ def pgCheckAlerts():
 
         avg_all = total / len(results)
 
-        # If any triggers occurred, update alert and record the result
+        # If any triggers occurred, record the result then update db entry
         if triggered_ids:
-            cur.execute("""
-                UPDATE alerts
-                SET last_alert = %s,
-                    n_triggered = n_triggered + 1
-                WHERE address = %s AND name = %s
-            """, (now, address, name))
-
             if True:
                 triggered_alerts.append({
                     "alert": {
@@ -462,6 +455,13 @@ def pgCheckAlerts():
                     "triggered_ids":triggered_ids,
                     "avg_aqi":avg_all
                 })
+
+            cur.execute("""
+                UPDATE alerts
+                SET last_alert = %s,
+                    n_triggered = n_triggered + 1
+                WHERE address = %s AND name = %s
+            """, (now, address, name))
 
     conn.commit()
     conn.close()

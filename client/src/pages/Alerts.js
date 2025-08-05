@@ -8,8 +8,8 @@ const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
 function Alerts() {
-    const {API_URL} = useAppContext();
     const {BASE_URL} = useAppContext();
+    const API_URL = BASE_URL + "api/";
     const dashboard_url = BASE_URL + "dashboard";
     const api = axios.create({
       baseURL: API_URL,
