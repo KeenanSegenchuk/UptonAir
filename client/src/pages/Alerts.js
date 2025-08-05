@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-//import "../App.css";
+import "../App.css";
 import "../DeepseekCSSorcery/Alerts.css";
 import LinkButton from "../components/LinkButton";
 import { useAppContext } from "../AppContext";
