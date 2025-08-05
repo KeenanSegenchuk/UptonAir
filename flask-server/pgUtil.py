@@ -456,7 +456,7 @@ def pgCheckAlerts():
                         "ids": ids,
                         "cooldown": cooldown,
                         "avg_window": avg_window,
-                        "last_alert": now,
+                        "last_alert": last_alert,
                         "n_triggered": n_triggered + 1  # this is what it *will* be after the update
                     },
                     "triggered_ids":triggered_ids,
