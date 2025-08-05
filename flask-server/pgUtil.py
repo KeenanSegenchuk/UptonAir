@@ -416,7 +416,7 @@ def pgCheckAlerts():
 
         # Get AQI averages for readings from relevant ids in the time window
         cur.execute("""
-            SELECT id, AVG(AQI) as avg_aqi
+            SELECT id, AVG(AQIEPA) as avg_aqi
             FROM readings
             WHERE id = ANY(%s)
               AND time >= %s
@@ -424,6 +424,9 @@ def pgCheckAlerts():
         """, (ids, window_start))
         
         results = cur.fetchall()
+
+        if len(results) == 0:
+            continue
 
         # Check if any average exceeds the threshold
         triggered_ids = []
