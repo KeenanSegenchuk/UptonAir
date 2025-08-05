@@ -39,6 +39,7 @@ const ToggleButton = React.memo(({ textOn, textOff, toggleKey, style = {} }) => 
 
   return (
     <div
+      id="Togglebutton.js"
       style={{
         display: 'inline-flex',
         borderRadius: '8px',

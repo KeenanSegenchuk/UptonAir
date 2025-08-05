@@ -143,6 +143,16 @@
     width:30%;
     z-layer:10;
 }
+.dashboardButton {
+    padding:10px;
+    font-size: 1.3em;
+    color:white;
+    width:50%;
+    background: #38ba5b;
+    border: 1px solid white;
+    display: inline-block;
+    text-decoration:none;
+}
 .toggleOn {
   background: #cbcbcb;
   color: black;
@@ -181,6 +191,37 @@
     width:100%;
   }
 }
+{/* margins */}
+a.tabbed {
+    margin-left:1%;
+}
+p {
+    margin-top:0;
+    margin-bottom:0;
+}
+p.wmargin {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+p.tabbed{
+  margin-left:5%;
+  margin-right:5%;
+}
+p.centered{
+  margin-left:auto;
+  margin-right:auto;
+  max-width:75%;
+}
+h2.tabbed {
+  margin-left:1%;
+}
+h3.tabbed {    
+  margin-left:2%;
+}
+h3, h2 {
+     margin-top:5px;
+     margin-bottom:5px;
+}
 .Marginless {
     margin:0px;
     margin-top:0px;
@@ -188,6 +229,30 @@
     margin-right:0px;
     margin-left:0px;
     padding:0px;
+}
+.noLineSpacing {
+    margin-top:0px;
+    margin-bottom:0px;
+}
+
+/*Fonts*/
+.s25 {
+    font-size:2.5em;
+}
+.s18 {
+    font-size:1.8em;
+}
+.s15 {
+    font-size:1.5em;
+}
+.s16 {
+    font-size:1.6em;
+}
+.s12 {
+    font-size:1.2em;
+}
+.s9  {
+    font-size:.9em;
 }
 /*Homepage Title*/
 .blue{
@@ -222,13 +287,29 @@
   pointer-events: none; /* optional, so text doesn't block button clicks */
 }
 
-/* The LinkButton can keep margin-left:auto inline or via CSS */
-.title > a {
-  margin-left: auto;
+
+/* Options */
+.optionsdiv {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /*background-color: #435343; /* Very light gray/off-white for the background */
+  /*border: 1px solid #e0e0e0; /* Subtle light gray border */
+  /*border-radius: 8px; /* Slightly rounded corners */
+  /*padding: 20px;
+  /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  /*width: 300px; /* Fixed width, adjust as needed */
 }
-.alertLinkButton {
+
+/* The LinkButton can keep margin-left:auto inline or via CSS */
+
+.rightLinkButton {
     margin-left:auto;
     margin-right:0px;
+}
+.leftLinkButton {
+    margin-left:0px;
+    margin-right:auto;
 }
 /*Allignment styles*/
 .sinkBox {
@@ -246,6 +327,8 @@
 .container {
     display: flex;
     justify-content: center;
+    height:auto;
+    flex-shrink:1;
     overflow: hidden; /* Prevent overflow past viewport */
 }
 .floatContainer {
@@ -267,9 +350,8 @@
 {/*----Component Styles----*/}
 {/*Map Styles*/}
 .mapContainer {
-    width: auto;               /* OR fixed width like 300px */
-    width: 30vw;
     height: auto;
+    width: 30vw;               /* OR fixed width like 300px */
     flex: 1 0 auto;            /* do not grow/shrink in flex */
     aspect-ratio: 622 / 926;   /* maintain image ratio */
     position: relative;
@@ -314,8 +396,8 @@
 }
 .mapButton {
     position: absolute;
-    width: 17px;
-    height: 17px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     text-align: center;
     align-items: center;
@@ -414,10 +496,15 @@
     margin-bottom: 5px;
     justify-content: space-between;
 }
+
 {/*Info*/}
 .infodiv{
-    margin: 20px;
-    background-color: "rgba(0,0,0,0)";
+    color:black;
+    max-width: 1500px;
+    margin: 0 auto;
+    width: 100%;
+    padding-left:20px;
+    padding-right:20px;
 }
 .imgContainer{
   display: flex;

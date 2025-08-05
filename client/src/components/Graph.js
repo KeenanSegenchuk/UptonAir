@@ -12,10 +12,12 @@ function Graph({ sensor_id, start, end, dummy }) {
 	 * Note: dummy input so Map Buttons can force Graph to rerender when all other inputs are unchanges because the same button is pressed miltuple times to toggle data[where sensor = sensor_id].show  
 	 */   	
 
-	const {API_URL} = useAppContext();
+	//route API
+	const {API_URL, units} = useAppContext();
 	const api = axios.create({
           baseURL: API_URL,
 	});
+
 
 	const [loading, setLoading] = useState(false);
 	const ref = useRef(null);
@@ -55,17 +57,17 @@ function Graph({ sensor_id, start, end, dummy }) {
 			if(checkData())
 				return;
 				
-		api.get('aqi/time/' + start + "-" + end + '/' + sensor_id)
+		api.get(`time/${units}/${start}-${end}/${sensor_id}`)
 			.then(response => {
 				console.log("Existing Data:", data);
 				//console.log("Sensor_id:", sensor_id);
 				//console.log("Server's Response", response);
-				setData(prev => [...prev, {context: dataContext, sensor:sensor_id, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
+				setData(prev => [...prev, {context: dataContext, sensor:sensor_id, units:units, data:response.data.data, color:getObj("C"+sensor_id), showline:lineBool||sensor_id===0}]);
 			}).catch(error => {
                     		console.error('Error fetching data:', error);
                     		setLoading(false);
                 	});
-	}, [sensor_id, start, end, dummy]);
+	}, [sensor_id, start, end, dummy, units]);
 
 	/*useEffect(() => {
 		setGraphLayout(prev => lineGraphLayout(prev.shapes));
@@ -186,7 +188,7 @@ if (loading)
     {return (<div className="loading-message">Loading...</div>);}
 
 return (
-    <div className="Marginless">
+    <div id="Graph.js" className="Marginless">
         <h1 className="Marginless">7-Day AQI Readings</h1>
         <div className="graphContainer" ref={ref}>
             <button className="Button" onClick={toggleLineBool} style={{width:"30%"}}>

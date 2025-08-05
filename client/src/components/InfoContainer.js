@@ -25,7 +25,7 @@ const InfoContainer = ({ infodoc }) => {
   }, []);
 
   return (
-    <div className="contentBackground">
+    <div id="InfoContainer.js" className="contentBackground">
 	{infolist ? (infolist.map((info, index) => (
 	    <InfoBox 
 		className={info.type === "image" ? "staticImage" : undefined}
@@ -34,6 +34,7 @@ const InfoContainer = ({ infodoc }) => {
 		images={info.images && info.images} 
 		title={info.title} 
 		body={info.body && info.body} 
+		container_id = {allStyle.collapseKey}
 		style={{
 		    title: {...(allStyle.title || {}),
 			...(info.style?.title || {})},

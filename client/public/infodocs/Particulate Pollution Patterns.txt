@@ -66,7 +66,7 @@
     },
     "title": "Limitations of Our Data",
     "body": ["The data we archive and display on this site is list of observations made by a sensor over a period of time. ",
-	"These data are not always a perfect representation of reality, for instance purpleair sensors are sensitive to humidity, ",
+	"The data are not always a perfect representation of reality, for instance purpleair sensors are sensitive to humidity, ",
 	"so we apply a transformation to the PM_2.5 and humidity readings to make them correlate better with more advanced EPA sensors. ",
 	"Most data you encounter in the real world has some transformation applied to it; even the 'raw data' we pull from the purpleair API is the average concentration the air monitor observed over a ten-minute period. ",
 	"We can see on the images below that this transformation occasionally produces slightly negative particulate concentrations, ",

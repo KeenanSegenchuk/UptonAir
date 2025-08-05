@@ -10,6 +10,7 @@ const sensors = getObj("positions");
 function Alerts() {
     const {API_URL} = useAppContext();
     const {BASE_URL} = useAppContext();
+    const dashboard_url = BASE_URL + "dashboard";
     const api = axios.create({
       baseURL: API_URL,
     });
@@ -52,7 +53,7 @@ function Alerts() {
 
     const showNotification = (message, isSuccess = true) => {
         setNotification({ message, isSuccess });
-        setTimeout(() => setNotification(null), 3000);
+        setTimeout(() => setNotification(null), 21000);
     };
     //convert selection list to csv string
     const L2S = (selected) => {
@@ -89,13 +90,14 @@ function Alerts() {
       <div style={{width:"100%"}}>
 	{/*Header*/}
 	<div className="title" style={{width:"100%", display:"flex", height:"70px"}}>
-	    <LinkButton style={{marginLeft:"0px", marginRight:"auto"}} text="Back to homepage" right={false} href={BASE_URL}/>
+	    <LinkButton className="leftLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Back to Dashboard"} right={false} href={dashboard_url}/>
             <h1         style={{
 			marginTop:"10px",
             		position: "absolute",
             		left: "50%",
             		transform: "translateX(-50%)"}}
-            >Upton Air</h1>
+            >Upton Air Alerts</h1>
+	    <LinkButton className="rightLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Back to Landing Page"} right={true} href={BASE_URL}/>
 	</div>
 	
         <div className="alerts-container">
@@ -207,8 +209,8 @@ function Alerts() {
                 </div>
 		    <div style={{lineHeight:"1", paddingTop:"30px"}}>
 			<p>This alert is named "{alertName}" and is associated with the email: "{email}".</p> 
-			<p>A notification will be triggered if AQI readings from the selected sensors average over {AQIcutoff} for {avgWindow} minutes.</p>
-			<p>You will not recieve another notification from this alert if one has been issued in the past {cooldown} hours.</p>
+			<br/><p>A notification will be triggered if AQI readings from any of the selected sensors averages over {AQIcutoff} for {avgWindow} minutes.</p>
+			<br/><p>You will not recieve another notification from this alert if one has been issued in the past {cooldown} hours.</p>
 		    </div>
 		</div>
 	    ) : (
@@ -235,6 +237,7 @@ function Alerts() {
 		</div>
 		</div>
 	    )}	
+	    <div style={{height:"15px"}}/>
             {notification && (
                 <div className={`notification ${notification.isSuccess ? 'success' : 'error'}`}>
                     {notification.message}

@@ -14,17 +14,27 @@ update_time_seconds = update_time_minutes*60
 alert_delay = 30
 
 def alert_loop():
-    print("Checking if any alerts have been triggered...")
+    print(f"Checking if any alerts have been triggered... {datetime.now()}")
     triggered_alerts = pgAlert(update_time_seconds)
     new_triggered_alerts = pgCheckAlerts()
-    pgLog(new_triggered_alerts)
     if triggered_alerts:
         for alert in triggered_alerts:
-            print(f"Alert triggered: {alert}")
+            log(f"Alert triggered: {alert}")
             try:
                 send_email(alert)
             except Exception as e:
                 log(e);
+        return
+    if new_triggered_alerts:
+        for alert in new_triggered_alerts:
+            log(f"New Alert triggered: {alert}")
+            try:
+                send_email2(alert)
+            except Exception as e:
+                log(e);
+        return
+    print("No alerts triggered.")
+
 def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
         try:
@@ -74,6 +84,10 @@ if __name__ == "__main__":
 		print("WARNING: Alerts table does not exist and/or building failed.")
 	else:
 		print("Succesfully located alerts table.")
+
+	#add new columns
+	#pgAddPercentDifferenceColumn()
+	#pgAddPMColumn()
 
 	if os.getenv("LOOP") == "0":
 		print("LOOP env var is 0, data-updater returning.")

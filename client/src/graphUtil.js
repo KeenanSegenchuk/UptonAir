@@ -170,12 +170,12 @@ function graphUtil(func) {
         // Compute bin centers and averages
         for (let i = 0; i < n; i++) {
             const binTime = start + (i + 1) * step;
-            X[i] = binTime * 1000; // adjust if needed for ms
+            X[i] = binTime * 1000; // convert seconds to ms
 
             if (counts[i] > 0) {
                 Y[i] = Y[i] / counts[i];
             } else {
-                Y[i] = 0; // or null if you want to show gaps
+                Y[i] = 0; 
             }
         }
 

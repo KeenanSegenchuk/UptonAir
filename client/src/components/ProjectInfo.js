@@ -24,7 +24,7 @@ const ProjectInfo = ({ file }) => {
   };
 
   return (
-    <div>
+    <div id="ProjectInfo.js">
     </div>
   );
 };

@@ -12,13 +12,26 @@ function EGraph() {
 	 */   	
 
 	//setup data management
-	const {dataContext, sensor_id, data, hover, switches, setPopup} = useAppContext(); 
+	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits} = useAppContext(); 
 	const contexts = getObj("DataContexts");
+
+    	const debug = false;
+    	const log = (text, val = -1) => {
+		if(debug && val === -1) console.log(text);
+    		if(debug && val !== -1) console.log(text, val);
+    	}
+	log(`ECharts rerendering... Sensor: ${getObj("$"+sensor_id)} Context: ${dataContext} Units: ${units}`);
+	log(`Data: `, data);
 
 	//times
 	const [end] = useState(() => Math.floor(Date.now() / 1000));
 	const [start, setStart] = useState(end - contexts[dataContext]);
-	useEffect(() => {setStart(end - contexts[dataContext]);}, [dataContext, end, contexts]);
+	useEffect(() => {setStart(end - contexts[dataContext]);
+			 const maxN = contexts[dataContext]/600;
+			 log(`Max N in context: ${maxN}... actual N: ${nBars}`);
+			 if(maxN < nBars)
+				setN(maxN);
+	}, [dataContext, end, contexts]);
 
 	//communicate graph mode with map via app context
 	const {setGlobalLineBool} = useAppContext();
@@ -47,7 +60,6 @@ function EGraph() {
 		    setLineBool(false);
 		}
 	}, [switches]);
-
 
 	//track component width
 	const containerRef = useRef(null);
@@ -101,13 +113,26 @@ function EGraph() {
 	      }
 	), [width]);
 
+
         //filter for current data context
         const filteredData = () => {
-	    //console.log("Filtering Data...", data.map(entry => entry.context)); 
-	    //console.log("Given context:", dataContext);
-  	    const fd = data.filter(entry => entry.context === dataContext);  
-	    //console.log("Filter Result:", fd);
-	    return fd;
+	    if (!data || !Array.isArray(data)) {
+	        console.warn("Data is not ready or not an array:", data);
+	        return [];
+	    }
+	    try {
+	        /*console.log("In EGraph. Filtering Data...", data); 
+	        console.log("Given context:", dataContext);
+	        console.log("Units:", units);
+		*/
+	        const fd = data.filter(entry => entry.context === dataContext && entry.units === units);
+	        log("Filter Result:", fd);
+
+	        return fd;
+	    } catch (err) {
+	        console.error("filteredData error:", err);
+	        return [];
+	    }
         };
 
 	//setup nBars slider functionality
@@ -149,6 +174,17 @@ function EGraph() {
 	};
 
 
+    //check for missing units in line graph
+    const missingLineData = () => {
+	const missingLineUnits = lineUnits.filter(unit => {
+	    return !data.some(entry =>
+	        entry.sensor === sensor_id &&
+	        entry.context === dataContext &&
+	        entry.units === unit
+	    );
+	});
+	return missingLineUnits; 
+    };
 
   //get the bars for graphing current sensor
   const getBars = () => {
@@ -157,7 +193,8 @@ function EGraph() {
     let response = { data: [[0,0]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
     if(selectedData)
 	response = formatBars(selectedData, nBars);
-    //console.log("Bar-Formatted Data:", response);
+    log("nBars", nBars);
+    log("Bar-Formatted Data:", response?.data?.map(e => e.value));
     return response;
   };
 
@@ -170,14 +207,16 @@ function EGraph() {
 	    console.log("Error binning data into bars.");
 	    return bars;
 	}
-	bars = {
+	if(bars.x) {
+  	  bars = {
             type: "bar",
             name: getObj("$" + b.sensor),
             data: bars.x.map((timestamp, i) => ({
                 value: [timestamp, bars.y[i]],
-                itemStyle: { color: bars.marker.color[i] }
+                itemStyle: { color: getObj(`X${bars.y[i]}${units}`) }
             }))
-        };
+          };
+	}
 	return bars;
 
     };
@@ -224,8 +263,8 @@ useEffect(() => {
 }, []); 
 
 return (
-    <div className="Marginless">
-        <h1 className="headerText">{dataContext} AQI Readings</h1>
+    <div id = "EGraph.js" className="Marginless">
+        <h1 className="headerText">{dataContext} Readings ({getObj(`U${units}`)})</h1>
         <div className="graphContainer">
             <button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}

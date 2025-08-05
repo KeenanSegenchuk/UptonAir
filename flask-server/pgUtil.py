@@ -35,7 +35,6 @@ from PMtoAQI import *
 	  pgRemoveAddress: (cur, str) => () :removes all instance of an email address/phone number from alerts table
 '''	  
 			
-
 def pgOpen():
 	DB_URL = os.getenv("DB_URL")
 	if DB_URL:
@@ -428,9 +427,13 @@ def pgCheckAlerts():
 
         # Check if any average exceeds the threshold
         triggered_ids = []
+        total = 0
         for id_val, avg_aqi in results:
+            total += avg_aqi
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
+
+        avg_all = total / len(results)
 
         # If any triggers occurred, update alert and record the result
         if triggered_ids:
@@ -441,7 +444,7 @@ def pgCheckAlerts():
                 WHERE address = %s AND name = %s
             """, (now, address, name))
 
-            for id_val, avg_aqi in triggered_ids:
+            if True:
                 triggered_alerts.append({
                     "alert": {
                         "address": address,
@@ -453,8 +456,8 @@ def pgCheckAlerts():
                         "last_alert": now,
                         "n_triggered": n_triggered + 1  # this is what it *will* be after the update
                     },
-                    "triggered_id": id_val,
-                    "average_aqi": avg_aqi
+                    "triggered_ids":triggered_ids,
+                    "avg_aqi":avg_all
                 })
 
     conn.commit()
@@ -475,6 +478,84 @@ def pgLog(triggered_alerts, filename="log.txt"):
                 "alert": alert_entry["alert"]
             }
             f.write(json.dumps(log_entry) + "\n")
+
+#check for then add column
+def pgAddColumn(table_name, column_name, data_type, function):
+    conn, cur = pgOpen()
+
+    # check tbale exists
+    if(not pgCheck(cur, table_name)):
+        print("TRYING TO ADD COLUMN TO TABLE THAT DOESN'T EXIST")
+
+    # check if column already exists
+    cur.execute("""
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = %s AND column_name = %s
+    """, (table_name, column_name))
+    if cur.fetchone():
+        print(f"Column '{column_name}' already exists in '{table_name}'.")
+        pgClose(conn, cur)
+        return
+
+    cur.execute(f"""
+        ALTER TABLE {table_name}
+        ADD COLUMN {column_name} {data_type}
+        {function}
+    """)
+
+    conn.commit()
+    pgClose(conn, cur)
+
+def pgAddPercentDifferenceColumn():
+    function = """
+        GENERATED ALWAYS AS (
+          CASE
+            WHEN (PMA + PMB) = 0 THEN NULL
+            ELSE ROUND((ABS(PMA - PMB) / ((PMA + PMB) / 2.0)) * 100)
+          END
+        ) STORED;
+    """
+    pgAddColumn("readings", "percent_difference", "INTEGER", function)
+
+    #check it worked
+    conn, cur = pgOpen()
+    cur.execute("""
+        SELECT PMA, PMB, percent_difference
+        FROM readings
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+    rows = cur.fetchall()
+    print("printing rows with new percent_difference column...")
+    print("[PMA, PMB, percent_difference]")
+    for row in rows:
+        print(row)
+    pgClose(conn, cur)
+
+def pgAddPMColumn():
+    function = """
+        GENERATED ALWAYS AS (
+	    ((PMA + PMB)/2.0)
+	) STORED;
+    """
+
+    pgAddColumn("readings", "PM", "NUMERIC(6, 3)", function)
+
+    #check it worked
+    conn, cur = pgOpen()
+    cur.execute("""
+        SELECT PMA, PMB, PM
+        FROM readings
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+    rows = cur.fetchall()
+    print("printing rows with new PM column...")
+    print("[PMA, PMB, PM]")
+    for row in rows:
+        print(row)
+    pgClose(conn, cur)
 
 if __name__ == "__main__":
 	#pgInit("data.txt")

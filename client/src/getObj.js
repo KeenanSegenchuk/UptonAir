@@ -41,7 +41,29 @@ export function getObj(obj) {
 
     let sensor_id = obj.substring(1,7);
 
+    const units = {
+	"AQIEPA":"AQI",
+	"AQI":"AQI",
+	"PMEPA":"µg/m³",
+	"PM":"µg/m³",
+	"PMA":"µg/m³",
+	"PMB":"µg/m³",
+	"percent_difference":"%",
+	"humidity":"%",
+    };
+    const unitDescriptions = {
+	"PMEPA":"EPA Callibrated Raw PM2.5",
+	"PM":"Unadjusted Raw PM2.5",
+	"PMA":"Raw PM2.5 Channel A",
+	"PMB":"Raw PM2.5 Channel B",
+	"AQIEPA":"EPA Callibrated AQI",
+	"AQI":"Unadjusted AQI",
+	"humidity":"Humidity",
+	"percent_difference":"PM2.5 Channel Difference",
+    };
 
+    /*
+    Relic from when sensors were manually positioned. Now this data is stored in the config and lat/long are pulled from purpleair.
     const positionsOld = [
     {
         "id": "128729",
@@ -151,7 +173,10 @@ export function getObj(obj) {
 	"xLabelOffset": 0,
 	"yLabelOffset": 2
     }
-];
+    ];
+    */
+
+
 
     /* CODES *//*
 	call getObj(code) to access static objects stored in this file
@@ -170,6 +195,11 @@ export function getObj(obj) {
 	
     */
 
+    let match;
+    let val = -1;
+    let unit = "";
+    let AQindex = -1;
+
     switch (obj.substring(0,1)) {
 	case "$":
 		sensor_id = obj.substring(1,7);
@@ -180,6 +210,20 @@ export function getObj(obj) {
  
 		return "src/getObj: sensor id not found.";
 	case "Q":
+		//get quality description for given reading value and units
+		match = obj.match(/^Q(-?[\d.]+)([a-zA-Z%μ_]*)$/);
+
+		if(match) {
+			val = parseFloat(match[1]);
+			unit = match[2];
+			AQindex = ranges.findIndex(item => item > val);
+			if(unit.includes("AQI"))
+			{	return qualities[AQindex];	}
+			return "";
+		} else {
+			console.warn("Invalid getObj query:", obj);
+			return "";
+		}
 	case "q":
 		return qualities;
 	case "C":
@@ -188,14 +232,60 @@ export function getObj(obj) {
 	case "c":
 		return colors;
 	case "T":
+		//get text color for given reading value and units
+		match = obj.match(/^T(-?[\d.]+)([a-zA-Z%μ_]*)$/);
+
+		if(match) {
+			val = parseFloat(match[1]);
+			unit = match[2];
+			AQindex = ranges.findIndex(item => item > val);
+			if(unit.includes("AQI"))
+			{	return textColors[AQindex];	}
+			return "black";
+		} else {
+			console.warn("Invalid getObj query:", obj);
+			return "black";
+		}
 	case "t":
 		return textColors;
 	case "X": 
-		const value = parseFloat(obj.substring(1,7));
-		//console.log("GETOBJ  X VALUE:", value);
-		const index = ranges.findIndex(item => item > value);
-		//console.log("RETURNING COLOR FROM GETOBJ", colors[index]);
-		return colors[index];
+		//get color for given reading value and units
+		match = obj.match(/^X(-?[\d.]+)([a-zA-Z%μ_]*)$/);
+
+		if(match) {
+			val = parseFloat(match[1]);
+			unit = match[2];
+			AQindex = ranges.findIndex(item => item > val);
+			if(unit.includes("AQI"))
+			{	return colors[AQindex];	}
+			if(unit.includes("PM"))
+			{	return "aqua";		}
+			else 
+			{	return Math.abs(val) > 100 ? "rgb(255,0,0)" : 
+				Math.abs(val) <= 50 ? "rgb(0,228,0)" : "rgb(255,255,0)";	}
+		} else {
+			console.warn("Invalid getObj query:", obj);
+			return "rgb(250, 250, 240)";
+		}
+	case "W":
+	case "w":
+		unit = obj.substring(1);
+		console.log("Fetching units:", unit);
+		try{
+			return unitDescriptions[unit];
+		} catch {
+			return;
+		}
+	case "U":
+		unit = obj.substring(1);
+		//console.log("Fetching units:", unit);
+		try{
+			return units[unit];
+		} catch {
+			return;
+		}
+	case "u":
+		return units;
 	case "V":
 	case "v":
 		return vibrColors;

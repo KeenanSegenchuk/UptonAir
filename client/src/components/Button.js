@@ -10,18 +10,19 @@ function Button({ id, x, y }) {
     const api = axios.create({
       baseURL: API_URL,
     });
+
     //check if mobile to let buttons enable sensorinfo popup
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     //setup vars and static vals
-    const [val, setVal] = useState(-1);
+    const [val, setVal] = useState({"PMA":-1, "PMB":-1, "PMEPA":-1, "PM": -1, "AQI":-1, "AQIEPA":-1, "percent_difference":-1, "humidity":-1});
     const ranges = getObj("r");
     const colors = getObj("c");
     const [color, setColor] = useState("default");
     const name = getObj("$" + id);
     const borderColor = getObj("C" + id);
     const labelOffsets = getObj("O" + id);
-    const { globalLineBool, hover, switches, data, setData, setPopup } = useAppContext();
+    const { globalLineBool, units, hover, switches, data, setData, setPopup } = useAppContext();
     const [borderStyle, setBorderStyle] = useState("none");
     const hoverKey = "labels";
 
@@ -35,11 +36,12 @@ function Button({ id, x, y }) {
 
     //----Data update handling----//
 
+
     //check if data already exists for current sensor
     const checkData = () => {
         //console.log(`Checking if data already exists; sensor = ${sensor_id} and context = ${dataContext}`)
         //console.log("Result: " + data.some(entry => entry.sensor === id && entry.context === dataContext));
-        return data.some(entry => entry.sensor === id && entry.context === dataContext);
+        return data.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === units);
     };
 
     //Load sensor avg on mount for desktop
@@ -55,22 +57,27 @@ function Button({ id, x, y }) {
 
     //pull data from API when clicked
     const getData = (forceSelect) => {
+	//console.log("Button clicked! ID: ", id);
 	if(!globalLineBool && !switches.get("selected"))
 		setSensor_id(id);
 	if(checkData())
 		return;
+	//console.log("About to pull data...");
+	//console.log(`Sensor ${id}, units: ${units}, checkdata: ${checkData()}`); 
 
 	const start = end - contexts[dataContext];
-	api.get('aqi/time/' + start + "-" + end + '/' + id)
+	api.get(`time/${units}/${start}-${end}/${id}`)
 		.then(response => {
 			//console.log("Existing Data:", data);
 			//console.log("Sensor_id:", id);
 			//console.log("Server's Response", response);
-			if(!checkData())
-				setData(prev => {if(prev.some(entry => entry.sensor === id && entry.context === dataContext))
-							return prev;
-						return [...prev, {context: dataContext, sensor:id, data:response.data.data, color:getObj("C"+id), showline: forceSelect === undefined ? selected : forceSelect}];
-					});
+			console.log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
+	
+			setData(prev => {
+				if(prev.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === units))
+					return prev;
+				return [...prev, {context: dataContext, sensor:id, units:units, data:response.data.data, color:getObj("C"+id), showline: forceSelect === undefined ? selected : forceSelect}];
+			});
 
 		}).catch(error => {
         		console.error('Error fetching data:', error);
@@ -105,43 +112,48 @@ function Button({ id, x, y }) {
 	}
     }, [globalLineBool]);
 
-    //fetch updated data when context changes
+    //fetch updated data when time context/units changes
     const [seenContexts, setSeenContexts] = useState(new Set());
     useEffect(() => {
-	if(id === sensor_id && !seenContexts.has(dataContext)) {
-		getData();
-		setSeenContexts(prev => prev.add(dataContext));
-	}else if(globalLineBool && selected) {
+	//console.log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
+	if(id === sensor_id || (globalLineBool && selected)) {
 		getData();
 		setSeenContexts(prev => prev.add(dataContext));
 	}
-    }, [dataContext]);
+    }, [dataContext, units]);
+    //fetch updated data when lineUnits changes
 
     //----Setup Button Element----//
     useEffect(() => {
-        api.get('aqi/avg/'+(end-60*60+"-"+end+"/"+id))
+	if (val[units] === -1)
+          api.get(`avg/${units}/${end - 60 * 60}-${end}/${id}`)
             .then(response => {
                 //console.log("/aqi/avg API Response:",response);
 		if(!response.data)
 			{console.log("Error getting button value."); 
 			return;}
-		setVal(response.data);
+		setVal(prevVal => ({...prevVal,[units]: response.data}));
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [units]);
 
     // Calculate the color based on val
     useEffect(() => {
+	setColor(getObj(`X${val[units]}${units}`));
+	return;
+
 	//console.log(val);
+	if(["PMA", "PMB", "PMEPA", "PM"].includes(units))
+	{   setColor("aqua"); return;   }
 	for (let i = 0; i < ranges.length; i++) {
-	    if (val < ranges[i]) {
+	    if (val[units] < ranges[i]) {
                 setColor(colors[i]);
                 break;
             }
         }
-    }, [val]);
+    }, [val, units]);
 
     const handleButtonClick = (sensorValue, event) => {
         if (globalLineBool || switches.get("select")) {
@@ -193,27 +205,29 @@ function Button({ id, x, y }) {
     }, [selected]);
 
     return (
-        <div title={name} style={{top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>
+        <div title={name} id="Button.js" style={{top: 0, left: 0, right: 0, bottom: 0, position:"absolute"}}>
             <button
 		className="mapButton"
                 id={id}
+		
                 style={{
-		    color: (id === "0" && selected && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
+		    //color: (id === "0" && selected && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
 		    backgroundColor: color,
 		    boxShadow: globalLineBool || switches.get("select") ? borderStyle : "none",
                     top: y+"%",
                     left: x+"%",
 		    zIndex: selected ? 2000 : 1000,
-        	    clipPath: id === "0"
+        	    /*clipPath: id === "0"
         	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
-       	              : "none"
-		    ,width: id === "0" ? "70px" : undefined
-		    ,height: id === "0" ? "70px" : undefined
-		    ,fontSize: id === "0" ? "1.5em" : undefined
+       	              : "none",*/
+		    width: id === "0" ? "50px" : undefined,
+		    height: id === "0" ? "50px" : undefined,
+		    fontSize: id === "0" ? "1.5em" : undefined
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >
-                {Math.round(val)}
+                {val && val[units] !== undefined && val[units] !== -1 ? Math.round(val[units]) : "N/A"}
+
             </button>
 	    {(hover===hoverKey || switches.get(hoverKey)) ? (
 		<input type="text" placeholder={name} style={labelStyle}/>

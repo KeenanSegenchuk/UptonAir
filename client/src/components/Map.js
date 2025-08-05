@@ -6,12 +6,15 @@ import Button from "./Button";
 import "../App.css";
 import DButton from "./DButton";
 import ToggleButton from "./ToggleButton";
+import DashboardConfig from "./DashboardConfig";
 import { useAppContext } from "../AppContext";
 
 function Map({ buttons }) {
-  const { setPopup } = useAppContext();
-
+  // control map popup on mobile
+  const { setPopup, map_type } = useAppContext();
   const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  // control config box popup
+  const [showConfig, setShowConfig] = useState(false);
 
   const triggerPopup = () => {
     if (isMobile) {
@@ -28,28 +31,38 @@ function Map({ buttons }) {
       .catch((error) => console.error('Error loading GeoJSON:', error));
   }, []);
   const townBorderStyle = {
-    color: "white",
+    color: map_type === "roads" ? "black" : "white",
     weight: 2,
     opacity: .6,
     fillOpacity: 0
   };
 
   return (
-    <div className="mapContainer" style={{ position: 'relative',
+    <div id="Map.js" className="mapContainer" style={{ position: 'relative',
 					   height: isMobile ? '70vh' : undefined,
         				   width: isMobile ? '90vw' : undefined }}>
+
+      {/* The Map */}
       <MapContainer
         center={[42.173996, -71.60191]} // Choose your map center
         zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
-        <TileLayer
-          // Example Esri satellite imagery
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye'
-        />
+        {map_type === "roads" ? (
+	  <TileLayer
+	    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+	    attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+	  />
+	):(
+	  <TileLayer
+            // Esri satellite imagery
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye'
+          />
+	)}
         {townBorder && <GeoJSON data={townBorder} style={townBorderStyle} />}
 
+	{/* Place Sensors on Map */}
         {buttons.map((button, index) => (
           <LeafletButton key={index} button={button}>
             <Button
@@ -63,7 +76,70 @@ function Map({ buttons }) {
         ))}
       </MapContainer>
 
-      {/* Overlay at top center */}
+
+      {/* Config Popup */}
+      {/* Icon */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+          zIndex: 1000
+        }}
+      >
+        <button
+          onClick={() => setShowConfig(prev => !prev)}
+          style={{
+            background: 'transparent',
+            borderRadius: '50%',
+            fontSize: '40px',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+          title="Settings"
+        >
+          ⚙️
+        </button>
+      </div>
+
+      {/* Config Modal Overlay */}
+      {true && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '10%',
+            left: '50%',
+            transform: 'translate(-50%)',
+            width: '80%',
+            backgroundColor: 'rgba(240,255,240,0.95)',
+            zIndex: 1500,
+            padding: '20px',
+            overflow: 'auto',
+            borderRadius: '10px',
+            boxShadow: '0 0 20px rgba(0,0,0,0.3)',
+	    display: showConfig ? 'block' : 'none'
+          }}
+        >
+          <button
+            onClick={() => setShowConfig(false)}
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              background: 'transparent',
+              border: 'none',
+              fontSize: '24px',
+              cursor: 'pointer'
+            }}
+            title="Close"
+          >
+            ✕
+          </button>
+          <DashboardConfig />
+        </div>
+      )}
+
+      {/* HoverButton at top center 
       <div
         style={{
           position: "absolute",
@@ -92,7 +168,7 @@ function Map({ buttons }) {
             style={{ height: "30px" }}
           />
         )}
-      </div>
+      </div>*/}
     </div>
   );
 }

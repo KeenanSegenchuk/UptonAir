@@ -13,9 +13,9 @@ export const ContextProvider = ({ children }) => {
   const [data, setData] = useState([]);
   const [showPopup, setPopup] = useState(false);
   const [sensor_id, setSensor_id] = useState("0");
-  const BASE_URL = "https://upton-air.com/";
-  const API_URL = BASE_URL + "api";
-  //const API_URL = process.env.API_URL;
+  const [dashboardConfig, setDashboardConfig] = useState({"plot_type":"echarts", "units":"AQIEPA", "map_type":"satellite"});
+  const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
+  //const [BASE_URL, API_URL] = ["http://localhost:3000/","http://localhost:5000/api/data"];
 
   const contextVals = {
 	getLine, setLine,
@@ -27,7 +27,12 @@ export const ContextProvider = ({ children }) => {
 	BASE_URL,
 	API_URL,
 	showPopup, setPopup,
-	sensor_id, setSensor_id
+	sensor_id, setSensor_id,
+	dashboardConfig, setDashboardConfig,
+	units: dashboardConfig.units,
+	map_type: dashboardConfig.map_type,
+	plot_type: dashboardConfig.plot_type,
+	lineUnits: dashboardConfig.line_units,
   };
 
 

@@ -33,7 +33,7 @@ const DButton = React.memo(({ text, dkey, style }) => {
   };
 
   return (
-    <div>
+    <div id="DButton.js">
 	<button className={switches.get(dkey) ? "pressed" : ""}
       		onMouseEnter={mouseIn} onMouseLeave={mouseOut} onClick={toggle} style={style}>
 	    {text}	

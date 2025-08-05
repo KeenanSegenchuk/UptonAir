@@ -43,14 +43,15 @@ function LeafletButton({ button, children, clipOnBoundary = true }) {
 
   const style = {
     position: 'absolute',
-    left: button.id === "0" ? map.getSize().x-70: pos.x - 10, // or whatever value
-    top: button.id === "0" ? 0 : pos.y - 10,
+    left: button.id === "0" ? 50: pos.x - 11, // or whatever value
+    top: button.id === "0" ? 15 : pos.y - 11,
     pointerEvents: 'auto',
     zIndex: 1000,
   };
 
   return (
     <div
+      id = "LeafletButton.js"
       style={style}
     >
       {children}

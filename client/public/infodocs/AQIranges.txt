@@ -5,6 +5,7 @@
 	"border": "2px solid black",
         "padding": "10px"
       },
+      "collapseKey":"AQI",
       "title": {
 	"fontSize": "1.25em"
       }
@@ -19,11 +20,10 @@
     },
     "title": "What is AQI?",
     "body": [
-      "Air Quality Index is a standardized air pollution unit developed by the EPA to make readings scale linearly with the severity of the resulting health effects. ",
-      "AQI is used for various pollutants: particulate matter, ozone, carbon monoxide, nitrogen dioxide, sulfure dioxide. ",
-      "Our censors only measure particulate matter, so the AQI values and health effects reported on this page are only for particulate pollution. ",
-      "Since both the chemical composition of particulate pollution and individuals' sensitivy to it can vary from day to day, and person to person, ",
-      "so you are encouraged to use these data we report within the greater context of how you analyze your health. "
+      "Air Quality Index is a standardized air pollution unit developed by the EPA to make readings better correlate with health effects. ",
+      "AQI is used for various pollutants, but our censors only measure small particulate matter, so the AQI values and health effects reported on this page are only for on type of air pollution. ",
+      "Both the chemical composition of particulate pollution and individual sensitivy to it can vary from day to day and person to person, ",
+      "so you are encouraged to use the data we report within the greater context of how you feel. "
     ]
   },
   {
@@ -67,7 +67,7 @@
   {
     "style": {
       "both": {
-        "backgroundColor": "rgb(255,0,0)"
+        "backgroundColor": "rgb(245,17,17)"
       }
     },
     "title": "Unhealthy (151-200)",

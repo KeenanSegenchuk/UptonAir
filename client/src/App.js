@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ContextProvider } from "./AppContext";
 
 // Lazy-loaded components
-const Home = lazy(() => import('./pages/Home'));
-//const Home2 = lazy(() => import('./pages/Home2'));
+const Dashboard = lazy(() => import('./pages/Home'));
+const Landing = lazy(() => import('./pages/Landing'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 //const Test = lazy(() => import('./pages/Test'));
 
@@ -22,7 +22,8 @@ function App() {
                 <Router>
                     <Suspense fallback={<div>Loading...</div>}>
                         <Routes>
-                            <Route path="/" element={<Home />} />
+                            <Route path="/" element={<Landing />} />
+			    <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/alerts" element={<Alerts />} />
                         </Routes>
                     </Suspense>

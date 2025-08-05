@@ -6,13 +6,13 @@ import SensorInfo from "../components/SensorInfo";
 import LinkButton from "../components/LinkButton";
 import InfoContainer from "../components/InfoContainer";
 import { useAppContext } from "../AppContext";
+
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
-//comment
-
-
+//this is the Dashboard now :/
 function Home() { 
+    //setup urls
     const {API_URL, BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
     const api = axios.create({
@@ -42,8 +42,9 @@ function Home() {
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row"}}>
-                <h1 className="titleText">Upton Air</h1>
-	        <LinkButton className="alertLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Get Notified"} href={alerts_url}/>
+       	        <LinkButton className="leftLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"More Info"} right={false} href={BASE_URL}/>
+		<h1 className="titleText">Upton Air Dashboard</h1>
+	        <LinkButton className="rightLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Get Notified"} href={alerts_url}/>
 	    </div>
 
 	    {/*Page Body*/}
@@ -59,14 +60,6 @@ function Home() {
        		    <SensorInfo id="infoBox" sensor_id={sensor_id}/>
       		</div> 
             </div>
-	    
-	
-	    {/*Information*/}
-	    <div className="infodiv">
-		<InfoContainer infodoc="/infodocs/AQIranges.txt"/>
-		<div style={{height: "25px"}}/>
-		<InfoContainer infodoc="/infodocs/Particulate Pollution Patterns.txt"/>
-	    </div>
 	</div>
     );
 }

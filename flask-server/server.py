@@ -16,19 +16,21 @@ app = Flask(__name__)
 CORS(app)
 datafile = "data.txt"
 
-# Members API Route
-@app.route("/members")
-def members():
-	return {"members":["Syed Shazli is a Computer Science Major at Worcester Polytechnic Institute", "Keenan Segenchuck is a recent Computer Science graduate at Worcester Polytechnic Institute", "Peter Friedland is a passionate environmental activist with extensive experience in Air Quality. He runs the brains of the operation along with Laurie.", "Laurie Woodland is a passionate environmental activist with extensive experience in Air Quality. She runs the brains of the operation along with Peter."]}
+#log stuff before request
+@app.before_request
+def log_api_calls():
+    if request.path.startswith('/api'):
+        print(f"[{int(datetime.utcnow().timestamp())}] API CALL: {request.method} {request.url}")
+
 
 # API ROUTES
 alert_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts') #API for submitting and withdrawing emails/phone #s from alerts system
-aqi_bp = Blueprint('aqi', __name__, url_prefix='/api/aqi') #API for pulling AQI readings
+data_bp = Blueprint('data', __name__, url_prefix='/api/data') #API for pulling data with various units
 raw_bp = Blueprint('raw', __name__, url_prefix='/api/raw') #API for pulling raw data
 sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo') #API for preformated sensorinfo JSON
 
 # PULL ARCHIVE
-@app.route("/api/data")
+@app.route("/api/full_data")
 def raw_data():
 	with open(datafile, "r") as data:
 		return data.read()
@@ -80,12 +82,11 @@ def remove_alert(address, name):
 
 app.register_blueprint(alert_bp)
 
-# AQI
+# DATA
 
-# Average the AQI of all sensors for given timespan
-@aqi_bp.route("/avg/<int:start>-<int:end>")
-def avg_aqi(start, end):
-	print(f"Avg AQI from {start} to {end} Requested...")
+# Average the data of all sensors for given timespan
+@data_bp.route("/avg/<string:units>/<int:start>-<int:end>")
+def avg(units, start, end):
 	sensors = getSensors()
 
 	#connect to postgres database
@@ -93,7 +94,7 @@ def avg_aqi(start, end):
 	response = []
 	#get avg for each sensor
 	for sensor in sensors:
-		pgQuery(cur, start, end, sensor, col = "AVG(AQIEPA)")
+		pgQuery(cur, start, end, sensor, col = f"AVG({units})")
 		data = cur.fetchone()
 		try:
 			response += [{"avg": float(sum(data)/len(data)), "id": sensor}]
@@ -101,18 +102,16 @@ def avg_aqi(start, end):
 			print(f"Error averaging aqi data: {data}")
 	pgClose(conn, cur) 
 	
-	print(f"api/avg/ outgoing response: {response}")
 	return json.dumps(response, indent=4)
 
-# Average the AQI of given sensor for given timespan
-@aqi_bp.route("/avg/<int:start>-<int:end>/<int:sensor_id>")
-def avg_aqi2(start, end, sensor_id):
-	print(f"Avg AQI from {start} to {end} Requested for Sensor {sensor_id}...")
+# Average the data of given sensor for given timespan
+@data_bp.route("/avg/<string:units>/<int:start>-<int:end>/<int:sensor_id>")
+def avgS(units, start, end, sensor_id):
 	res = -1
 
 	#connect to postgres database
 	conn, cur = pgOpen()
-	pgQueryAvg(cur, start, end, sensor_id, col = "AQIEPA")
+	pgQueryAvg(cur, start, end, sensor_id, col = units)
 	data = cur.fetchone()
 	try:
 		res = float(data[0])
@@ -120,22 +119,22 @@ def avg_aqi2(start, end, sensor_id):
 		print(f"Error averaging aqi data: {data}")
 	pgClose(conn, cur) 
 	
-	print(f"api/avg/ outgoing response: {res}")
 	return json.dumps(res, indent=4)
 
-#pull time, aqi data for given timespan and sensor for plotting
-@aqi_bp.route("/time/<int:start>-<int:end>/<int:sensor_id>")
-def aqi3(start, end, sensor_id):
+#pull time, data for given timespan and sensor for plotting
+@data_bp.route("/time/<string:units>/<int:start>-<int:end>/<int:sensor_id>")
+def timeS(units, start, end, sensor_id):
 	conn, cur = pgOpen()
 	if sensor_id == 0:
-		pgQuery(cur, start, end, sensor_id, "time, AVG(AQIEPA) AS average_AQI")
+		pgQuery(cur, start, end, sensor_id, f"time, AVG({units}) AS average_AQI")
 		data = cur.fetchall()
 	else:
-		pgQuery(cur, start, end, sensor_id, "time, AVG(AQIEPA)")
+		pgQuery(cur, start, end, sensor_id, f"time, AVG({units})")
 		data = cur.fetchall()
 
-	#type and sort(?) unsorted pg data	
-	data = [[row[0], int(row[1])] for row in data]
+	#type and pg data	
+	data = [[row[0], int(row[1]) if row[1] is not None else 0] for row in data]
+	#already sorted
 	#data.sort(key= lambda x: (x[0], x[1]))
 
 	#package data
@@ -144,9 +143,9 @@ def aqi3(start, end, sensor_id):
 
 	return json.dumps(data, indent=4)
 
-#Get aqi averages for each sensor for past x days/hours
-@aqi_bp.route("/sensorinfo/<int:sensor_id>")
-def sensorinfo(sensor_id):	
+#Get data averages for each sensor for past x days/hours
+@data_bp.route("/sensorinfo/<string:units>/<int:sensor_id>")
+def sensorinfo(units, sensor_id):	
 	averages = ["6 months", "30 days", "1 week", "24 hours", "1 hour"]
 	hour = 60 * 60
 	day = 24 * hour
@@ -160,9 +159,9 @@ def sensorinfo(sensor_id):
 		timespan = averages[i]
 		#print(f"\Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
-		pgQueryAvg(cur, start, end, sensor_id, "AQIEPA")
+		pgQueryAvg(cur, start, end, sensor_id, units)
 		res = cur.fetchall()
-		print(f"Response: {res}")
+		#print(f"Response: {res}")
 		try:
 			avgs[i] = round(float(res[0][0]), 2)
 		except:
@@ -176,11 +175,10 @@ def sensorinfo(sensor_id):
 		"inputs": averages,
 		"banner_avg": avgs[-1]
 	}
-	print(f"\n✅ /api/sensorinfo outgoing response: {json.dumps(response, indent=4)}")
 	return response
 
 # Register Blueprint
-app.register_blueprint(aqi_bp)
+app.register_blueprint(data_bp)
 
 # RAW
 #Pull raw data from given timespan and sensor
