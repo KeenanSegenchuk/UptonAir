@@ -86,8 +86,8 @@ if __name__ == "__main__":
 		print("Succesfully located alerts table.")
 
 	#add new columns
-	pgAddPercentDifferenceColumn()
-	pgAddPMColumn()
+	#pgAddPercentDifferenceColumn()
+	#pgAddPMColumn()
 
 	if os.getenv("LOOP") == "0":
 		print("LOOP env var is 0, data-updater returning.")
