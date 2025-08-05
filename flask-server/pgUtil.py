@@ -403,7 +403,7 @@ def pgCheckAlerts():
     # Get all alerts that are eligible to trigger
     cur.execute("""
         SELECT * FROM alerts
-        WHERE %s - last_alert >= cooldown
+        WHERE %s - last_alert >= cooldown * 60 * 60 
     """, (now,))
     alerts = cur.fetchall()
 
