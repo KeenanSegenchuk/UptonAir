@@ -17,7 +17,7 @@ async function fetchLatLon(sensorId) {
   const url = `https://api.purpleair.com/v1/sensors/${sensorId}?fields=latitude,longitude`;
   const options = {
     headers: {
-      'X-API-Key': "A52182AD-3030-11F0-81BE-42010A80001F"
+      'X-API-Key': "97AFA31E-6D6C-11F0-AF66-42010A800028"
     }
   };
 
