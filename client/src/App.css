@@ -1,3 +1,21 @@
+/* User Guide Styles */
+.figure {
+  width: 70%;
+  height:auto;
+  margin-left:15%;
+  padding:15px;
+}
+@media (max-width: 767px) {
+  .figure {
+    width:90%;
+    height:auto;
+    margin-left: calc(5% - 10px);
+    padding:10px;
+  }
+}
+
+
+/* default react styles */
 .App {
   text-align: center;
 }
@@ -254,6 +272,15 @@ h3, h2 {
 .s9  {
     font-size:.9em;
 }
+/*Min Heights*/
+.mh105 {min-height:10.5%}
+.mh66 {min-height:6.6%}
+
+.verticalCenter {
+  display: flex;
+  align-items: center;
+}
+
 /*Homepage Title*/
 .blue{
     background:#4f99c6;
@@ -263,6 +290,13 @@ h3, h2 {
 }
 .contentBackground {
     background:#E7D2AB;
+}
+@media (max-width: 767px) {
+    .contentBackground {
+      width:90%;
+      margin-left:5%;
+      padding:0px;
+    }
 }
 .darkgreen {
     background:#157a25;
@@ -327,7 +361,7 @@ h3, h2 {
 .container {
     display: flex;
     justify-content: center;
-    height:auto;
+    height:100%;
     flex-shrink:1;
     overflow: hidden; /* Prevent overflow past viewport */
 }
@@ -422,7 +456,7 @@ h3, h2 {
   }
   .mapContainer {
     width: 100%;
-    height: auto;
+    height: 100%;
     aspect-ratio: auto;
   }
 }
@@ -502,9 +536,15 @@ h3, h2 {
     color:black;
     max-width: 1500px;
     margin: 0 auto;
-    width: 100%;
+    width: calc(100%-40px);
     padding-left:20px;
     padding-right:20px;
+}
+@media (max-width: 767px) {
+  .infodiv{
+    padding:0px;
+    margin: 0 0;
+  }
 }
 .imgContainer{
   display: flex;

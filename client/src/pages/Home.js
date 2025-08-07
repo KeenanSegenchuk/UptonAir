@@ -37,18 +37,21 @@ function Home() {
         return <h1>Loading... </h1>;
     }
 
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    console.log(isMobile);
+
     return (
-	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll' }}>
+	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll', display: 'flex', flexDirection: 'column' }}>
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row"}}>
-       	        <LinkButton className="leftLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"More Info"} right={false} href={BASE_URL}/>
-		<h1 className="titleText">Upton Air Dashboard</h1>
-	        <LinkButton className="rightLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Get Notified"} href={alerts_url}/>
+       	        <LinkButton className="leftLinkButton" text={isMobile?"":"More Info"} right={false} href={BASE_URL}/>
+		<h1 className="titleText">{isMobile ? "Dashboard" : "Upton Air Dashboard"}</h1>
+	        <LinkButton className="rightLinkButton" text={isMobile?"":"Get Notified"} href={alerts_url}/>
 	    </div>
 
 	    {/*Page Body*/}
-            <div className="container">
+            <div className="container" style={{flex:1}}>
                 {/* Map */}
 		<Map className="floatBox" buttons={sensors}/>
                 <div className={`sensorInfo contentBackground sinkBox ${showPopup ? "mobileOverlay open" : "hideMobile"}`}>

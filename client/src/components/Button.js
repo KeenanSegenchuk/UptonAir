@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
@@ -10,6 +10,14 @@ function Button({ id, x, y }) {
     const api = axios.create({
       baseURL: API_URL,
     });
+
+    //debug logging
+    const l = false;
+    const log = (txt, val) => {
+	if(!l) return;
+	if(val) console.log(txt, val);
+	else    console.log(txt);
+    }
 
     //check if mobile to let buttons enable sensorinfo popup
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -46,7 +54,7 @@ function Button({ id, x, y }) {
 
     //Load sensor avg on mount for desktop
     useEffect(() => {
-	console.log("Mounting with global sensor: ", sensor_id); 
+	log("Mounting with global sensor: ", sensor_id); 
 	if(id === sensor_id) {
 		console.log("Loading default sensor on mount.");
 		getData();
@@ -71,7 +79,7 @@ function Button({ id, x, y }) {
 			//console.log("Existing Data:", data);
 			//console.log("Sensor_id:", id);
 			//console.log("Server's Response", response);
-			console.log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
+			log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
 	
 			setData(prev => {
 				if(prev.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === units))
@@ -113,12 +121,10 @@ function Button({ id, x, y }) {
     }, [globalLineBool]);
 
     //fetch updated data when time context/units changes
-    const [seenContexts, setSeenContexts] = useState(new Set());
     useEffect(() => {
-	//console.log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
+	log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
 	if(id === sensor_id || (globalLineBool && selected)) {
 		getData();
-		setSeenContexts(prev => prev.add(dataContext));
 	}
     }, [dataContext, units]);
     //fetch updated data when lineUnits changes
@@ -128,7 +134,7 @@ function Button({ id, x, y }) {
 	if (val[units] === -1)
           api.get(`avg/${units}/${end - 60 * 60}-${end}/${id}`)
             .then(response => {
-                //console.log("/aqi/avg API Response:",response);
+                log("/aqi/avg API Response:",response);
 		if(!response.data)
 			{console.log("Error getting button value."); 
 			return;}

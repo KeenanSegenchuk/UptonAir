@@ -10,13 +10,16 @@ function Landing() {
     const {BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
     const dashboard_url = BASE_URL + "dashboard";
+
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
     return (
         <div className="darkgreen" style = {{ paddingBottom:"80vh", color: "white", padding: "12px" }}>
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", height:"70px", width:"100%", padding:"0px"}}>
-	        <LinkButton className="leftLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"To Alerts"} right={false} href={alerts_url}/>
-                <h1 className="titleText">Upton Air Landing Page</h1>
-	        <LinkButton className="rightLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"To Dashboard"} right={true} href={dashboard_url}/>
+	        <LinkButton className="leftLinkButton" text={isMobile?"":"To Alerts"} right={false} href={alerts_url}/>
+                <h1 className="titleText">{isMobile?"Upton Air":"Upton Air Landing Page"}</h1>
+	        <LinkButton className="rightLinkButton" text={isMobile?"":"To Dashboard"} right={true} href={dashboard_url}/>
             </div>
 
 	    <div style = {{height:"25px"}}/>

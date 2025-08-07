@@ -13,6 +13,7 @@ export const ContextProvider = ({ children }) => {
   const [data, setData] = useState([]);
   const [showPopup, setPopup] = useState(false);
   const [sensor_id, setSensor_id] = useState("0");
+  const [buttonPositions, setButtonPositions] = useState({goal:{}, no_overlap:{}});
   const [dashboardConfig, setDashboardConfig] = useState({"plot_type":"echarts", "units":"AQIEPA", "map_type":"satellite"});
   const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
   //const [BASE_URL, API_URL] = ["http://localhost:3000/","http://localhost:5000/api/data"];
@@ -33,6 +34,8 @@ export const ContextProvider = ({ children }) => {
 	map_type: dashboardConfig.map_type,
 	plot_type: dashboardConfig.plot_type,
 	lineUnits: dashboardConfig.line_units,
+	buttonPositions, setButtonPositions,
+	button_position: (sensor) => buttonPositions[sensor],
   };
 
 

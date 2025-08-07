@@ -1,5 +1,9 @@
 import positions from "./sensor-pos.json";
 export function getObj(obj) {
+
+    //enable logs
+    const l = false;
+
     const qualities = ["Air quality is impossibly good, this is showing up because an error occured or the sensor has no readings in this timeframe.",
 			"It’s a great day to be active outside.",
 			"Unusually sensitive people: Consider making outdoor activities shorter and less intense. Go inside if you have symptoms such as coughing or shortness of breath.",
@@ -200,10 +204,18 @@ export function getObj(obj) {
     let unit = "";
     let AQindex = -1;
 
+    const log = (txt, val) => {
+	if(!l) return;
+	if(val)
+		console.log(txt,val);
+	else
+		console.log(txt);
+    };
+
     switch (obj.substring(0,1)) {
 	case "$":
 		sensor_id = obj.substring(1,7);
-		//console.log(sensor_id);
+		//log("$",sensor_id);
 		let sensor = positions.find(sensor => sensor.id.trim() === sensor_id.trim());
 		if (sensor) {
 		  return sensor.name;}
@@ -270,7 +282,7 @@ export function getObj(obj) {
 	case "W":
 	case "w":
 		unit = obj.substring(1);
-		console.log("Fetching units:", unit);
+		log("Fetching unit description:", unit);
 		try{
 			return unitDescriptions[unit];
 		} catch {
@@ -278,7 +290,7 @@ export function getObj(obj) {
 		}
 	case "U":
 		unit = obj.substring(1);
-		//console.log("Fetching units:", unit);
+		log("Fetching Units:", unit);
 		try{
 			return units[unit];
 		} catch {

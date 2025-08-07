@@ -86,18 +86,20 @@ function Alerts() {
             });
     };
 
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
     return (
       <div style={{width:"100%"}}>
 	{/*Header*/}
 	<div className="title" style={{width:"100%", display:"flex", height:"70px"}}>
-	    <LinkButton className="leftLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Back to Dashboard"} right={false} href={dashboard_url}/>
+	    <LinkButton className="leftLinkButton" text={isMobile?"":"Back to Dashboard"} right={false} href={dashboard_url}/>
             <h1         style={{
 			marginTop:"10px",
             		position: "absolute",
             		left: "50%",
             		transform: "translateX(-50%)"}}
-            >Upton Air Alerts</h1>
-	    <LinkButton className="rightLinkButton" text={window.matchMedia("(max-width: 767px)").matches?"":"Back to Landing Page"} right={true} href={BASE_URL}/>
+            >{isMobile?"Alerts":"Upton Air Alerts"}</h1>
+	    <LinkButton className="rightLinkButton" text={isMobile?"":"Back to Landing Page"} right={true} href={BASE_URL}/>
 	</div>
 	
         <div className="alerts-container">
