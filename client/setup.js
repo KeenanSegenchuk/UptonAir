@@ -1,4 +1,5 @@
 // setup.js
+const sensor_setup = false;
 
 const fs = require('fs');
 const path = require('path');
@@ -42,6 +43,8 @@ async function fetchLatLon(sensorId) {
 }
 
 async function main() {
+  if(!sensor_setup) return;
+
   try {
     if (!fs.existsSync(sensorSource)) {
       throw new Error(`Source file not found: ${sensorSource}`);

@@ -412,6 +412,8 @@ def pgCheckAlerts():
     for alert in alerts:
         address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
+        print(f"Selected alert: {alert}")
+
         window_start = now - avg_window * 60
 
         # Get AQI averages for readings from relevant ids in the time window
@@ -424,6 +426,7 @@ def pgCheckAlerts():
         """, (ids, window_start))
         
         results = cur.fetchall()
+        print("Sensors over threshold: {results}")
 
         if len(results) == 0:
             continue
@@ -440,6 +443,7 @@ def pgCheckAlerts():
 
         # If any triggers occurred, record the result then update db entry
         if triggered_ids:
+            print(f"Alert Tiggered: {name}")
             if True:
                 triggered_alerts.append({
                     "alert": {
