@@ -426,7 +426,7 @@ def pgCheckAlerts():
         """, (ids, window_start))
         
         results = cur.fetchall()
-        print("Sensors over threshold: {results}")
+        print(f"Sensors over threshold: {results}")
 
         if len(results) == 0:
             continue
