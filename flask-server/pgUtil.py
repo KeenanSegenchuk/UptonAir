@@ -426,8 +426,7 @@ def pgCheckAlerts():
         """, (ids, window_start))
         
         results = cur.fetchall()
-        print(f"Sensors over threshold: {results}")
-
+        
         if len(results) == 0:
             continue
 
@@ -443,7 +442,7 @@ def pgCheckAlerts():
 
         # If any triggers occurred, record the result then update db entry
         if triggered_ids:
-            print(f"Alert Tiggered: {name}")
+            print(f"Alert Tiggered: {name}, {triggered_ids}")
             if True:
                 triggered_alerts.append({
                     "alert": {
