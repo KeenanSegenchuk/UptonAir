@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2 import errors
 import os
 from PMtoAQI import *
+from log import *
 
 '''
 	pgUtil.py contains useful functions for interfacing with the postgreSQL database
@@ -412,7 +413,7 @@ def pgCheckAlerts():
     for alert in alerts:
         address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
-        print(f"Selected alert: {alert}")
+        log(f"Selected alert: {alert}")
 
         window_start = now - avg_window * 60
 
@@ -435,6 +436,7 @@ def pgCheckAlerts():
         total = 0
         for id_val, avg_aqi in results:
             total += avg_aqi
+            print(f"Checking alert threshold ({min_AQI}) against avg: {avg_aqi}")
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
 
@@ -442,7 +444,7 @@ def pgCheckAlerts():
 
         # If any triggers occurred, record the result then update db entry
         if triggered_ids:
-            print(f"Alert Tiggered: {name}, {triggered_ids}")
+            log(f"Alert Tiggered: {name}, {triggered_ids}")
             if True:
                 triggered_alerts.append({
                     "alert": {
@@ -456,7 +458,7 @@ def pgCheckAlerts():
                         "n_triggered": n_triggered + 1  # this is what it *will* be after the update
                     },
                     "triggered_ids":triggered_ids,
-                    "avg_aqi":avg_all
+                    "avg_aqi":float(avg_all)
                 })
 
             cur.execute("""

@@ -14,7 +14,7 @@ update_time_seconds = update_time_minutes*60
 alert_delay = 30
 
 def alert_loop():
-    print(f"Checking if any alerts have been triggered... {datetime.now()}")
+    log(f"Checking if any alerts have been triggered...")
     #triggered_alerts = pgAlert(update_time_seconds)
     new_triggered_alerts = pgCheckAlerts()
     if new_triggered_alerts:
@@ -23,16 +23,16 @@ def alert_loop():
             try:
                 send_email2(alert)
             except Exception as e:
-                log(e);
+                log(f"Send_Email Exception: {e}");
         return
-    print("No alerts triggered.")
+    log("No alerts triggered.")
 
 def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
         try:
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
         except:
-            log("Error pulling data. pullfn returned empty")
+            print("Error pulling data. pullfn returned empty")
             return
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
@@ -46,7 +46,7 @@ def update_loop():
         new_lines = formatLines(new_lines, "tuple")
         #print(new_lines)
 	    
-        print("Pushing to postgres database...")
+        log("Pushing to postgres database...")
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
         pgClose(conn, cur)

@@ -1,13 +1,6 @@
 import smtplib, ssl, os
 from fileUtil import getSensorNames
 
-port = 465
-context = ssl.create_default_context()
-sender_email = "uptonAQalerts@gmail.com"
-password = os.getenv("EMAIL_PASSWORD")
-ssl_smtp_server = smtplib.SMTP_SSL("smtp.gmail.com", port, context=context)
-ssl_smtp_server.login(sender_email, password)
-
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -66,8 +59,17 @@ def send_email(alert):
     msg["To"] = email_address
     msg.attach(MIMEText(html, "html"))
 
-    # Send the email
-    ssl_smtp_server.sendmail(sender_email, email_address, msg.as_string())
+    #setup connection config
+    port = 465
+    context = ssl.create_default_context()
+    sender_email = "uptonAQalerts@gmail.com"
+    password = os.getenv("EMAIL_PASSWORD")
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        # GMail Login
+        server.login(sender_email, password)
+        # Send the email
+        server.sendmail(sender_email, email_address, msg.as_string())
 
 def send_email2(alert_obj):
     alert_info = alert_obj["alert"]
@@ -161,5 +163,16 @@ def send_email2(alert_obj):
     msg["To"] = email_address
     msg.attach(MIMEText(html, "html"))
 
-    # Send the email
-    ssl_smtp_server.sendmail(sender_email, email_address, msg.as_string())
+    #setup connection config
+    port = 465
+    context = ssl.create_default_context()
+    sender_email = "uptonAQalerts@gmail.com"
+    password = os.getenv("EMAIL_PASSWORD")
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+        # GMail Login
+        server.login(sender_email, password)
+        # Send the email
+        server.sendmail(sender_email, email_address, msg.as_string())
+
+

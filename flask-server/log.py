@@ -1,8 +1,11 @@
 import datetime
 
 LOG_FILE = "important-logs.txt"
+LOG = True
 
 def log(message):
+    if !LOG:
+        return
     timestamp = datetime.datetime.now().isoformat(sep=' ', timespec='seconds')
     log_entry = f"[{timestamp}] {message}\n"
     try:
