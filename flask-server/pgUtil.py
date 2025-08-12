@@ -434,9 +434,9 @@ def pgCheckAlerts():
         # Check if any average exceeds the threshold
         triggered_ids = []
         total = 0
+        log(f"Checking alert threshold ({min_AQI}) against query results: {results}")
         for id_val, avg_aqi in results:
             total += avg_aqi
-            print(f"Checking alert threshold ({min_AQI}) against avg: {avg_aqi}")
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
 
