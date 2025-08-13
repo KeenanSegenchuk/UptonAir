@@ -9,7 +9,7 @@ from fileUtil import getSensors
 async def pullfn(return_data = False):
     #get sensor IDs
     sensors = [sensor for sensor in getPAirSensors() if sensor != 0]
-    print(sensors)
+    print(f"sensors: {sensors}")
 
     #set max pull timespan to 2 weeks to avoid large api calls
     endtime = int(time())
