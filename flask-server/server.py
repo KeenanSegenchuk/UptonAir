@@ -71,7 +71,7 @@ def remove_alert(address, name):
 
 	conn, cur = pgOpen()
 
-	if name is "ALERT_SUMMARY":
+	if name == "ALERT_SUMMARY":
 		summary_alerts = pgListAlerts(cur, address)
 		send_summary_email(summary_alerts)
 		return (jsonify(message=f"Sent summary email to {address}."), 200)
