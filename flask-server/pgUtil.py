@@ -106,7 +106,8 @@ def getTimestamp(sensor_id):
     
     result = cur.fetchone()
     pgClose(conn, cur)
-    return result[0] if result else 0
+    print(f"getTimestamp result: {result}")
+    return (result[0] or 0) if result else 0
 
 def pgQueryAvg(cur, start, end, sensor, col = "*"):
 	query = """SELECT AVG({col}) FROM readings 
