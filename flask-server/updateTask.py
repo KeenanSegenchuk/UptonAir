@@ -7,6 +7,7 @@ from fileUtil import getSensorMap
 from datetime import datetime
 from send_email import *
 from log import log
+import traceback
 
 #This python file is meant to be run as a thread that updates the data every x minutes
 
@@ -34,6 +35,7 @@ def update_loop():
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
         except Exception as e:
             print(f"Error pulling data: {e}")
+            traceback.print_exc()
             return
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
