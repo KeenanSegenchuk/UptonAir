@@ -1,5 +1,5 @@
 // setup.js
-const sensor_setup = false;
+const sensor_setup = true;
 
 const fs = require('fs');
 const path = require('path');
