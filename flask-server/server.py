@@ -11,6 +11,7 @@ import threading
 from datetime import datetime
 from pgUtil import *
 from updateTask import update_loop
+from send_email import send_summary_email
 
 app = Flask(__name__)
 CORS(app)
