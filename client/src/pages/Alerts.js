@@ -78,7 +78,7 @@ function Alerts() {
 
         api.get(`alerts/remove/${email}/${alertName}`)
             .then(response => {
-                showNotification('Successfully removed contact information', true);
+                showNotification('Successfully removed given alert.', true);
                 console.log("Response from contact info remove request:", response);
             }).catch(error => {
 		const serverMessage = error.response?.data?.error || "Unknown error occurred.";
