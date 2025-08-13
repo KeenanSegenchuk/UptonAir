@@ -4,7 +4,7 @@ from time import time
 import asyncio
 import sys
 from pgUtil import getTimestamp
-from fileUtil import getSensors
+from fileUtil import getSensors, getPAirSensors
 
 async def pullfn(return_data = False):
     #get sensor IDs

@@ -3,6 +3,7 @@ import asyncio
 from pullfn import *
 from cleanfn import *
 from pgUtil import *
+from fileUtil import getSensorMap
 from datetime import datetime
 from send_email import *
 from log import log
