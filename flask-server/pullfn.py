@@ -25,15 +25,15 @@ async def pullfn(return_data = False):
 
     #check for last entry in data.txt, replaced by checking database
     lastSample = [-1 for sensor in sensors]
-    for i in range(len(file)-1, -1, -1):
-        index = -1
-        if int(file[i][1]) in sensors:
-            index = sensors.index(int(file[i][1]))
+    #for i in range(len(file)-1, -1, -1):
+        #index = -1
+        #if int(file[i][1]) in sensors:
+            #index = sensors.index(int(file[i][1]))
             #print(f"Found sensor in index {index} while checking data line: {file[i][0]},{file[i][1]}.")
-        if index != -1 and lastSample[index] == -1:
-            lastSample[index] = file[i][0]
-        if -1 not in lastSample or int(file[i][0]) < starttime:
-            break
+        #if index != -1 and lastSample[index] == -1:
+            #lastSample[index] = file[i][0]
+        #if -1 not in lastSample or int(file[i][0]) < starttime:
+            #break
     #find the last data point from each sensor
     print(f"Checking for data pulled from sensors: {sensors}")
     lastSample = [getTimestamp(sensor) for sensor in sensors]

@@ -3,6 +3,7 @@ from psycopg2 import errors
 import os
 from PMtoAQI import *
 from log import *
+from fileUtil import getSensorMap
 
 '''
 	pgUtil.py contains useful functions for interfacing with the postgreSQL database
@@ -100,6 +101,7 @@ def maxTimestamp():
 	return result[0] if result else None
 
 def getTimestamp(sensor_id):
+    sensor_id = getSensorMap().get(sensor_id) or sensor_id
     conn, cur = pgOpen()
     query = """SELECT MAX(time) FROM readings WHERE id = %s"""
     cur.execute(query, (sensor_id,))
