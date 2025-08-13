@@ -25,7 +25,7 @@ def getPAirSensors():
 	#return a list of all sensor ids as they are on purpleair
 	with open("sensor-pos.json", "r") as json_file:
 		sensors = json.load(json_file)
-	sensors = [int(sensor["pAir_id"] or sensor["id"]) for sensor in sensors]
+	sensors = [int(sensor.get("pAir_id") or sensor["id"]) for sensor in sensors]
 	return sensors
 
 def getSensorMap():
