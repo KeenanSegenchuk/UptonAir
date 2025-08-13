@@ -97,7 +97,7 @@ def maxTimestamp():
 	
 	result = cur.fetchone()
 	pgClose(conn, cur)
-	return result[0] if result else None
+	return result[0] if result else 0
 
 def getTimestamp(sensor_id):
     conn, cur = pgOpen()
