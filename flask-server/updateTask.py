@@ -31,8 +31,8 @@ def update_loop():
     if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
         try:
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
-        except:
-            print("Error pulling data. pullfn returned empty")
+        except Exception as e:
+            print(f"Error pulling data: {e}")
             return
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
