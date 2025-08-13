@@ -49,12 +49,10 @@ def update_loop():
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
         sensor_map = getSensorMap()
-        print(sensor_map)
         for line in new_lines:
-            pAir_id = str(line[0])
-            print(pAir_id)
+            pAir_id = str(line[1])
             if sensor_map.get("pAir_id"):
-                line[0] = int(sensor_map["pAir_id"]) 
+                line[1] = int(sensor_map["pAir_id"]) 
             
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
