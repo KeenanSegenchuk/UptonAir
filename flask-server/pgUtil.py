@@ -101,16 +101,14 @@ def maxTimestamp():
 	return result[0] if result else None
 
 def getTimestamp(sensor_id):
-    print(f"map: {getSensorMap()}")
-    sensor_id = getSensorMap().get(sensor_id) or sensor_id
-    print(sensor_id)
+    sensor_map = {val: key for key, val in getSensorMap().items()} #flip sensor map
+    sensor_id = sensor_map.get(sensor_id) or sensor_id
     conn, cur = pgOpen()
     query = """SELECT MAX(time) FROM readings WHERE id = %s"""
     cur.execute(query, (sensor_id,))
     
     result = cur.fetchone()
     pgClose(conn, cur)
-    print(f"getTimestamp result: {result}")
     return (result[0] or 0) if result else 0
 
 def pgQueryAvg(cur, start, end, sensor, col = "*"):

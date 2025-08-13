@@ -36,7 +36,7 @@ async def pullfn(return_data = False):
             #break
     #find the last data point from each sensor
     print(f"Checking for data pulled from sensors: {sensors}")
-    lastSample = [getTimestamp(sensor) or starttime for sensor in sensors]
+    lastSample = [getTimestamp(sensor) or int(starttime) for sensor in sensors] #if 0 set to 2 weeks ago so API call goes through
 
     print(f"Pulling data after last entry: {lastSample}...")
 
