@@ -67,7 +67,7 @@ def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
 @alert_bp.route("remove/<string:address>/<string:name>/")
 @alert_bp.route("remove/<string:address>/<string:name>")
 def remove_alert(address, name):
-	print(f"Removing Alert: {address}, {name}"}
+	print(f"Removing Alert: {address}, {name}")
 
 	conn, cur = pgOpen()
 
