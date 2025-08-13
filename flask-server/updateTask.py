@@ -43,10 +43,14 @@ def update_loop():
         else:
             print("Already Cleaning data.txt...")
 
+        #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
-        #print(new_lines)
-	    
-        log("Pushing to postgres database...")
+        sensor_map = getSensorMap()
+        for line in new_lines:
+            pAir_id = str(line[0])
+            if sensor_map.get(pAir_id):
+                line[0] = int(sensor_map[pAir_id]) 
+            
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
         pgClose(conn, cur)
