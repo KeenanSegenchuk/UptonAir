@@ -454,7 +454,7 @@ def pgCheckAlerts():
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
             else:
-                other_ids.appends((id_val, float(avg_aqi)))
+                other_ids.append((id_val, float(avg_aqi)))
 
         avg_all = total / len(results)
 
