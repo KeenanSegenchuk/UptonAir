@@ -74,7 +74,7 @@ def remove_alert(address, name):
 
 	if name == "ALERT_SUMMARY":
 		summary_alerts = pgListAlerts(cur, address)
-		send_summary_email(summary_alerts)
+		send_summary_email(summary_alerts, address)
 		return (jsonify(message=f"Sent summary email to {address}."), 200)
 
 	if not pgCheck(cur, "alerts"):  	#check for table
