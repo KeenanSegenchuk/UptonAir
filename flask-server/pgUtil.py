@@ -388,11 +388,24 @@ def pgRemoveAddress(cur, address, name):
 		print("Unhandled DB error during deletion:", e)
 	return 2
 
-def pgListAlerts(cur):
+def pgListAllAlerts(cur):
 	cur.execute("SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
 	rows = cur.fetchall()
 	
 	print(rows)
+
+def pgListAlerts(cur, address):
+	cur.execute(
+		"""
+		SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
+		FROM alerts
+		WHERE address = %s
+		""",
+		(address,)
+	)
+	rows = cur.fetchall()
+	return rows
+
 
 import time
 from collections import defaultdict
@@ -433,12 +446,15 @@ def pgCheckAlerts():
 
         # Check if any average exceeds the threshold
         triggered_ids = []
+        other_ids = []
         total = 0
         log(f"Checking alert threshold ({min_AQI}) against query results: {results}")
         for id_val, avg_aqi in results:
             total += avg_aqi
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
+            else:
+                other_ids.appends((id_val, float(avg_aqi)))
 
         avg_all = total / len(results)
 
@@ -458,6 +474,7 @@ def pgCheckAlerts():
                         "n_triggered": n_triggered + 1  # this is what it *will* be after the update
                     },
                     "triggered_ids":triggered_ids,
+                    "other_ids":other_ids,
                     "avg_aqi":float(avg_all)
                 })
 

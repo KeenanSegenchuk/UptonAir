@@ -64,11 +64,19 @@ def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
 	return responses[response]
 
 # Remove address from db
+@alert_bp.route("remove/<string:address>/<string:name>/")
 @alert_bp.route("remove/<string:address>/<string:name>")
 def remove_alert(address, name):
-	#check for table
+	print(f"Removing Alert: {address}, {name}"}
+
 	conn, cur = pgOpen()
-	if not pgCheck(cur, table):
+
+	if name is "ALERT_SUMMARY":
+		summary_alerts = pgListAlerts(cur, address)
+		send_summary_email(summary_alerts)
+		return (jsonify(message=f"Sent summary email to {address}."), 200)
+
+	if not pgCheck(cur, "alerts"):  	#check for table
 		print("WARNING: Alert table not found when trying to add alert.")
 
 	response = pgRemoveAddress(cur, address, name)

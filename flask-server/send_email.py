@@ -74,6 +74,7 @@ def send_email(alert):
 def send_email2(alert_obj):
     alert_info = alert_obj["alert"]
     triggered_ids = alert_obj["triggered_ids"]  # List of [id, avg]
+    other_ids = alert_obj["other_ids"] #same format as triggered_ids
     avg_aqi = alert_obj["avg_aqi"]
 
     # Unpack alert info
@@ -93,6 +94,11 @@ def send_email2(alert_obj):
         (getSensorNames([sensor_id]), round(sensor_avg, 2))
         for sensor_id, sensor_avg in triggered_ids
     ]
+    other_sensor_data = [
+        (getSensorNames([sensor_id]), round(sensor_avg, 2))
+        for sensor_id, sensor_avg in other_ids
+    ]
+
 
     # Time since last alert
     if last_alert == 0:
@@ -128,7 +134,7 @@ def send_email2(alert_obj):
           <strong>Overall Average AQI:</strong> {AQI} (over the last {avg_window} minutes)
         </p>
 
-        <h3 style="margin-top: 24px;">🚨 Sensors That Triggered the Alert</h3>
+        <h3 style="margin-top: 24px;">🚨 Sensors That Triggered The Alert</h3>
         <table style="border-collapse: collapse; margin-top: 10px;">
           <thead>
             <tr style="background-color: #f2f2f2;">
@@ -140,12 +146,25 @@ def send_email2(alert_obj):
             {triggered_sensors_html}
           </tbody>
         </table>
+        <h3 style="margin-top: 24px;">🟢 Other Sensors Monitored By This Alert </h3>
+        <table style="border-collapse: collapse; margin-top: 10px;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="text-align: left; padding: 6px 12px;">Sensor</th>
+              <th style="text-align: left; padding: 6px 12px;">Avg AQI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {other_sensors_html}
+          </tbody>
+        </table>
+
 
         <p>
           <strong>Alert Threshold:</strong> {min_AQI} AQI<br>
           <strong>Cooldown Period:</strong> {cooldown} hour(s)<br>
           <strong>Last Triggered:</strong> {last_alert_str} ago<br>
-          <strong>Total Times Triggered:</strong> {n_triggered}
+          <!--<strong>Total Times Triggered:</strong> {n_triggered}-->
         </p>
 
         <hr style="margin-top: 30px; margin-bottom: 20px;">
@@ -176,3 +195,71 @@ def send_email2(alert_obj):
         server.sendmail(sender_email, email_address, msg.as_string())
 
 
+def send_summary_email(alerts, email_address):
+	# alerts is expected to be a list of tuples from pgListAlerts
+	# (address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
+
+	# Build HTML table rows
+	rows_html = ""
+	for alert in alerts:
+		address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+		rows_html += f"""
+			<tr>
+				<td style="padding: 6px 12px;">{address}</td>
+				<td style="padding: 6px 12px;">{name}</td>
+				<td style="padding: 6px 12px;">{min_AQI}</td>
+				<td style="padding: 6px 12px;">{ids}</td>
+				<td style="padding: 6px 12px;">{cooldown} hr</td>
+				<td style="padding: 6px 12px;">{avg_window} min</td>
+				<td style="padding: 6px 12px;">{last_alert}</td>
+				<td style="padding: 6px 12px;">{n_triggered}</td>
+			</tr>
+		"""
+
+	# HTML email content
+	html = f"""
+	<html>
+		<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+			<h2 style="color: #5cb85c;">📊 Upton-Air Alert Summary</h2>
+			<p>Here is a summary of your alerts:</p>
+			<table style="border-collapse: collapse; margin-top: 10px; border: 1px solid #ccc;">
+				<thead>
+					<tr style="background-color: #f2f2f2;">
+						<th style="text-align: left; padding: 6px 12px;">Address</th>
+						<th style="text-align: left; padding: 6px 12px;">Name</th>
+						<th style="text-align: left; padding: 6px 12px;">Min AQI</th>
+						<th style="text-align: left; padding: 6px 12px;">IDs</th>
+						<th style="text-align: left; padding: 6px 12px;">Cooldown</th>
+						<th style="text-align: left; padding: 6px 12px;">Avg Window</th>
+						<th style="text-align: left; padding: 6px 12px;">Last Alert</th>
+						<th style="text-align: left; padding: 6px 12px;">Times Triggered</th>
+					</tr>
+				</thead>
+				<tbody>
+					{rows_html}
+				</tbody>
+			</table>
+			<hr style="margin-top: 30px; margin-bottom: 20px;">
+			<p style="font-size: 0.9em; color: #888;">
+				You are receiving this email because you subscribed to Upton-Air alerts.
+			</p>
+		</body>
+	</html>
+	"""
+
+	# Email setup
+	sender_email = "uptonAQalerts@gmail.com"
+	password = os.getenv("EMAIL_PASSWORD")
+
+	msg = MIMEMultipart("alternative")
+	msg["Subject"] = "Upton-Air Alert Summary"
+	msg["From"] = sender_email
+	msg["To"] = email_address
+	msg.attach(MIMEText(html, "html"))
+
+	# Send email
+	port = 465
+	context = ssl.create_default_context()
+	with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+		server.login(sender_email, password)
+		server.sendmail(sender_email, email_address, msg.as_string())
