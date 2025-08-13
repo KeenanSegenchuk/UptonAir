@@ -119,6 +119,10 @@ def send_email2(alert_obj):
         f"<tr><td style='padding: 4px 12px;'>{sensor_name}</td><td style='padding: 4px 12px;'>{aqi}</td></tr>"
         for sensor_name, aqi in triggered_sensor_data
     )
+    other_sensors_html = "".join(
+        f"<tr><td style='padding: 4px 12px;'>{sensor_name}</td><td style='padding: 4px 12px;'>{aqi}</td></tr>"
+        for sensor_name, aqi in other_sensor_data
+    )
 
     # HTML Message
     html = f"""
