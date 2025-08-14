@@ -138,18 +138,19 @@ def send_email2(alert_obj):
           <strong>Overall Average AQI:</strong> {AQI} (over the last {avg_window} minutes)
         </p>
 
-        {triggered_sensors_html ? <h3 style="margin-top: 24px;">🚨 Sensors That Triggered The Alert</h3>
-        <table style="border-collapse: collapse; margin-top: 10px;">
-          <thead>
-            <tr style="background-color: #f2f2f2;">
-              <th style="text-align: left; padding: 6px 12px;">Sensor</th>
-              <th style="text-align: left; padding: 6px 12px;">Avg AQI</th>
-            </tr>
-          </thead>
-          <tbody>
-            {triggered_sensors_html}
-          </tbody>
-        </table> : ""}
+        f"""{'<h3 style="margin-top: 24px;">🚨 Sensors That Triggered The Alert</h3>'
+        '<table style="border-collapse: collapse; margin-top: 10px;">'
+          '<thead>'
+            '<tr style="background-color: #f2f2f2;">'
+              '<th style="text-align: left; padding: 6px 12px;">Sensor</th>'
+              '<th style="text-align: left; padding: 6px 12px;">Avg AQI</th>'
+            '</tr>'
+          '</thead>'
+          '<tbody>'
+            f'{triggered_sensors_html}'
+          '</tbody>'
+        '</table>' if triggered_sensors_html else ""}"""
+
         <h3 style="margin-top: 24px;">🟢 Other Sensors Monitored By This Alert </h3>
         <table style="border-collapse: collapse; margin-top: 10px;">
           <thead>
