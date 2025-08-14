@@ -73,8 +73,12 @@ def pgCheck(cur, table):
 def formatLines(lines, format = "tuple"):
 	#converts lines from raw purpleair to tuples or strings with AQI fields added
 	lines = [line.split(",") for line in lines]
+
+	#check for db id vs purpleair id
+	sensor_map = getSensorMap()
+
 	#check for invalid values
-	lines = [line[0:3] + [int(float(line[3])<float(line[4])), min(float(line[3]), float(line[4])), 999, 999, 999] if float(line[3]) > 750 or float(line[4]) > 750 else line + PMtoAQI(float(line[2]), float(line[3]), float(line[4])) for line in lines]
+	lines = [line[0] + (sensor_map.get(line[1]) or line[1]) + line[2:3] + [int(float(line[3])<float(line[4])), min(float(line[3]), float(line[4])), 999, 999, 999] if float(line[3]) > 750 or float(line[4]) > 750 else line + PMtoAQI(float(line[2]), float(line[3]), float(line[4])) for line in lines]
 
 	if format == "tuple":
 		return [tuple(line) for line in lines]
