@@ -77,8 +77,10 @@ def formatLines(lines, format = "tuple"):
 	#check for db id vs purpleair id
 	sensor_map = getSensorMap()
 
+	print(sensor_map)
 	#check for invalid values
 	lines = [line[0] + (sensor_map.get(line[1]) or line[1]) + line[2:3] + [int(float(line[3])<float(line[4])), min(float(line[3]), float(line[4])), 999, 999, 999] if float(line[3]) > 750 or float(line[4]) > 750 else line + PMtoAQI(float(line[2]), float(line[3]), float(line[4])) for line in lines]
+	print(f"formatLines lines: {lines}")
 
 	if format == "tuple":
 		return [tuple(line) for line in lines]
