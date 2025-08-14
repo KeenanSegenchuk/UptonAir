@@ -442,7 +442,8 @@ def pgCheckAlerts():
         """, (ids, window_start))
         
         results = cur.fetchall()
-        
+        #log(f"Check alert readings query: {results}")        
+
         if len(results) == 0:
             continue
 

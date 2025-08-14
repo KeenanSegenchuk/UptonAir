@@ -51,8 +51,8 @@ def update_loop():
         sensor_map = getSensorMap()
         for line in new_lines:
             pAir_id = str(line[1])
-            if sensor_map.get("pAir_id"):
-                line[1] = int(sensor_map["pAir_id"]) 
+            if sensor_map.get(pAir_id):
+                line[1] = int(sensor_map[pAir_id]) 
             
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
