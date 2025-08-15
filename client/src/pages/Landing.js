@@ -99,7 +99,8 @@ function Landing() {
 		<div style={{borderTop:"2px dashed white"}}/>
                 <h3 class="tabbed s18">Share Feedback</h3>
 		<p class="s12 centered">We would very much appreciate any feedback or suggestions on the website. 
-		For now you can submit all feedback to uptonAQalerts@gmail.com.
+		For now you can submit all feedback to 
+		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>.
 		</p>
 		<div style={{height:"25px"}}/>
 		<div style={{borderTop:"2px dashed white"}}/>
