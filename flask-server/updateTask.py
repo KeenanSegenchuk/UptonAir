@@ -48,6 +48,7 @@ def update_loop():
 
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
+        print(f"Formatted lines: {new_lines}")
             
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
