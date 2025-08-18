@@ -67,9 +67,9 @@ function UserGuide() {
 		You can set up an air quality notification on&nbsp; 
 		<a href="https://Upton-Air.com/alerts" target="_blank">Upton-Air.com/alerts</a>.
 	    </p>
-	  {isMobile ? <p class='centered s12'><br/>This is still work in progress (WIP). Check the alert description at the bottom of the page to ensure it's configured correctly before submitting.</p> : 
+	  {isMobile ? <p class='centered s12'><br/>This is still work in progress (WIP). Check the alert description at the bottom of the form to ensure it's configured correctly before submitting.</p> : 
 	    <div style={{display:"flex", flexDirection: "row"}}>
-		<img alt="" src="figs/UG_alert.png" width="100%" height="auto" style={{padding:"15px", paddingRight:"3px"}}/>
+		<img alt="" src="figs/UG_alert.png" width="auto" height="auto" style={{maxWidth:"50%", padding:"15px", paddingRight:"3px"}}/>
 		<div style={{display:"inline"}}>
 			<div style={{height:"23%"}}/>
 			<p class="s8 mh105 verticalCenter">

@@ -107,7 +107,7 @@ function Landing() {
                 <h3 class="tabbed s18">Get Involved</h3>
 		<p class="s12 centered">If you would like to host an air monitor, get involved in our work, or just reach out to someone at Sustainable Upton, 
 		you can reach us via email:&nbsp;
-		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>
+		<a href="mailto:uptonAQalerts@gmail.com">sustainableuptonma@gmail.com </a>
 		<br/><br/>
 		You can also find us on the <a href="https://www.facebook.com/groups/1669539636635991/">Sustainable Upton Facebook page</a>
 		</p>
