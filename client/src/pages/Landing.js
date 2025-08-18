@@ -99,16 +99,16 @@ function Landing() {
 		<div style={{borderTop:"2px dashed white"}}/>
                 <h3 class="tabbed s18">Share Feedback</h3>
 		<p class="s12 centered">We would very much appreciate any feedback or suggestions on the website. 
-		For now you can submit all feedback to 
-		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>.
+		For now you can submit all feedback to&nbsp;
+		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>
 		</p>
 		<div style={{height:"25px"}}/>
 		<div style={{borderTop:"2px dashed white"}}/>
                 <h3 class="tabbed s18">Get Involved</h3>
 		<p class="s12 centered">If you would like to host an air monitor, get involved in our work, or just reach out to someone at Sustainable Upton, 
-		you can reach us via email: 
-		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>.
-		</br></br>
+		you can reach us via email:&nbsp;
+		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>
+		<br/><br/>
 		You can also find us on the <a href="https://www.facebook.com/groups/1669539636635991/">Sustainable Upton Facebook page</a>
 		</p>
 		<div style={{height:"25px"}}/>
