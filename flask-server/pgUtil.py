@@ -116,7 +116,7 @@ def getTimestamp(sensor_id):
     sensor_id2 = sensor_id
     if map.get(sensor_id):
         sensor_id = map[sensor_id]
-    sensor_id2 = map().get(sensor_id2) or sensor_id2
+    sensor_id2 = map.get(sensor_id2) or sensor_id2
     print(f"sensor_id: {sensor_id}")
     print(f"sensor_id2: {sensor_id2}")
     conn, cur = pgOpen()
