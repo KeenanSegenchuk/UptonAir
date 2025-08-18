@@ -114,7 +114,6 @@ def maxTimestamp():
 def getTimestamp(sensor_id):
     map = getSensorMap()
     sensor_id = map.get(str(sensor_id)) or sensor_id
-    print(f"sensor_id: {sensor_id}")
     conn, cur = pgOpen()
     query = """SELECT MAX(time) FROM readings WHERE id = %s"""
     cur.execute(query, (sensor_id,))
