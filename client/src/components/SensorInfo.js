@@ -122,7 +122,7 @@ function SensorInfo({ dummy }) {
     return (
 	<div id="SensorInfo.js" className="sensorDiv">
 	    <div className={mobileMultiSelect ? "hideMobile" : ""}>		    
-	        <h1 style={{fontSize:"3em", padding: "10px"}} className="headerText">Current Sensor: {sensorName} [{getObj(`W${units}`)}]</h1>
+	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {sensorName} [{getObj(`W${units}`)}]</h1>
 	        <Banner avg={Math.round(100*filteredData().banner_avg) / 100} units = {units}/>
 
     	        <h1 className="headerText">Recent Averages ({getObj(`U${units}`)})</h1>
@@ -147,5 +147,6 @@ function SensorInfo({ dummy }) {
 	</div>
     );
 }
+
 
 export default SensorInfo;
