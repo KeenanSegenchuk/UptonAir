@@ -148,4 +148,5 @@ function SensorInfo({ dummy }) {
     );
 }
 
+
 export default SensorInfo;
