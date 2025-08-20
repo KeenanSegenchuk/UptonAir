@@ -65,6 +65,16 @@ export function getObj(obj) {
 	"humidity":"Humidity",
 	"percent_difference":"PM2.5 Channel Difference",
     };
+    const unitColors = {
+	AQIEPA:"black",
+	AQI:"darkgrey",
+	PMEPA:"darkblue",
+	PM:"mediumAquaMarine",
+	PMA:"goldenrod",
+	PMB:"indianred",
+	humidity: "mediumpurple",
+	percent_difference: "saddlebrown"
+    };
 
     /*
     Relic from when sensors were manually positioned. Now this data is stored in the config and lat/long are pulled from purpleair.
@@ -213,6 +223,7 @@ export function getObj(obj) {
     };
 
     switch (obj.substring(0,1)) {
+        
 	case "$":
 		sensor_id = obj.substring(1,7);
 		//log("$",sensor_id);
@@ -289,6 +300,17 @@ export function getObj(obj) {
 			return;
 		}
 	case "U":
+		unit = obj.substring(2);
+		switch (obj.substring(1,2)) {
+			case "C":
+				return unitColors[unit] ;
+			case "c":
+				return unitColors;
+			case "D":
+				return unitDescriptions[unit];
+			case "d":
+				return unitDescriptions;
+		}
 		unit = obj.substring(1);
 		log("Fetching Units:", unit);
 		try{
@@ -297,7 +319,21 @@ export function getObj(obj) {
 			return;
 		}
 	case "u":
+		unit = obj.substring(2);
+		switch (obj.substring(1,2)) {
+			case "C":
+				return unitColors[unit] ;
+			case "c":
+				return unitColors;
+			case "D":
+				return unitDescriptions[unit];
+			case "d":
+				return unitDescriptions;
+		}
 		return units;
+	case "S":
+	case "s":
+		return positions.map(entry => entry.id);
 	case "V":
 	case "v":
 		return vibrColors;
@@ -324,4 +360,3 @@ export function getObj(obj) {
     }
 
 } 
-//module.exports = { getObj };

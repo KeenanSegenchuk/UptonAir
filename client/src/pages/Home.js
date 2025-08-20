@@ -38,7 +38,6 @@ function Home() {
     }
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    console.log(isMobile);
 
     return (
 	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll', display: 'flex', flexDirection: 'column' }}>

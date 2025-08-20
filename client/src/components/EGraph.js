@@ -12,7 +12,7 @@ function EGraph() {
 	 */   	
 
 	//setup data management
-	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits} = useAppContext(); 
+	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode} = useAppContext(); 
 	const contexts = getObj("DataContexts");
 
     	const debug = false;
@@ -121,12 +121,29 @@ function EGraph() {
 	        return [];
 	    }
 	    try {
-	        /*console.log("In EGraph. Filtering Data...", data); 
-	        console.log("Given context:", dataContext);
+		
+	        console.log("In EGraph. Filtering Data...", data); 
+	        /*console.log("Given context:", dataContext);
 	        console.log("Units:", units);
 		*/
-	        const fd = data.filter(entry => entry.context === dataContext && entry.units === units);
-	        log("Filter Result:", fd);
+
+
+	        let fd = data.filter(entry => entry.context === dataContext);
+			
+	        if (lineBool && lineMode === "sensors") 
+			fd = fd.filter(entry => entry.showline); //isLineSelected(entry.sensor) 
+		else
+			fd = fd.filter(entry => entry.sensor === sensor_id);
+
+		if (lineBool && lineMode === "units")
+			fd = fd.filter(entry => lineUnits.includes(entry.units));
+		else if (lineBool)
+			fd = fd.filter(entry => entry.units === units);
+		else 
+			fd = fd.find(entry => entry.units === units);
+
+		console.log("Filter Result:", fd);
+		
 
 	        return fd;
 	    } catch (err) {
@@ -160,14 +177,14 @@ function EGraph() {
 	const formatLine = (l) => {
 		return {
 			type: "line",
-			name: getObj("$"+l.sensor),
-			id: l.sensor,
+			name: lineMode === "sensors" ? getObj("$"+l.sensor) : l.units,
+			id: l.sensor + l.units,
 			symbol: "none",
 			lineStyle: {
-				color: l.color
+				color: lineMode === "sensors" ? l.color : getObj(`UC${l.units}`)
 			},
 			itemStyle: {
-				color: l.color
+				color: lineMode === "sensors" ? l.color : getObj(`UC${l.units}`)
 			},
         		data: l.data.map(point => [point[0]*1000, point[1]]), 
 		};
@@ -188,7 +205,7 @@ function EGraph() {
 
   //get the bars for graphing current sensor
   const getBars = () => {
-    const selectedData = filteredData().find(entry => entry.sensor === sensor_id);
+    const selectedData = filteredData(); //.find(entry => entry.sensor === sensor_id);
     //console.log("Selected Data:", selectedData);
     let response = { data: [[0,0]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
     if(selectedData)
@@ -204,7 +221,8 @@ function EGraph() {
 	try {
             bars = graphUtil("getBars")(b, n, start, end);
         } catch(error) {
-	    console.log("Error binning data into bars.");
+	    console.log("Error binning data into bars.", bars);
+	    console.log(`b: ${b}, n: ${n}, start: ${start}, end: ${end}`);
 	    return bars;
 	}
 	if(bars.x) {
@@ -271,8 +289,8 @@ return (
             </button>
             {lineBool ? (
 		<div className="graphDiv" ref={containerRef}>
-		    {!isMobile && <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center>} 
-		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().filter(entry => entry.showline).map(formatLine)}}
+		    {!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>} 
+		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}

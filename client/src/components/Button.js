@@ -30,7 +30,7 @@ function Button({ id, x, y }) {
     const name = getObj("$" + id);
     const borderColor = getObj("C" + id);
     const labelOffsets = getObj("O" + id);
-    const { globalLineBool, units, hover, switches, data, setData, setPopup } = useAppContext();
+    const { globalLineBool, units, hover, switches, data, setData, setPopup, lineMode, newLineUnit, lineUnits, isLineSelected, toggleLineSelect, selectSensor } = useAppContext();
     const [borderStyle, setBorderStyle] = useState("none");
     const hoverKey = "labels";
 
@@ -40,16 +40,36 @@ function Button({ id, x, y }) {
     //track selected data range
     const {dataContext, setSensor_id, sensor_id} = useAppContext();
     const [contexts] = useState(() => getObj("DataContexts"));
-    const [selected, setSelected] = useState(false);
+    const [selected, setSelected] = useState(isLineSelected(id));
+    useEffect(() => {
+	//console.log("isLineSelected(id): ", isLineSelected(id));
+	setSelected(isLineSelected(id)); //Update if Selection from Menu changes
+	getData(false);
+    }, [isLineSelected(id)] );
+
+    //check for new line graph units/measurements
+    useEffect(() => {
+	if (id === sensor_id)
+	    getData(false, newLineUnit);
+    }, [newLineUnit]);
+
+    //check when switching back to sensor-select for line graph
+    useEffect(() => {
+	if (selected && lineMode === "sensors") {
+	    console.log(`LineMode changes, fetching line, Sensor: ${name}`);
+	    getData();
+	}
+    }, [lineMode]);
 
     //----Data update handling----//
 
 
     //check if data already exists for current sensor
-    const checkData = () => {
+    const checkData = (forceUnits) => {
         //console.log(`Checking if data already exists; sensor = ${sensor_id} and context = ${dataContext}`)
         //console.log("Result: " + data.some(entry => entry.sensor === id && entry.context === dataContext));
-        return data.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === units);
+	const UNITS = forceUnits ?? units;
+        return data.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === UNITS);
     };
 
     //Load sensor avg on mount for desktop
@@ -64,27 +84,27 @@ function Button({ id, x, y }) {
 
 
     //pull data from API when clicked
-    const getData = (forceSelect) => {
+    const getData = (forceSelect, forceUnits) => {
 	//console.log("Button clicked! ID: ", id);
-	if(!globalLineBool && !switches.get("selected"))
-		setSensor_id(id);
-	if(checkData())
+
+	if(checkData(forceUnits))
 		return;
 	//console.log("About to pull data...");
 	//console.log(`Sensor ${id}, units: ${units}, checkdata: ${checkData()}`); 
 
+	const UNITS = forceUnits ?? units;
 	const start = end - contexts[dataContext];
-	api.get(`time/${units}/${start}-${end}/${id}`)
+	api.get(`time/${UNITS}/${start}-${end}/${id}`)
 		.then(response => {
 			//console.log("Existing Data:", data);
 			//console.log("Sensor_id:", id);
 			//console.log("Server's Response", response);
-			log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
+			log(`Sensor ${id}, UNITS: ${UNITS}, checkdata: ${checkData()}`); 
 	
 			setData(prev => {
-				if(prev.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === units))
+				if(prev.some(entry => entry.sensor === id && entry.context === dataContext && entry.units === UNITS))
 					return prev;
-				return [...prev, {context: dataContext, sensor:id, units:units, data:response.data.data, color:getObj("C"+id), showline: forceSelect === undefined ? selected : forceSelect}];
+				return [...prev, {context: dataContext, sensor:id, units:UNITS, data:response.data.data, color:getObj("C"+id), showline: forceSelect === undefined ? selected : forceSelect}];
 			});
 
 		}).catch(error => {
@@ -114,8 +134,9 @@ function Button({ id, x, y }) {
 
     //check for id == sensor_id during swap to globallinebool and update showline for that data series
     useEffect(() => {
-	if(id === sensor_id && globalLineBool)
+	if(id === sensor_id && globalLineBool && lineMode === "sensors")
 	{
+		selectSensor(id); //set true in context var
 		setSelected(true);
 	}
     }, [globalLineBool]);
@@ -123,8 +144,13 @@ function Button({ id, x, y }) {
     //fetch updated data when time context/units changes
     useEffect(() => {
 	log(`Sensor ${sensor_id}, units: ${units}, checkdata: ${checkData()}`); 
-	if(id === sensor_id || (globalLineBool && selected)) {
-		getData();
+	if(id === sensor_id || (globalLineBool && lineMode === "sensors" && selected)) {
+		if(globalLineBool && lineMode === "units")
+			lineUnits.forEach((unit) => getData(false, unit));
+		else {
+			console.log(`DataContext/Unit Change... Sensor:${name} DataContext:${dataContext}`);
+			getData();
+		}
 	}
     }, [dataContext, units]);
     //fetch updated data when lineUnits changes
@@ -162,7 +188,7 @@ function Button({ id, x, y }) {
     }, [val, units]);
 
     const handleButtonClick = (sensorValue, event) => {
-        if (globalLineBool || switches.get("select")) {
+        if ((globalLineBool && lineMode === "sensors") || switches.get("select")) {
 	    if(!switches.get("select")) {
 	        setSensor_id(id);
 	        if(isMobile) {
@@ -178,8 +204,13 @@ function Button({ id, x, y }) {
 		setSelected(true);
 		getData(true);
 	    }
+	    toggleLineSelect(id);
 	    return;
         }
+	if (globalLineBool && lineMode === "units")
+	{ 
+		lineUnits.forEach((unit) => getData(false, unit));
+	}
 	console.log(sensorValue);
 	setSensor_id(id);
 	if(isMobile) {
@@ -217,18 +248,20 @@ function Button({ id, x, y }) {
                 id={id}
 		
                 style={{
-		    //color: (id === "0" && selected && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
+		    //color: (id === "0" && selected && lineMode === "sensors" && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
 		    backgroundColor: color,
-		    boxShadow: globalLineBool || switches.get("select") ? borderStyle : "none",
+		    boxShadow: (lineMode === "sensors" && (globalLineBool || switches.get("select"))) ? borderStyle 
+				: ((lineMode === "units" && globalLineBool && id === sensor_id) ? `0 0 0 5px ${borderColor}` 
+				: "none"),
                     top: y+"%",
                     left: x+"%",
 		    zIndex: selected ? 2000 : 1000,
         	    /*clipPath: id === "0"
         	      ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
-       	              : "none",*/
+       	              : "none", THIS MAKES TOWN AVG BUTTON A STAR*/
 		    width: id === "0" ? "50px" : undefined,
 		    height: id === "0" ? "50px" : undefined,
-		    fontSize: id === "0" ? "1.5em" : undefined
+		    fontSize: id === "0" ? "1.5em" : "1.05em" //undefined
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >

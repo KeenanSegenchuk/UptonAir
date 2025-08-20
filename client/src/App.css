@@ -327,6 +327,8 @@ h3, h2 {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-height: 100%;
+  width: 100%;
   /*background-color: #435343; /* Very light gray/off-white for the background */
   /*border: 1px solid #e0e0e0; /* Subtle light gray border */
   /*border-radius: 8px; /* Slightly rounded corners */
@@ -497,6 +499,8 @@ h3, h2 {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
+  border-left: none; 
+  broder-right: none;
 }
 @media (min-width: 768px) {
   .bannerText {

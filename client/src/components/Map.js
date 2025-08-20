@@ -101,55 +101,69 @@ function Map({ buttons }) {
           ⚙️
         </button>
       </div>
-
+      
       {/* Config Modal Overlay */}
-      {true && (
+      {showConfig && (
         <div
           style={{
-            position: 'absolute',
-            top: '10%',
-            left: '50%',
-            transform: 'translate(-50%)',
-            width: '80%',
-            backgroundColor: 'rgba(240,255,240,0.95)',
-            zIndex: 1500,
-            padding: '20px',
-            overflow: 'auto',
-            borderRadius: '10px',
-            boxShadow: '0 0 20px rgba(0,0,0,0.3)',
-	    display: showConfig ? 'block' : 'none'
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.4)",
+            zIndex: 1499,
           }}
+          onClick={() => setShowConfig(false)}
         >
-          <button
-            onClick={() => setShowConfig(false)}
+          <div
             style={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              background: 'transparent',
-              border: 'none',
-              fontSize: '24px',
-              cursor: 'pointer'
+              position: "absolute",
+              maxHeight: "90%",
+              top: "5%",
+              left: "50%",
+              transform: "translate(-50%)",
+              width: "75%",
+              backgroundColor: "rgba(240,255,240,0.95)",
+              zIndex: 1500,
+              padding: "20px",
+              overflow: "auto",
+              borderRadius: "10px",
+              boxShadow: "0 0 20px rgba(0,0,0,0.3)",
             }}
-            title="Close"
+            onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
           >
-            ✕
-          </button>
-          <DashboardConfig />
+            <button
+              onClick={() => setShowConfig(false)}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                background: "transparent",
+                border: "none",
+                fontSize: "24px",
+                cursor: "pointer",
+              }}
+              title="Close"
+            >
+              ✕
+            </button>
+            <DashboardConfig />
+          </div>
         </div>
       )}
 
-      {/* HoverButton at top center 
+      {/* HoverButton at top center */}
       <div
         style={{
           position: "absolute",
-          top: 10,
-          left: 0,
-          right: 0,
+          top: "3%",
+          left: "50%",
+	  transform: "translate(-50%, 0%)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          zIndex: 999
+          zIndex: 1000
         }}
       >
         {isMobile ? (
@@ -158,17 +172,17 @@ function Map({ buttons }) {
             textOn={"Select Multiple|Graph Multiple"}
             textOff={"Graph One"}
             toggleKey="select"
-            style={{ height: "30px" }}
+            style={{ height: "30px", fontSize:".85em"}}
           />
         ) : (
-          <DButton
+          /*<DButton
             className="Button"
             text={"Hover/Click here to show location names."}
             dkey="labels"
             style={{ height: "30px" }}
-          />
-        )}
-      </div>*/}
+          />*/
+        <div/>)}
+      </div>
     </div>
   );
 }
