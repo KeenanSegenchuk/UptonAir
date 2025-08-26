@@ -21,7 +21,7 @@ function Alerts() {
     const [alertName, setAlertName] = useState('');
     const [alertSensors, setAlertSensors] = useState(["All"]);
     const [cooldown, setCooldown] = useState(24);
-    const [avgWindow, setAvgWindow] = useState('20');
+    const [avgWindow, setAvgWindow] = useState('60');
 
     const [notification, setNotification] = useState(null);
     const [activeTab, setActiveTab] = useState('add');
@@ -259,5 +259,6 @@ function Alerts() {
       </div>
     );
 }
+
 
 export default Alerts;
