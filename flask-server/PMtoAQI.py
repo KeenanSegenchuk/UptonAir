@@ -35,4 +35,11 @@ def PMtoAQI(humidity, PMA, PMB):
 		i1 += 1
 		i2 += 1
 	
-	
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 4:
+        print("Usage: python PMtoAQI.py <humidity> <PMA> <PMB>")
+        sys.exit(1)
+
+    humidity, PMA, PMB = map(float, sys.argv[1:4])
+    print(PMtoAQI(humidity, PMA, PMB))
