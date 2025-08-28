@@ -13,7 +13,7 @@ function SensorInfo({ dummy }) {
       baseURL: API_URL,
     });
 
-    const debug = false;
+    const debug = true;
     const log = (text, val = -1) => {
 	if(debug && val === -1) console.log(text);
     	if(debug && val !== -1) console.log(text, val);
@@ -120,7 +120,7 @@ function SensorInfo({ dummy }) {
     return (
 	<div id="SensorInfo.js" className="sensorDiv">
 	    <div className={mobileMultiSelect ? "hideMobile" : ""}>		    
-	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {getObj(`${sensor_id}`)} [{getObj(`W${units}`)}]</h1>
+	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {getObj("$" + sensor_id)} [{getObj(`W${units}`)}]</h1>
 	        <Banner avg={Math.round(100*filteredData().banner_avg) / 100} units = {units}/>
 
     	        <h1 className="headerText">Recent Averages ({getObj(`U${units}`)})</h1>

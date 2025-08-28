@@ -122,7 +122,7 @@ function EGraph() {
 	    }
 	    try {
 		
-	        console.log("In EGraph. Filtering Data...", data); 
+	        log("In EGraph. Filtering Data...", data); 
 	        /*console.log("Given context:", dataContext);
 	        console.log("Units:", units);
 		*/
@@ -142,7 +142,7 @@ function EGraph() {
 		else 
 			fd = fd.find(entry => entry.units === units);
 
-		console.log("Filter Result:", fd);
+		log("Filter Result:", fd);
 		
 
 	        return fd;
