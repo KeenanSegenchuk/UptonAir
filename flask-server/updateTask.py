@@ -7,6 +7,7 @@ from fileUtil import getSensorMap
 from datetime import datetime
 from send_email import *
 from log import log
+from statusChecker import checkStatus
 import traceback
 
 #This python file is meant to be run as a thread that updates the data every x minutes
@@ -61,6 +62,8 @@ def update_loop():
         #check for alerts
         alert_loop()
 
+        #send text alert to admin if database is not up to date
+        checkStatus()
 
 
 if __name__ == "__main__":

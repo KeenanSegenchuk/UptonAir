@@ -14,4 +14,4 @@ COPY flask-server ./
 EXPOSE 5000
 
 # Run the Flask app with Gunicorn and updater task in default python
-CMD ["sh", "-c", "python updateTask.py & python statusChecker.py & exec gunicorn -w 4 -b 0.0.0.0:5000 server:app"]
+CMD ["sh", "-c", "python updateTask.py & exec gunicorn -w 4 -b 0.0.0.0:5000 server:app"]
