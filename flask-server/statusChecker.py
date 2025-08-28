@@ -28,6 +28,10 @@ def send_alert(latest_ts):
 
 def main():
     while True:
+        checkStatus()
+
+def checkStatus():
+    if True:
         now = int(time.time())
         latest_ts = maxTimestamp()  # must return unix time in seconds
         print(f"[INFO] Current time={now}, Latest DB ts={latest_ts}")
