@@ -454,10 +454,11 @@ def pgCheckAlerts():
     for alert in alerts:
         address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
-        log(f"Selected alert: {alert}")
-
         window_start = now - avg_window * 60
-
+        window_start = window_start - 90
+        log(f"Selected alert: {alert}")
+        log(f"Query times: {window_start}, {now}")
+        
         # Get AQI averages for readings from relevant ids in the time window
         cur.execute("""
             SELECT id, AVG(AQIEPA) as avg_aqi

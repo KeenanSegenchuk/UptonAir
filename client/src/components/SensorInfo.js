@@ -25,7 +25,6 @@ function SensorInfo({ dummy }) {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sensorName, setSensorName] = useState('');
     const [contextIndex, setIndex] = useState(2);
     const {setDataContext, setPopup, switches, units} = useAppContext();
     const mobileMultiSelect = switches.get("select");
@@ -71,7 +70,6 @@ function SensorInfo({ dummy }) {
     useEffect(() => {
         log(`Checking data from ${sensor_id} where units = ${units}`);
 	if (!checkData()) {
-	  setSensorName(getObj("$" + sensor_id));
           log(`Pulling data from ${sensor_id} where units = ${units}`);
           api.get(`sensorinfo/${units}/${sensor_id}`)
             .then(response => {
@@ -122,7 +120,7 @@ function SensorInfo({ dummy }) {
     return (
 	<div id="SensorInfo.js" className="sensorDiv">
 	    <div className={mobileMultiSelect ? "hideMobile" : ""}>		    
-	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {sensorName} [{getObj(`W${units}`)}]</h1>
+	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {getObj(`%{sensor_id}`)} [{getObj(`W${units}`)}]</h1>
 	        <Banner avg={Math.round(100*filteredData().banner_avg) / 100} units = {units}/>
 
     	        <h1 className="headerText">Recent Averages ({getObj(`U${units}`)})</h1>
