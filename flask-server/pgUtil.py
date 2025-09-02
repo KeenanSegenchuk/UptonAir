@@ -440,7 +440,7 @@ from collections import defaultdict
 
 def pgCheckAlerts():
     conn, cur = pgOpen()
-    now = int(time.time())
+    now = maxTimestamp() #int(time.time())
     
     # Get all alerts that are eligible to trigger
     cur.execute("""
