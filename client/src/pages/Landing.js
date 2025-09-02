@@ -100,7 +100,7 @@ function Landing() {
                 <h3 class="tabbed s18">Share Feedback</h3>
 		<p class="s12 centered">We would very much appreciate any feedback or suggestions on the website. 
 		For now you can submit all feedback to&nbsp;
-		<a href="mailto:uptonAQalerts@gmail.com">uptonAQalerts@gmail.com</a>
+		<a href="https://docs.google.com/forms/d/e/1FAIpQLSe21Vobf8oFnvnsSUp6Ru0wW0g5Xoceb27VNS_abwRut-pOoA/viewform">our google form.</a>
 		</p>
 		<div style={{height:"25px"}}/>
 		<div style={{borderTop:"2px dashed white"}}/>
