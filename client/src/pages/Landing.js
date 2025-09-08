@@ -47,7 +47,7 @@ function Landing() {
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Quality Index (AQI)</p>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Types of Air Pollution </p>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Analyzing the Data </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Monitor Measurement Descriptions </p>
+		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Measurements We Use </p>
 		<p></p>
                 <a class="tabbed" href="#guide" style={{fontSize:"2em"}}>User Guide</a>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Check local air quality </p>
@@ -96,7 +96,7 @@ function Landing() {
 
 
 		<div style={{borderTop:"2px dashed white"}}/>
-	    	<h3 className="tabbed s18">Measurement Descriptions</h3>
+	    	<h3 className="tabbed s18">Measurements We Use</h3>
 		<p class="centered s12">
 			The Upton-Air dashboard reports a variety of different measurement to help you analyze local air quality readings. Below are descriptions of the measurements we report:
 		</p>
