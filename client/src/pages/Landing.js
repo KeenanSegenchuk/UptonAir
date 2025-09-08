@@ -43,15 +43,16 @@ function Landing() {
 	    <h2 className="noLineSpacing" style={{fontSize:"2.5em"}}>Table of Contents</h2>
             {/* Table of Contents */}
             <div style = {{marginTop: "10px", marginBottom:"10px"}}>
+		<a class="tabbed" href="#aqm" style={{fontSize:"2em"}}>Specifics about Air Quality Monitoring</a>
+		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Quality Index (AQI)</p>
+		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Types of Air Pollution </p>
+		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Analyzing the Data </p>
+		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Monitor Measurement Descriptions </p>
+		<p></p>
                 <a class="tabbed" href="#guide" style={{fontSize:"2em"}}>User Guide</a>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Check local air quality </p>
                 <p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Compare AQI at different locations </p>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Configure an air quality alert </p>
-		<p></p>
-		<a class="tabbed" href="#aqm" style={{fontSize:"2em"}}>Specifics about Air Quality Monitoring</a>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Types of Air Pollution </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Quality Index (AQI)</p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Analyzing the Data </p>
 		<p></p>
 		<a class="tabbed" href="#contact" style={{fontSize:"2em"}}>Contact Us</a>
 		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Share Feedback </p>
@@ -62,16 +63,17 @@ function Landing() {
 	    <div style={{height:"50px"}}/>
 
             {/* Contents */}
-            <UserGuide/>
-	    <div style={{height:"35px"}}/>
 
+	    {/* background info on air quality monitoring */}
 	    <div style={{border:"2px solid white"}}>
             	<h2 id="aqm" className="tabbed s25">Air Quality Monitoring</h2>
+
 
 		<div style={{borderTop:"2px dashed white"}}/>
 	    	<h3 className="tabbed s18">Air Quality Index</h3>
 	    	<div className="infodiv"><InfoContainer infodoc="/infodocs/AQIranges.txt"/></div>    
             	<div style={{height:"25px"}}/>
+
 
 		<div style={{borderTop:"2px dashed white"}}/>
 	    	<h3 className="tabbed s18">Types of Air Pollution</h3>
@@ -85,12 +87,62 @@ function Landing() {
 		Lead is also considered a major air pollutant by the EPA, though the major source of airborne lead, leaded gasoline, has been mostly phased out of use.
 	    	</p>
 	    	<div style={{height:"25px"}}/>
+ 
 
 		<div style={{borderTop:"2px dashed white"}}/>
 	    	<h3 className="tabbed s18">Analyzing the Data</h3>
 	    	<div className="infodiv"><InfoContainer infodoc="infodocs/Particulate Pollution Patterns.txt"/></div>
 	    	<div style={{height:"25px"}}/>
+
+
+		<div style={{borderTop:"2px dashed white"}}/>
+	    	<h3 className="tabbed s18">Measurement Descriptions</h3>
+		<p class="centered s12">
+			The Upton-Air dashboard reports a variety of different measurement to help you analyze local air quality readings. Below are descriptions of the measurements we report:
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>PM:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			PM displays PM2.5, or the concentration of air particles less than 2.5 microns in diameter. This is reported as micrograms per cubic meter of air (ug/m^3). Micrograms are 1 millionth of a gram, so the concentrations being measured are very small.
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>PMEPA:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			PMEPA shows PM2.5 readings in ug/m^3 that are callibrated to better match with more expensive EPA sensors that are less sensitive to humidity changes.
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>AQI:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			AQI measures the same thing as PM2.5, but is scaled to make it easier to understand the possible effects on your health.
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>AQIEPA:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			AQIEPA is the default measurement displayed on the dashboard. It is on the same scale as normal AQI, but is calculated from PM2.5 levels that were adjusted for humidity to better match up with more expensive EPA sensors that are less sensitive to humidity changes.
+		</p> 
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>PMA/PMB:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			PMA and PMB are the readings from the two channels in a given sensor. This allows us to see when the channels diverge, indicating that air monitor readings may have deviated from the actual pollutant level at that location.
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>Humidity:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			This is just relative humidity as you'd see in any weather report. PurpleAir sensors are sensitive to changes in humidity, so we use humidity readings in an equation to callibrate PurpleAir readings with readings from more expensive and rigorously tested EPA sensors.
+		</p>
+		<div style={{height:"15px"}}/>
+		<p class="s12" style={{marginLeft:"15px"}}>Percent Difference:</p>
+		<p class="s8" style={{marginLeft:"30px"}}>
+			This is the difference between PMA and PMB as a percent of their average. It allows us to measure how well the channels of a given air monitor are lining up which can provide insights on whether spikes in the data are real pollution readings or anomalies like bugs getting into the sensor or it acting up for some other reason.
+		</p>
+            	<div style={{height:"25px"}}/>
+
 	    </div>
+	    <div style={{height:"35px"}}/>
+
+	
+	    {/*User Guide*/}
+            <UserGuide/>
 	    <div style={{height:"35px"}}/>
 
 		

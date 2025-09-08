@@ -80,7 +80,7 @@ function UserGuide() {
 			<p class="s8 mh105 verticalCenter">
 				Select what air monitors you want to trigger the notification. 
 				<br/>
-				Here I select the monitors near West Upton so I can be notified about the air quality in that area.
+				Here I select the monitors on the west side of town so I can be notified about the air quality in that area.
 			</p>
 			<div style={{height:"4%"}}/>
 			<p class="s8 mh105 verticalCenter">
@@ -97,12 +97,11 @@ function UserGuide() {
 				Before submiting you should check the alert description to make sure the alert is configured how you want it. 
 			</p>
 		</div>
-		<div>
 	    </div>
 	  }
 	    <p class = "centered s12">
-		Once you've set up your alert you will be emailed whenever the average AQI (EPA adjusted) across all selected sensors exceeds the threshold you set.
-		You will not be emailed if this alert has been triggered within the cooldown period you configured.
+		Once you've set up your alert you will be emailed whenever the average AQIEPA across all selected sensors exceeds the threshold you set.
+		You will not be emailed if this alert has already been triggered within the cooldown period you configured.
 	    </p>
 	    <div style={{height:"25px"}}/>
 	</div>
