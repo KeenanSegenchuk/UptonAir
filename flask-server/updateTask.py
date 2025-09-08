@@ -18,13 +18,13 @@ alert_delay = 30
 
 def alert_loop():
     print(f"Checking if any alerts have been triggered...")
-    triggered_alerts = pgAlert(update_time_seconds)
-    #triggered_alerts = pgCheckAlerts()
+    #triggered_alerts = pgAlert(update_time_seconds)
+    triggered_alerts = pgCheckAlerts()
     if triggered_alerts:
         for alert in triggered_alerts:
             print(f"New Alert triggered: {alert}")
             try:
-                send_email(alert)
+                send_email3(alert)
             except Exception as e:
                 log(f"Send_Email Exception: {e}");
         return

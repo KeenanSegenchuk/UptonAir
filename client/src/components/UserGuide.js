@@ -32,7 +32,7 @@ function UserGuide() {
 	    <p class="centered s12">		
 		The large button on the top left of the map represents the average of all sensors in Upton and can be clicked to revert the graph to the town average.		
 		<br/>
-		You can also change the map and data type by using the gear icon located on the map.
+		You can also change the map and data units by using the gear icon located on the map.
 	    </p>
 	    <img alt="" src="figs/UG_map.png" class="figure"/>
 	    <p class="centered s12">
@@ -97,8 +97,13 @@ function UserGuide() {
 				Before submiting you should check the alert description to make sure the alert is configured how you want it. 
 			</p>
 		</div>
+		<div>
 	    </div>
 	  }
+	    <p class = "centered s12">
+		Once you've set up your alert you will be emailed whenever the average AQI (EPA adjusted) across all selected sensors exceeds the threshold you set.
+		You will not be emailed if this alert has been triggered within the cooldown period you configured.
+	    </p>
 	    <div style={{height:"25px"}}/>
 	</div>
     );

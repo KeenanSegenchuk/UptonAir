@@ -272,8 +272,6 @@ def pgFindGaps(min_gap=1200, buffer=300):
 def pgAlert(update_time_seconds):
 	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
 	lastTimestamp = maxTimestamp()
-	firstTimestamp = lastTimestamp - update_time_seconds
-	print(f"Timestamps: {firstTimestamp} {lastTimestamp}")
 
 	#open connection to database
 	conn, cur = pgOpen()
@@ -333,38 +331,7 @@ def pgAlert(update_time_seconds):
 
 	return alerts
 
-def pgAlert1(update_time_seconds):
-	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
-	lastTimestamp = maxTimestamp()
-	firstTimestamp = lastTimestamp - update_time_seconds
 
-	#open connection to database
-	conn, cur = pgOpen()
-	if not pgCheck(cur, "alerts"):
-		print("Failed to find alerts table, aborting pgAlert.")
-		pgClose(conn, cur)
-		return False
-
-	#check if average AQIEPA values are greater than the min_AQI of any rows in alerts table
-	# and retrieve address column from those rows
-	cur.execute("""
-		SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
-		FROM alerts
-		WHERE min_AQI <= (
-		    SELECT AVG(AQIEPA)
-		    FROM readings 
-		    WHERE readings.time BETWEEN (%s - alerts.avg_window*60) AND %s
-		    AND readings.id = ANY(alerts.ids)
-		)
-		AND (last_alert IS NULL OR last_alert < (%s - alerts.cooldown*60*60))
-	""", (lastTimestamp, lastTimestamp, lastTimestamp))
-	
-	#^^^^^ might want to make it check if any sensor average exceeds min_AQI
-
-	addresses = cur.fetchall()
-	pgClose(conn, cur)
-
-	return addresses
 
 def pgBuildAlertsTable(rebuild):
 	conn, cur = pgOpen()
@@ -455,7 +422,6 @@ def pgCheckAlerts():
         address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
         window_start = now - avg_window * 60
-        window_start = window_start - 90
         log(f"Selected alert: {alert}")
         log(f"Query times: {window_start}, {now}")
         
@@ -484,12 +450,13 @@ def pgCheckAlerts():
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
             else:
-                other_ids.append((id_val, float(avg_aqi)))
-
+                other_ids.append((id_val, float(avg_aqi)))        
         avg_all = total / len(results)
 
         # If any triggers occurred, record the result then update db entry
-        if triggered_ids:
+        #if triggered_ids:
+	# If avg >= threshold, send alert
+        if avg_all >= min_AQI: 
             log(f"Alert Tiggered: {name}, {triggered_ids}")
             if True:
                 triggered_alerts.append({
