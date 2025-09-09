@@ -1,0 +1,30 @@
+base url for api:
+upton-air.com/api/
+
+
+
+prefixes:	params:		Description:
+	/full_data
+				Returns entire database as CSV
+
+	/raw	#for public use
+		/<int:start>-<int:end>/<string:sensor_ids>
+				Returns data rows between start and end times for all ids in csv string sensor_ids
+
+	/alerts #for use by Alerts.js
+		/add/<string:address>/<string:name>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>
+				Adds a new alert for given email with given configuration
+		/remove/<string:address>/<string:name>
+				Disables Specified Alert. Unique alert names act as password so others can't remove your alert.
+				Set name to "ALERT_SUMMARY" to recieve an email listing all the alerts associated with the given email address.
+
+	/data   #used by webpage to recive display data
+		/avg/<string:column>/<int:start>-<int:end> #Pretty sure this isnt currently used
+				Return average of column for all db entries between start and end times.
+		/avg/<string:column>/<int:start>-<int:end>/<int:sensor_id> #Used to get display values for Button.js and Banner.js
+				Return average of column for all db entries between start and end times for given sensor.
+		/time/<string:column>/<int:start>-<int:end>/<int:sensor_id> #Used by EGraph.js (and Graph.js which is currently unreachable until I add that option in cookie config)
+				Return (time, <column>) for all rows with given sensor_id between start and end time.
+		/sensorinfo/<string:column>/<int:sensor_id> #vvvvv
+				Return JSON object that populates sensorInfo.js
+		

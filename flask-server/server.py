@@ -33,8 +33,14 @@ sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo')
 # PULL ARCHIVE
 @app.route("/api/full_data")
 def raw_data():
-	with open(datafile, "r") as data:
-		return data.read()
+    with open(datafile, "r") as data:
+        csv_data = data.read()
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=readings.csv"}
+    )
 
 # ALERTS
 # Add new email alert to database
@@ -191,12 +197,37 @@ app.register_blueprint(data_bp)
 
 # RAW
 #Pull raw data from given timespan and sensor
-raw_bp.route("/<int:start>-<int:end>/<int:sensor_id>")
-def raw2(start, end, sensor_id):
-	data = getByDate(sensor_id, start, end)
-	data = {"data": data}
+@raw_bp.route("/<int:start>-<int:end>/<string:sensor_ids>")
+def get_data(start, end, sensor_ids):
+    sensor_ids = [int(sid) for sid in sensor_ids.split(",")]
+    conn, cur = pgOpen()
 
-	return json.dumps(data, indent=4)
+    query = """
+        SELECT *
+        FROM readings
+        WHERE time >= %s
+          AND time <= %s
+          AND id = ANY(%s)
+    """
+
+    cur.execute(query, (start, end, sensor_ids))
+    rows = cur.fetchall()
+
+    pgClose(conn, cur)
+    header = [desc[0] for desc in cur.description]  # column names
+
+    #build csv string
+    csv_lines = []
+    csv_lines.append(",".join(header))  # header row
+    for row in rows:
+        csv_lines.append(",".join(str(col) for col in row))
+    csv_data = "\n".join(csv_lines)
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=readings.csv"}
+    )
 
 # Register Blueprint
 app.register_blueprint(raw_bp)
