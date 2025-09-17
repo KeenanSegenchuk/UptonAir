@@ -15,6 +15,9 @@ function EGraph() {
 	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode} = useAppContext(); 
 	const contexts = getObj("DataContexts");
 
+	console.log("linemode:", lineMode);
+	console.log("units:", units);
+
     	const debug = false;
     	const log = (text, val = -1) => {
 		if(debug && val === -1) console.log(text);
@@ -34,11 +37,9 @@ function EGraph() {
 	}, [dataContext, end, contexts]);
 
 	//communicate graph mode with map via app context
-	const {setGlobalLineBool} = useAppContext();
-	const [lineBool, setLineBool] = useState(false);
+	const {globalLineBool, setGlobalLineBool} = useAppContext();
         const toggleLineBool = () => {
-	    let prevState = lineBool;
-	    setLineBool(!prevState); 
+	    let prevState = globalLineBool;
 	    setGlobalLineBool(!prevState);
         };
 
@@ -48,7 +49,6 @@ function EGraph() {
 	    if(isMobile)
 		if(hover === "Graph Multiple") {
 		    setGlobalLineBool(true);
-		    setLineBool(true);
 		    setPopup(true);
 		}
 	}, [hover]);
@@ -57,7 +57,6 @@ function EGraph() {
 	    if(isMobile) 
 		if(!switches.get("select")) {
 		    setGlobalLineBool(false);
-		    setLineBool(false);
 		}
 	}, [switches]);
 
@@ -130,14 +129,14 @@ function EGraph() {
 
 	        let fd = data.filter(entry => entry.context === dataContext);
 			
-	        if (lineBool && lineMode === "sensors") 
+	        if (globalLineBool && lineMode === "sensors") 
 			fd = fd.filter(entry => entry.showline); //isLineSelected(entry.sensor) 
 		else
 			fd = fd.filter(entry => entry.sensor === sensor_id);
 
-		if (lineBool && lineMode === "units")
+		if (globalLineBool && lineMode === "units")
 			fd = fd.filter(entry => lineUnits.includes(entry.units));
-		else if (lineBool)
+		else if (globalLineBool)
 			fd = fd.filter(entry => entry.units === units);
 		else 
 			fd = fd.find(entry => entry.units === units);
@@ -272,7 +271,7 @@ function EGraph() {
         	trigger: 'axis'
 	},
 	legend: {
-		show: lineBool //&& !isMobile
+		show: globalLineBool //&& !isMobile
 	}
     };
 
@@ -282,12 +281,12 @@ useEffect(() => {
 
 return (
     <div id = "EGraph.js" className="Marginless">
-        <h1 className="headerText">{dataContext} Readings ({getObj(`U${units}`)})</h1>
+        <h1 className="headerText">{dataContext} Readings {(globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
         <div className="graphContainer">
-            <button className="Button hideMobile" onClick={toggleLineBool}>
+            {/*<button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
-            </button>
-            {lineBool ? (
+            </button>*/}
+            {globalLineBool ? (
 		<div className="graphDiv" ref={containerRef}>
 		    {!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>} 
 		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}

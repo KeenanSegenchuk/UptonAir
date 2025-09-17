@@ -251,7 +251,7 @@ function Button({ id, x, y }) {
 		    //color: (id === "0" && selected && lineMode === "sensors" && (globalLineBool || switches.get("select"))) ? "magenta" : "black",
 		    backgroundColor: color,
 		    boxShadow: (lineMode === "sensors" && (globalLineBool || switches.get("select"))) ? borderStyle 
-				: ((lineMode === "units" && globalLineBool && id === sensor_id) ? `0 0 0 5px ${borderColor}` 
+				: ((/*lineMode === "units" && globalLineBool &&*/ id === sensor_id) ? `0 0 0 5px ${borderColor}` 
 				: "none"),
                     top: y+"%",
                     left: x+"%",

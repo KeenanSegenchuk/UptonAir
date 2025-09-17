@@ -5,7 +5,7 @@ import { getObj } from "../getObj";
 
 function DashboardConfig({}) {
     //load cookies to configure map background and data units
-    const { dashboardConfig, setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode  } = useAppContext();
+    const { dashboardConfig, setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool  } = useAppContext();
     const [mapType, setMapType] = useState('satellite');
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
@@ -59,86 +59,103 @@ function DashboardConfig({}) {
 	    <div id="DashboardConfig.js" class="optionsdiv">
 	        <h2>Dashboard Config</h2>
 		<label class="s16">
-		    Select Map Type:<br/>
+		    Map Background:<br/>
 		    <select class="s9" value={mapType} onChange={e => setMapType(e.target.value)}>
                         <option value="satellite">Satellite</option>
                         <option value="roads">Roads</option>
                         {/* maybe add back later <option value="img">Image</option>*/}
                     </select>
 		</label>
-		<label class="s16">
-		    Select Map/Bar Graph Units:<br/>
-		    <select class="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
-       		        {Object.keys(getObj("u")).map((val, index) => (
-				<option value={val}>{getObj("W" + val)}</option>
-			))}
-		    </select>
-		</label>
-
-		{/* toggle between units and sensors */}	
-		<label className="s16">
-		  Select Line Graph Mode:<br />
-		  <select
-		    className="s9"
-		    value={lineMode}
-		    onChange={(e) => setLineMode(e.target.value)}
-		  >
-		    <option value="units">Units</option>
-		    <option value="sensors">Sensors</option>
-		  </select>
-		</label>
-
-		{/* select boxes for graphing multiple readings from the same sensor  */}
-		{lineMode == "units" ?
-		<label class="s16">
-		    Select Line Graph Units:<br/>
-		    <div class="checkbox-group">
-		        {[
-		            "AQIEPA", "AQI", "PMEPA", "PM", "PMA", "PMB", "humidity", "percent_difference"
-		        ].map(unit => (
-		            <label key={unit} class="s9" style={{ display: "block", whiteSpace: "nowrap" }}>
-		                <input
-		                    type="checkbox"
-		                    value={unit}
-		                    checked={lineUnits.includes(unit)}
-				    style={{accentColor: unitColors[unit]}}
-		                    onChange={(e) => {
-					if (e.target.value.length === 1)
-		                        	return;
-					const value = e.target.value;
-					setNewLineUnit(e.target.value);
-		                        setLineUnits(prev =>
-		                            e.target.checked
-		                                ? [...prev, value]
-		                                : prev.filter(item => item !== value)
-		                        );
-		                    }}
-		                />
-		                {unit}
-		            </label>
-		        ))}
-		    </div>
-		</label> 
-		: 
-		<div id="sensorSelect" className="s16">
-		  Select Line Graph Sensors:<br />
-		  <div className="checkbox-group">
-		    {sensors.map((sensor) => (
-		      <label key={sensor} className="s9" style={{ display: "block" }}>
-		        <input
-		          type="checkbox"
-		          value={sensor}
-		          checked={isLineSelected(sensor)} // ✅ default false if not set
-		          onChange={() => toggleLineSelect(sensor)} // ✅ flip on click
-		        />
-		        {getObj(`$${sensor}`)} {/* label */}
-		      </label>
-		    ))}
-		  </div>
-		</div>
+	
+		{true /*lineMode != "units"*/ &&
+			<label class="s16">
+			    Default Map/Graph Data Type:<br/>
+			    <select class="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
+	       		        {Object.keys(getObj("u")).map((val, index) => (
+					<option value={val}>{getObj("W" + val)}</option>
+				))}
+			    </select>
+			</label>
 		}
 
-		{/* maybe give chart option later
+		<label class="s16">
+		    Graph Style:<br/>
+		    <select class="s9" value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
+                        <option value="bar">Bar Graph</option>
+                        <option value="line">Line Graph</option>
+                        {/* maybe add back later <option value="img">Image</option>*/}
+                    </select>
+		</label>
+
+		{globalLineBool && (
+			<>
+			{/* toggle between units and sensors */}	
+			<label className="s16">
+			  Select Line Graph Mode:<br />
+			  <select
+			    className="s9"
+			    value={lineMode}
+			    onChange={(e) => setLineMode(e.target.value)}
+			  >
+			    <option value="units">Units</option>
+			    <option value="sensors">Sensors</option>
+			  </select>
+			</label>
+	
+			{/* select boxes for graphing multiple readings from the same sensor  */}
+			{lineMode == "units" ?
+			<label class="s16">
+			    Select Line Graph Units:<br/>
+			    <div class="checkbox-group">
+			        {[
+			            "AQIEPA", "AQI", "PMEPA", "PM", "PMA", "PMB", "humidity", "percent_difference"
+			        ].map(unit => (
+			            <label key={unit} class="s9" style={{ display: "block", whiteSpace: "nowrap" }}>
+			                <input
+			                    type="checkbox"
+			                    value={unit}
+			                    checked={lineUnits.includes(unit)}
+					    style={{accentColor: unitColors[unit]}}
+			                    onChange={(e) => {
+						if (e.target.value.length === 1)
+			                        	return;
+						const value = e.target.value;
+						setNewLineUnit(e.target.value);
+			                        setLineUnits(prev =>
+			                            e.target.checked
+			                                ? [...prev, value]
+			                                : prev.filter(item => item !== value)
+			                        );
+			                    }}
+			                />
+			                {unit}
+			            </label>
+			        ))}
+			    </div>
+			</label> 
+			: 
+			<div id="sensorSelect" className="s16">
+			  Select Line Graph Sensors:<br />
+			  <div className="checkbox-group">
+			    {sensors.map((sensor) => (
+			      <label key={sensor} className="s9" style={{ display: "block" }}>
+			        <input
+			          type="checkbox"
+			          value={sensor}
+			          checked={isLineSelected(sensor)} // ✅ default false if not set
+			          onChange={() => toggleLineSelect(sensor)} // ✅ flip on click
+			        />
+			        {getObj(`$${sensor}`)} {/* label */}
+			      </label>
+			    ))}
+			  </div>
+			</div>
+			}
+			</>
+		)}
+
+
+		{/* maybe give chart library options later
 		<label class="s16">
 		    !WIP! Select Plot Framework:<br/>
 		    <select class="s9" value={plotType} onChange={e => setPlot(e.target.value)}>

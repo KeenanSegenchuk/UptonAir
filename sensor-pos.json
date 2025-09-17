@@ -1,12 +1,12 @@
 [
     {
-        "id": "128729",
-	"name": "Uxbridge",
-        "x": 0,
-        "y": 97,
+	"id": "0",
+	"name": "Upton Town Average",
+	"color": "white",
+	"x": 0,
+	"y": 0,
 	"xLabelOffset": 0,
-	"yLabelOffset": -2,
-	"color": "black"
+	"yLabelOffset": 2
     },
     {
         "id": "221881",
@@ -100,12 +100,12 @@
 	"color": "cyan"
     },
     {
-	"id": "0",
-	"name": "Upton Town Average",
-	"color": "white",
-	"x": 0,
-	"y": 0,
+        "id": "128729",
+	"name": "Uxbridge",
+        "x": 0,
+        "y": 97,
 	"xLabelOffset": 0,
-	"yLabelOffset": 2
+	"yLabelOffset": -2,
+	"color": "black"
     }
 ]
