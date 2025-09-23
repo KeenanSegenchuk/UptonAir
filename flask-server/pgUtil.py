@@ -270,6 +270,7 @@ def pgFindGaps(min_gap=1200, buffer=300):
 # vvvvvv Contact Table "alerts"
 
 def pgAlert(update_time_seconds):
+	#DEPRECATED!!!!! SEE pgCheckAlerts
 	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
 	lastTimestamp = maxTimestamp()
 
@@ -311,7 +312,7 @@ def pgAlert(update_time_seconds):
 			AND (a.last_alert IS NULL OR a.last_alert < (%s - a.cooldown * 60 * 60))
 	""", (lastTimestamp, lastTimestamp, lastTimestamp))
 	
-	#^^^^^ might want to make it check if any sensor average exceeds min_AQI
+	#^^^^^ might want to make it check if any sensor average exceeds min_AQI (tested, but caused too many alerts due to blips in the data)
 
 	alerts = cur.fetchall()
 
@@ -343,6 +344,7 @@ def pgBuildAlertsTable(rebuild):
 		cur.execute(f"""CREATE TABLE IF NOT EXISTS alerts (
 			address TEXT,
 			name TEXT,
+			unit TEXT,
 			min_AQI INT,
 			ids INT[],
 			cooldown INT,
@@ -358,8 +360,8 @@ def pgPushAddress(cur, row):
 	#add new addresses or update their rows
 	try:
 		cur.execute("""
-			INSERT INTO alerts (address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
-			VALUES (%s, %s, %s, %s, %s, %s, %s, %s)	
+			INSERT INTO alerts (address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
+			VALUES (%s, %s, %s, %S, %s, %s, %s, %s, %s)	
 		""", row)
 	except psycopg2.errors.UniqueViolation:
 		return 1
@@ -384,7 +386,7 @@ def pgRemoveAddress(cur, address, name):
 	return 2
 
 def pgListAllAlerts(cur):
-	cur.execute("SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
+	cur.execute("SELECT address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
 	rows = cur.fetchall()
 	
 	print(rows)
@@ -392,7 +394,7 @@ def pgListAllAlerts(cur):
 def pgListAlerts(cur, address):
 	cur.execute(
 		"""
-		SELECT address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
+		SELECT address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
 		FROM alerts
 		WHERE address = %s
 		""",
@@ -419,7 +421,7 @@ def pgCheckAlerts():
     triggered_alerts = []
 
     for alert in alerts:
-        address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+        address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
         window_start = now - avg_window * 60
         log(f"Selected alert: {alert}")
@@ -427,12 +429,12 @@ def pgCheckAlerts():
         
         # Get AQI averages for readings from relevant ids in the time window
         cur.execute("""
-            SELECT id, AVG(AQIEPA) as avg_aqi
+            SELECT id, AVG(%s) as avg_aqi
             FROM readings
             WHERE id = ANY(%s)
               AND time >= %s
             GROUP BY id
-        """, (ids, window_start))
+        """, (unit, ids, window_start))
         
         results = cur.fetchall()
         #log(f"Check alert readings query: {results}")        

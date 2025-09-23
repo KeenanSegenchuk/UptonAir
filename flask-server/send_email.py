@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 
 def send_email(alert):
-    address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered, AQI = alert
+    address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered, AQI = alert
     AQI = round(AQI, 2)
     email_address = address  # Mapping DB 'address' to actual email address
 
@@ -80,6 +80,7 @@ def send_email2(alert_obj):
     # Unpack alert info
     address = alert_info["address"]
     name = alert_info["name"]
+    unit = alert_info["unit"]
     min_AQI = alert_info["min_AQI"]
     ids = alert_info["ids"]
     cooldown = alert_info["cooldown"]
@@ -210,6 +211,7 @@ def send_email3(alert_obj):
     # Unpack alert info
     address = alert_info["address"]
     name = alert_info["name"]
+    unit = alert_info["unit"]
     min_AQI = alert_info["min_AQI"]
     ids = alert_info["ids"]
     cooldown = alert_info["cooldown"]
@@ -294,7 +296,7 @@ def send_email3(alert_obj):
 
 
         <p>
-          <strong>Alert Threshold:</strong> {min_AQI} AQI<br>
+          <strong>Alert Threshold:</strong> {min_AQI} {unit}<br>
           <strong>Cooldown Period:</strong> {cooldown} hour(s)<br>
           <strong>Last Triggered:</strong> {last_alert_str} ago<br>
           <!--<strong>Total Times Triggered:</strong> {n_triggered}-->
@@ -330,16 +332,17 @@ def send_email3(alert_obj):
 
 def send_summary_email(alerts, email_address):
 	# alerts is expected to be a list of tuples from pgListAlerts
-	# (address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
+	# (address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
 
 	# Build HTML table rows
 	rows_html = ""
 	for alert in alerts:
-		address, name, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+		address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 		rows_html += f"""
 			<tr>
 				<td style="padding: 6px 12px;">{address}</td>
 				<td style="padding: 6px 12px;">{name}</td>
+				<td style="padding: 6px 12px;">{unit}</td>
 				<td style="padding: 6px 12px;">{min_AQI}</td>
 				<td style="padding: 6px 12px;">{ids}</td>
 				<td style="padding: 6px 12px;">{cooldown} hr</td>
@@ -360,6 +363,7 @@ def send_summary_email(alerts, email_address):
 					<tr style="background-color: #f2f2f2;">
 						<th style="text-align: left; padding: 6px 12px;">Address</th>
 						<th style="text-align: left; padding: 6px 12px;">Name</th>
+						<th style="text-align: left; padding: 6px 12px;">Unit</th>
 						<th style="text-align: left; padding: 6px 12px;">Min AQI</th>
 						<th style="text-align: left; padding: 6px 12px;">IDs</th>
 						<th style="text-align: left; padding: 6px 12px;">Cooldown</th>

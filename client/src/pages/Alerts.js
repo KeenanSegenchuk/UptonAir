@@ -6,6 +6,9 @@ import LinkButton from "../components/LinkButton";
 import { useAppContext } from "../AppContext";
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
+const units = getObj("u");
+const unitDesc = getObj("ud");
+
 
 function Alerts() {
     const {BASE_URL} = useAppContext();
@@ -16,10 +19,14 @@ function Alerts() {
     });
 
     const [email, setEmail] = useState('');
+    const [unit, setUnit] = useState("AQIEPA");
     const [AQIcutoff, setAQIcutoff] = useState(75);
-    const defaultCutoff = 75;
     const [alertName, setAlertName] = useState('');
-    const [alertSensors, setAlertSensors] = useState(["All"]);
+    const [alertSensors, setAlertSensors] = useState(
+		Object.values(sensors)
+                        .filter(sensor => sensor.id !== "0")
+                        .map(sensor => sensor.id.toString())
+    );
     const [cooldown, setCooldown] = useState(24);
     const [avgWindow, setAvgWindow] = useState('60');
 
@@ -34,10 +41,14 @@ function Alerts() {
 
         setAlertSensors(prev => {
             if (value === "All") {
-                return checked ? ["All"] : [];
+		return checked 
+                    ? Object.values(sensors)
+                        .filter(sensor => sensor.id !== "0")
+                        .map(sensor => sensor.id.toString())
+                    : [];
             }
 
-            let next = prev.includes("All") ? [] : [...prev];
+            let next = [...prev];
 
             if (checked) {
                 next.push(value);
@@ -48,6 +59,7 @@ function Alerts() {
             return next;
         });
     };
+    const handleUnitChange = (e) => setUnit(e.target.value);
     const handleCooldownChange = (e) => setCooldown(e.target.value);
     const handleWindowChange = (e) => setAvgWindow(Math.round(10*e.target.value)/10);
 
@@ -64,7 +76,7 @@ function Alerts() {
     const addContact = () => {
 	const ids = L2S(alertSensors);
 
-        api.get(`alerts/add/${email}/${alertName}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
+        api.get(`alerts/add/${email}/${alertName}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
             .then(response => {
                 showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
                 console.log("Response from contact info add request:", response);
@@ -129,8 +141,10 @@ function Alerts() {
                 <div className="alert-description">
                     <p>Configure your air quality alert. You must provide a unique alert name if you already have an alert setup with the given email.</p>
                 </div>
-                <div className="input-group">
-                    <input 
+                <div className="input-group" style = {{display:"flex", flexDirection:"column"}}>
+                    
+		    {/*
+		    <input 
                         type="email" 
                         value={email} 
                         onChange={handleEmailChange} 
@@ -144,6 +158,26 @@ function Alerts() {
                         placeholder="Unique Alert Name" 
                         className="input-field"
                     />
+		    */}
+		    
+		    <div style = {{display:"flex", flexDirection:"row", alignItems:"center"}}><label>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+		    <input 
+                        type="email" 
+                        value={email} 
+                        onChange={handleEmailChange} 
+                        placeholder="your.email@example.com" 
+                        className="input-field"
+			style={{width:"100%"}}
+                    /></div>
+                    <div style = {{display:"flex", flexDirection:"row", alignItems:"center"}}><label>Alert Name:{"\u200A"}&nbsp;&nbsp;&nbsp;</label>
+		    <input
+                        type="text" 
+                        value={alertName} 
+                        onChange={handleNameChange} 
+                        placeholder="Unique Alert Name" 
+                        className="input-field"
+                    /></div>
 		</div>
 		<center> Select sensors to monitor. </center>
                 <div style={{   margin: "10px",
@@ -155,7 +189,7 @@ function Alerts() {
                         <input
                             type="checkbox"
                             value="All"
-                            checked={alertSensors.includes("All")}
+                            checked={alertSensors.length === sensors.length - 1 /*dont count the town average sensor*/} 
                             onChange={handleSensorSelectChange}
                         />
                         All
@@ -177,16 +211,54 @@ function Alerts() {
 				display: "flex",
 				gap: "10px",
 				flexDirection: "row"}}>
-                    <div style={{ flex: 1, margin:"10px" }}><center>AQI Threshold:</center>
+		    		<div style={{ flex: 1, margin: "10px" }}>
+		        <center>Unit/Measure:</center>
+		        <select
+		            value={unit}
+		            onChange={handleUnitChange}
+		            className="input-field"
+		            style={{ width: "100%", boxSizing: "border-box" }}
+		        >
+		            <option value="">-- Select a unit --</option>
+		            {Object.keys(units).map((u, i) => (
+		                <option key={i} value={u}>
+		                    {unitDesc[u]}
+		                </option>
+		            ))}
+		        </select>
+		    </div>
+                    <div style={{ flex: 1, margin:"10px" }}><center>Threshold ({units[unit]}):</center>
 		    <input
                         type="number"
                         value={AQIcutoff}
                         onChange={handleCutoffChange}
-                        placeholder="AQI alert trigger threshold"
+                        placeholder="threshold to trigger alert"
                         className="input-field"
 			style={{width:"100%", boxSizing: "border-box"}}
                     /></div>
-		    <div style={{ flex: 1, margin:"10px"}}><center>Alert Cooldown:</center>
+		</div>    
+		<div style={{   display: "flex",
+				flexDirection: "row"}}>
+		    <div style={{   flex: 1,
+				display: "flex",
+				flexDirection: "column", 
+				margin:"10px"}}>
+		    	<center>Averaging Window (minutes):</center>
+			<div style={{   display: "flex",flexDirection: "row"}}>
+		    		<input
+                        		type="number" 
+                        		value={avgWindow} 
+					step={10}
+                        		onChange={handleWindowChange} 
+                        		placeholder="Averaging window (in minutes)" 
+                        		className="input-field"
+					style={{width:"100%", boxSizing: "border-box"}}
+                    		/>
+			</div>
+		    	<center style={{marginTop:"0px", fontSize:"12px"}}>*Our data consists of 10-minute averages, so averaging windows will be rounded to the nearest 10s place.</center>
+		    </div>
+		
+		    <div style={{ flex: 1, margin:"10px"}}><center>Email Cooldown (hours):</center>
 		    <input
                         type="number" 
                         value={cooldown} 
@@ -194,26 +266,13 @@ function Alerts() {
                         placeholder="Cooldown between alerts (in hours)" 
                         className="input-field"
 			style={{width:"100%", boxSizing: "border-box"}}
-                    /></div>
-		</div>    
-		<div style={{   display: "flex",
-				flexDirection: "column"}}>
-		    <center>Averaging Window:</center>
-		    <input
-                        type="number" 
-                        value={avgWindow} 
-			step={10}
-                        onChange={handleWindowChange} 
-                        placeholder="Averaging window (in minutes)" 
-                        className="input-field"
-			style={{margin:"10px"}}
-                    />
-		    <center style={{marginTop:"0px", fontSize:"12px"}}>*Our data consists of 10-minute averages, so averaging windows will be rounded to the nearest 10s place.</center>
-                </div>
+                    /></div>                
+
+		</div>
 		    <div style={{lineHeight:"1", paddingTop:"30px"}}>
-			<p>This alert is named "{alertName}" and is associated with the email: "{email}".</p> 
-			<br/><p>A notification will be triggered if AQI readings from any of the selected sensors averages over {AQIcutoff} for {avgWindow} minutes.</p>
-			<br/><p>You will not recieve another notification from this alert if one has been issued in the past {cooldown} hours.</p>
+			<p>This alert is named "<b>{alertName}</b>" and is associated with the email: "<b>{email}</b>".</p> 
+			<br/><p>A notification will be triggered if <b>{unit}</b> readings from the selected sensors average over <b>{AQIcutoff}</b> for <b>{avgWindow}</b> minutes.</p>
+			<br/><p>You will not recieve another notification from this alert if one has been issued in the past <b>{cooldown}</b> hours.</p>
 		    </div>
 		</div>
 	    ) : (

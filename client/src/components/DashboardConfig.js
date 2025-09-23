@@ -1,26 +1,41 @@
 import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from "../AppContext";
-import { getObj } from "../getObj";
 
-function DashboardConfig({}) {
+function DashboardConfig() {
+    //this element can be used to configure the dashboard page, changing the map, data layer, etc.
+
     //load cookies to configure map background and data units
-    const { dashboardConfig, setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool  } = useAppContext();
+    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, setSensor_id } = useAppContext();
     const [mapType, setMapType] = useState('satellite');
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
     const [cookieInit, setCookieInit] = useState(false);
 
+    //track width to adjust how long data type labels are
+    const [width, setWidth] = useState(0);
+    useEffect(() => {
+      const el = document.getElementById("DashboardConfig.js");
+      if (!el) return;
+      const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, []);
+
+
     const { getObj } = require("../getObj");
     const sensors = getObj("sensors");
     const unitColors = getObj("uc");
 
+    //check for values saved in cookies
     useEffect(() => {
       const savedMapType = Cookies.get('map_type');
       const savedUnits = Cookies.get('units');
       //const savedLineUnits = Cookies.get('line_units');
+
       //init lineUnits to only having default unit (savedUnits) selected
       setLineUnits([savedUnits]);
+
       const savedPlotType = Cookies.get('plot_type');
       console.log("units",savedUnits);
       if (savedMapType) setMapType(savedMapType);
@@ -56,11 +71,11 @@ function DashboardConfig({}) {
     }, [plotType]);
 
     return (
-	    <div id="DashboardConfig.js" class="optionsdiv">
+	    <div id="DashboardConfig.js" className="optionsdiv">
 	        <h2>Dashboard Config</h2>
-		<label class="s16">
+		<label className="s16">
 		    Map Background:<br/>
-		    <select class="s9" value={mapType} onChange={e => setMapType(e.target.value)}>
+		    <select className="s9" value={mapType} onChange={e => setMapType(e.target.value)}>
                         <option value="satellite">Satellite</option>
                         <option value="roads">Roads</option>
                         {/* maybe add back later <option value="img">Image</option>*/}
@@ -68,9 +83,9 @@ function DashboardConfig({}) {
 		</label>
 	
 		{true /*lineMode != "units"*/ &&
-			<label class="s16">
-			    Default Map/Graph Data Type:<br/>
-			    <select class="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
+			<label className="s16">
+			    Main Map/Graph Units:<br/>
+			    <select className="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
 	       		        {Object.keys(getObj("u")).map((val, index) => (
 					<option value={val}>{getObj("W" + val)}</option>
 				))}
@@ -78,9 +93,9 @@ function DashboardConfig({}) {
 			</label>
 		}
 
-		<label class="s16">
+		<label className="s16">
 		    Graph Style:<br/>
-		    <select class="s9" value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
+		    <select className="s9" value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
                         <option value="bar">Bar Graph</option>
                         <option value="line">Line Graph</option>
                         {/* maybe add back later <option value="img">Image</option>*/}
@@ -88,10 +103,10 @@ function DashboardConfig({}) {
 		</label>
 
 		{globalLineBool && (
-			<>
+		    <>
 			{/* toggle between units and sensors */}	
 			<label className="s16">
-			  Select Line Graph Mode:<br />
+			  Line Graph Mode:<br />
 			  <select
 			    className="s9"
 			    value={lineMode}
@@ -104,13 +119,14 @@ function DashboardConfig({}) {
 	
 			{/* select boxes for graphing multiple readings from the same sensor  */}
 			{lineMode == "units" ?
-			<label class="s16">
-			    Select Line Graph Units:<br/>
-			    <div class="checkbox-group">
-			        {[
+			<label className="s16">
+			    Line Graph Units:<br/>
+			    <div className="checkbox-group">
+			        {/*[
 			            "AQIEPA", "AQI", "PMEPA", "PM", "PMA", "PMB", "humidity", "percent_difference"
-			        ].map(unit => (
-			            <label key={unit} class="s9" style={{ display: "block", whiteSpace: "nowrap" }}>
+			        ]*/
+				Object.keys(getObj("u")).map(unit => (
+			            <label key={unit} className="s9" style={{ display: "block", whiteSpace: "nowrap" }}>
 			                <input
 			                    type="checkbox"
 			                    value={unit}
@@ -128,14 +144,14 @@ function DashboardConfig({}) {
 			                        );
 			                    }}
 			                />
-			                {unit}
+			                {width > 268 ? getObj("W" + unit) : unit}
 			            </label>
 			        ))}
 			    </div>
 			</label> 
 			: 
 			<div id="sensorSelect" className="s16">
-			  Select Line Graph Sensors:<br />
+			  Line Graph Sensors:<br />
 			  <div className="checkbox-group">
 			    {sensors.map((sensor) => (
 			      <label key={sensor} className="s9" style={{ display: "block" }}>
@@ -143,7 +159,7 @@ function DashboardConfig({}) {
 			          type="checkbox"
 			          value={sensor}
 			          checked={isLineSelected(sensor)} // ✅ default false if not set
-			          onChange={() => toggleLineSelect(sensor)} // ✅ flip on click
+			          onChange={() => {if(!isLineSelected(sensor)){setSensor_id(sensor);} toggleLineSelect(sensor);}} // ✅ flip on click
 			        />
 			        {getObj(`$${sensor}`)} {/* label */}
 			      </label>
@@ -151,14 +167,14 @@ function DashboardConfig({}) {
 			  </div>
 			</div>
 			}
-			</>
+		    </>
 		)}
 
 
 		{/* maybe give chart library options later
-		<label class="s16">
+		<label className="s16">
 		    !WIP! Select Plot Framework:<br/>
-		    <select class="s9" value={plotType} onChange={e => setPlot(e.target.value)}>
+		    <select className="s9" value={plotType} onChange={e => setPlot(e.target.value)}>
        		        <option value="echarts">ECharts (default)</option>
       		        <option value="plotly">Plotly</option>
       		    </select>

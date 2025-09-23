@@ -4,7 +4,7 @@ import "../App.css";
 //import Graph from './Graph';
 import EGraph from './EGraph';
 import Banner from './Banner';
-import { useAppContext, AppContext } from "../AppContext";
+import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 
 function SensorInfo({ dummy }) {
@@ -141,6 +141,7 @@ function SensorInfo({ dummy }) {
 		})}
             </div>
 	    <div className={mobileMultiSelect ? "showMobile" : "hide"} style={{height:"25px"}}> </div>
+	    <div classname="hideMobile" style={{height:"25px"}}></div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	</div>
     );

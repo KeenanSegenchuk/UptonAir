@@ -44,13 +44,13 @@ def raw_data():
 
 # ALERTS
 # Add new email alert to database
-@alert_bp.route("add/<string:address>/<string:name>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>")
+@alert_bp.route("add/<string:address>/<string:name>/<string:unit>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>")
 def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
 	if ids == "All":
 		ids = [id for id in getSensors() if id != 0]
 	else:
 		ids = [int(id) for id in ids.split(",")]
-	DATA_ROW = (address, name, min_AQI, ids, cooldown, avg_window, 0, 0) #a row of data has this format, the last entries are the last time an alert has been issued to the given contact address, and how many times this alert has been triggered
+	DATA_ROW = (address, name, unit, min_AQI, ids, cooldown, avg_window, 0, 0) #a row of data has this format, the last entries are the last time an alert has been issued to the given contact address, and how many times this alert has been triggered
 	
 	conn, cur = pgOpen()
 	
