@@ -110,7 +110,7 @@ function DashboardConfig() {
 			  <select
 			    className="s9"
 			    value={lineMode}
-			    onChange={(e) => setLineMode(e.target.value)}
+			    onChange={(e) => {setLineMode(e.target.value); if(e.target.value === "units" && !lineUnits.includes(units)) {setLineUnits(prev => [...prev, units]);}}}
 			  >
 			    <option value="units">Units</option>
 			    <option value="sensors">Sensors</option>
