@@ -50,7 +50,7 @@ def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
 		ids = [id for id in getSensors() if id != 0]
 	else:
 		ids = [int(id) for id in ids.split(",")]
-	DATA_ROW = (address, name, unit, min_AQI, ids, cooldown, avg_window, 0, 0) #a row of data has this format, the last entries are the last time an alert has been issued to the given contact address, and how many times this alert has been triggered
+	DATA_ROW = (address, name, unit, min_AQI, ids, cooldown, avg_window, 0, 0) #a row of data has this format, the two 0s are the last time an alert has been issued to the given contact address, and how many times this alert has been triggered
 	
 	conn, cur = pgOpen()
 	

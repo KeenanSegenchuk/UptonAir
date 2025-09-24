@@ -269,71 +269,6 @@ def pgFindGaps(min_gap=1200, buffer=300):
 # ^^^^^^ Data Table "readings"
 # vvvvvv Contact Table "alerts"
 
-def pgAlert(update_time_seconds):
-	#DEPRECATED!!!!! SEE pgCheckAlerts
-	#pgAlert checks if any alerts have been triggered in the past <update_time_seconds> seconds
-	lastTimestamp = maxTimestamp()
-
-	#open connection to database
-	conn, cur = pgOpen()
-	if not pgCheck(cur, "alerts"):
-		print("Failed to find alerts table, aborting pgAlert.")
-		pgClose(conn, cur)
-		return False
-
-	#check if average AQIEPA values are greater than the min_AQI of any rows in alerts table
-	# and retrieve address column from those rows
-	cur.execute("""
-		WITH avg_values AS (
-			SELECT 
-				a.address,
-				a.name,
-				(
-					SELECT AVG(r.AQIEPA)
-					FROM readings r
-					WHERE r.time BETWEEN (%s - a.avg_window * 60) AND %s
-						AND r.id = ANY(a.ids)
-				) AS avg_aqi
-			FROM alerts a
-		)
-		SELECT 
-			a.address,
-			a.name,
-			a.min_AQI,
-			a.ids,
-			a.cooldown,
-			a.avg_window,
-			a.last_alert,
-			a.n_triggered,
-			av.avg_aqi
-		FROM alerts a
-		JOIN avg_values av ON av.address = a.address AND av.name = a.name
-		WHERE av.avg_aqi >= a.min_AQI
-			AND (a.last_alert IS NULL OR a.last_alert < (%s - a.cooldown * 60 * 60))
-	""", (lastTimestamp, lastTimestamp, lastTimestamp))
-	
-	#^^^^^ might want to make it check if any sensor average exceeds min_AQI (tested, but caused too many alerts due to blips in the data)
-
-	alerts = cur.fetchall()
-
-	#TODO: vvvvv make sure this works
-	# Update each triggered alert
-	updates = [(lastTimestamp, alert[0], alert[1]) for alert in alerts]
-	cur.executemany("""
-		UPDATE alerts
-		SET
-			n_triggered = n_triggered + 1,
-			last_alert = %s
-		WHERE address = %s AND name = %s
-	""", updates)
-
-	conn.commit()
-	pgClose(conn, cur)
-
-	return alerts
-
-
-
 def pgBuildAlertsTable(rebuild):
 	conn, cur = pgOpen()
 
@@ -344,13 +279,13 @@ def pgBuildAlertsTable(rebuild):
 		cur.execute(f"""CREATE TABLE IF NOT EXISTS alerts (
 			address TEXT,
 			name TEXT,
-			unit TEXT,
 			min_AQI INT,
 			ids INT[],
 			cooldown INT,
 			avg_window INT,
 			last_alert INT,
 			n_triggered INT,
+			unit TEXT,
 			CONSTRAINT unique_name_address UNIQUE (address, name)
 		);""")
 
@@ -428,13 +363,13 @@ def pgCheckAlerts():
         log(f"Query times: {window_start}, {now}")
         
         # Get AQI averages for readings from relevant ids in the time window
-        cur.execute("""
-            SELECT id, AVG(%s) as avg_aqi
+        cur.execute(f"""
+            SELECT id, AVG({unit}) as avg_aqi
             FROM readings
             WHERE id = ANY(%s)
               AND time >= %s
             GROUP BY id
-        """, (unit, ids, window_start))
+        """, (ids, window_start))
         
         results = cur.fetchall()
         #log(f"Check alert readings query: {results}")        
@@ -465,6 +400,7 @@ def pgCheckAlerts():
                     "alert": {
                         "address": address,
                         "name": name,
+                        "unit": unit,
                         "min_AQI": min_AQI,
                         "ids": ids,
                         "cooldown": cooldown,
