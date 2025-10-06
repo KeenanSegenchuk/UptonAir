@@ -1,12 +1,14 @@
 import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from "../AppContext";
+import ChatBox from "./ChatBox";
+import MoveableWindow from "./MoveableWindow";
 
 function DashboardConfig() {
     //this element can be used to configure the dashboard page, changing the map, data layer, etc.
 
     //load cookies to configure map background and data units
-    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, setSensor_id } = useAppContext();
+    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, setSensor_id, showChatBox, setShowChatBox } = useAppContext();
     const [mapType, setMapType] = useState('satellite');
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
@@ -179,6 +181,14 @@ function DashboardConfig() {
       		        <option value="plotly">Plotly</option>
       		    </select>
 		</label> */}
+
+		<button onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close ChatBot" : "Open ChatBot"}</button>
+		{showChatBox && (
+		    /*<MoveableWindow title="Chat Window" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 400, height: 300 }}>
+			<ChatBox/>
+		    </MoveableWindow>*/
+		    <ChatBox/>
+		)}
 	    </div>
     );
 }

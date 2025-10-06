@@ -114,7 +114,24 @@ function EGraph() {
 
 
         //filter for current data context
-        const filteredData = () => {
+	const filteredData = () => {
+		//wrap filteredData to update AppContext
+		const fd = filteredDataFN();
+		console.log("FD:", fd);
+
+		const compressedData = {
+			//if units then map units to data, else map sensor name to data
+		};
+
+		return fd;
+	};
+        const filteredDataFN = () => {
+	    //filter logic now in appContext
+	    if(!globalLineBool) {
+	    	return data[0]; 
+	    } else { return data;}
+
+	    //vvvv below is deprecated and unreachable
 	    if (!data || !Array.isArray(data)) {
 	        console.warn("Data is not ready or not an array:", data);
 	        return [];
@@ -221,7 +238,9 @@ function EGraph() {
             bars = graphUtil("getBars")(b, n, start, end);
         } catch(error) {
 	    console.log("Error binning data into bars.", bars);
-	    console.log(`b: ${b}, n: ${n}, start: ${start}, end: ${end}`);
+	    console.log("b: ", b);
+	    console.log(`n: ${n}, start: ${start}, end: ${end}`);
+	    console.warn(error);
 	    return bars;
 	}
 	if(bars.x) {

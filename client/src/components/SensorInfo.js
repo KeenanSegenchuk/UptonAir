@@ -8,7 +8,7 @@ import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 
 function SensorInfo({ dummy }) {
-    const {API_URL, sensor_id} = useAppContext();
+    const {API_URL, sensor_id, setSensor_idAvgs} = useAppContext();
     const api = axios.create({
       baseURL: API_URL,
     });
@@ -68,7 +68,11 @@ function SensorInfo({ dummy }) {
 	
 
     useEffect(() => {
-        log(`Checking data from ${sensor_id} where units = ${units}`);
+	//update sensorInfo whenever sensor_id or units changes
+	const fd = filteredData();
+	setSensor_idAvgs({...Object.fromEntries(fd.avgs.map((avg, index) => [dataContexts[index].context,avg])), "1-Hour":fd.banner_avg});
+        
+	log(`Checking data from ${sensor_id} where units = ${units}`);
 	if (!checkData()) {
           log(`Pulling data from ${sensor_id} where units = ${units}`);
           api.get(`sensorinfo/${units}/${sensor_id}`)

@@ -30,7 +30,7 @@ function Button({ id, x, y }) {
     const name = getObj("$" + id);
     const borderColor = getObj("C" + id);
     const labelOffsets = getObj("O" + id);
-    const { globalLineBool, units, hover, switches, data, setData, setPopup, lineMode, newLineUnit, lineUnits, isLineSelected, toggleLineSelect, selectSensor } = useAppContext();
+    const { globalLineBool, units, hover, switches, data, setData, setPopup, lineMode, newLineUnit, lineUnits, isLineSelected, toggleLineSelect, selectSensor, setButtonAvgs } = useAppContext();
     const [borderStyle, setBorderStyle] = useState("none");
     const hoverKey = "labels";
 
@@ -165,6 +165,7 @@ function Button({ id, x, y }) {
 			{console.log("Error getting button value."); 
 			return;}
 		setVal(prevVal => ({...prevVal,[units]: response.data}));
+		setButtonAvgs(prev => ({...prev,name:response.data}));
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
