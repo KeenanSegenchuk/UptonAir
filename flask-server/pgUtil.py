@@ -35,6 +35,9 @@ from fileUtil import getSensorMap
 	  pgBuildAlertsTable: (cur) => () :initializes alerts table
 	  pgPushAddress: (cur, tuple) => () :pushes rows to alerts table
 	  pgRemoveAddress: (cur, str) => () :removes all instance of an email address/phone number from alerts table
+	ChatLogs:
+	  pgBuildChatLogs: () => () :inits table to store conversations with chatbot
+	  pgPushChat: (tuple) => () :pushes row to db (prompt, response) 
 '''	  
 			
 def pgOpen():
@@ -424,6 +427,44 @@ def pgCheckAlerts():
     conn.close()
     return triggered_alerts
 
+
+#chatbot logs
+def pgBuildChatLogs(rebuild=False):
+	conn, cur = pgOpen()
+
+	#build new postgreSQL table to store alerts info
+	if rebuild or not pgCheck(cur, "chatlogs"):
+		print("Rebuilding chatlogs table...")
+		cur.execute("DROP TABLE IF EXISTS chatlogs;")
+		cur.execute(f"""CREATE TABLE IF NOT EXISTS chatlogs (
+			prompt TEXT,
+			response TEXT,
+			sessionID TEXT
+		);""")
+
+	pgClose(conn, cur)
+
+def pgPushChat(row):
+	conn, cur = pgOpen()
+	cur.execute("""
+		INSERT INTO chatlogs (prompt, response, sessionID)
+		VALUES (%s, %s, %s)	
+	""", row)
+	pgClose(conn, cur)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#more general functions
 import json
 from datetime import datetime
 

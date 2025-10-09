@@ -1,5 +1,6 @@
 import React, { useContext, useState, useMemo, useEffect, useCallback, createContext } from 'react';
 import DataCompressor from "./RDPcompression";
+import {getObj} from "./getObj";
 
 export const AppContext = createContext();
 
@@ -14,6 +15,7 @@ export const ContextProvider = ({ children }) => {
   const [dataContext, setDataContext] = useState("7-Day");
   const [rawData, setData] = useState([]); //uncompressed data
   const [compressedData, setCompressedData] = useState([]); //...
+  const [compressedSize, setCompressedSize] = useState(0);
   const compressor = new DataCompressor(); //data compressor for feeding it to LLM
   const [epsilon, setEpsilon] = useState(0); //epsilon for compressing data
   const [showCompression, setShowCompression] = useState(false); //control whether we wanna display compressed or raw data in graph
@@ -28,9 +30,10 @@ export const ContextProvider = ({ children }) => {
   const [sensor_idAvgs, setSensor_idAvgs] = useState({});
   const [buttonAvgs, setButtonAvgs] = useState({});
   const [showChatBox, setShowChatBox] = useState(false);
-  const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
+  //const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
   //const [BASE_URL, API_URL] = ["http://localhost:3000/","http://localhost:5000/api/data"];
-  
+  const [BASE_URL, API_URL] = ["http://localhost:5000/", "https://upton-air.com/api/data"];
+
   //filter data
   const selectData = useCallback(() => {
 	console.log("selectData updated... dependencies:", [globalLineBool, rawData, dataContext, lineMode, selectedSensors, lineUnits, sensor_id, dashboardConfig.units]);
@@ -55,8 +58,12 @@ export const ContextProvider = ({ children }) => {
   //update compressedData
   useEffect(()=> {
 	console.log("contextProvider useEffect... dependencies:", [selectData, epsilon]);
-	const compressedRes = selectData().map((entry) => ({...entry, data:compressor.get(entry, epsilon)}));
+	const compressedRes = selectData().map((entry) => ({units: entry.units, sensor: getObj("$"+entry.sensor), data:compressor.get(entry, epsilon)}));
+	console.log("compression result:", compressedRes[0]);
+	const totalLength = compressedRes.reduce((sum, entry) => sum + ((entry.data && entry.data.length) || 0),0);
 	setCompressedData(compressedRes);
+	setCompressedSize(totalLength);console.log("computed totalLength:", totalLength);
+
   }, [selectData, epsilon]);
 
   const contextVals = {
@@ -81,8 +88,9 @@ export const ContextProvider = ({ children }) => {
 	isLineSelected: (sensor) => !!selectedSensors[sensor],
         toggleLineSelect: (sensor) => {setSelectedSensors((prev) => {const current = !! prev[sensor]; return {...prev, [sensor]: !current};});},
 	selectSensor: (sensor) => setSelectedSensors((prev) => ({...prev, [sensor]: true})),
+	selectedSensors,
 	lineMode, setLineMode,
-	compressedData, setCompressedData,
+	compressedData, setCompressedData, compressedSize,
 	epsilon, setEpsilon,
 	showCompression, setShowCompression,
 	sensor_idAvgs, setSensor_idAvgs,

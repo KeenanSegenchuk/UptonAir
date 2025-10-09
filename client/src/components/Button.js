@@ -266,7 +266,7 @@ function Button({ id, x, y }) {
                 }}
                 onClick={(event) => handleButtonClick(id, event)}  
             >
-                {val && val[units] !== undefined && val[units] !== -1 ? Math.round(val[units]) : "N/A"}
+                {val && val[units] !== undefined && val[units] !== "N/A" ? Math.round(val[units]) : "N/A"}
 
             </button>
 	    {(hover===hoverKey || switches.get(hoverKey)) ? (

@@ -5,12 +5,14 @@ services:
       dockerfile: Dockerfile
       target: flask-server
     environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PURPLEAIR_API_KEY=${PURPLEAIR_API_KEY}
       - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
-      - EMAIL_PASSWORD=kkbu szwm engx xugf # app-specific password (can't be used to login to gmail, but allows sending smtp email)
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD} # app-specific password (can't be used to login to gmail, but allows sending smtp email)
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
       - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
-      - LOOP=1 # 0 to disable update loop
+      - LOOP=0 # 0 to disable update loop
       - REBUILD_ALERTS=0 # WARNING: this will fully wipe and rebuild alerts table
     ports:
       - "5000:5000"  # Expose port 5000 to the host

@@ -83,7 +83,15 @@ if __name__ == "__main__":
 	else:
 		print("Succesfully located alerts table.")
 
-	#add new columns
+	#make sure chatlogs table exists
+	try:
+		pgBuildChatLogs()
+	except:
+		print("WARNING: ChatLogs table does not exist and/or building failed.")
+	else:
+		print("Succesfully located chatlgos table.")
+
+	#add generated columns 
 	#pgAddPercentDifferenceColumn()
 	#pgAddPMColumn()
 

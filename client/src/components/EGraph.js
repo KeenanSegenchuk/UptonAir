@@ -12,7 +12,7 @@ function EGraph() {
 	 */   	
 
 	//setup data management
-	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode} = useAppContext(); 
+	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode, showCompression} = useAppContext(); 
 	const contexts = getObj("DataContexts");
 
 	console.log("linemode:", lineMode);
@@ -114,59 +114,13 @@ function EGraph() {
 
 
         //filter for current data context
-	const filteredData = () => {
-		//wrap filteredData to update AppContext
-		const fd = filteredDataFN();
-		console.log("FD:", fd);
-
-		const compressedData = {
-			//if units then map units to data, else map sensor name to data
-		};
-
-		return fd;
-	};
-        const filteredDataFN = () => {
+        const filteredData = () => {
 	    //filter logic now in appContext
 	    if(!globalLineBool) {
 	    	return data[0]; 
 	    } else { return data;}
-
-	    //vvvv below is deprecated and unreachable
-	    if (!data || !Array.isArray(data)) {
-	        console.warn("Data is not ready or not an array:", data);
-	        return [];
-	    }
-	    try {
-		
-	        log("In EGraph. Filtering Data...", data); 
-	        /*console.log("Given context:", dataContext);
-	        console.log("Units:", units);
-		*/
-
-
-	        let fd = data.filter(entry => entry.context === dataContext);
-			
-	        if (globalLineBool && lineMode === "sensors") 
-			fd = fd.filter(entry => entry.showline); //isLineSelected(entry.sensor) 
-		else
-			fd = fd.filter(entry => entry.sensor === sensor_id);
-
-		if (globalLineBool && lineMode === "units")
-			fd = fd.filter(entry => lineUnits.includes(entry.units));
-		else if (globalLineBool)
-			fd = fd.filter(entry => entry.units === units);
-		else 
-			fd = fd.find(entry => entry.units === units);
-
-		log("Filter Result:", fd);
-		
-
-	        return fd;
-	    } catch (err) {
-	        console.error("filteredData error:", err);
-	        return [];
-	    }
         };
+
 
 	//setup nBars slider functionality
 	const iNit = isMobile ? 480 : 50;
@@ -246,7 +200,7 @@ function EGraph() {
 	if(bars.x) {
   	  bars = {
             type: "bar",
-            name: getObj("$" + b.sensor),
+            name: (typeof b.sensor === "string") ? b.sensor : getObj("$" + b.sensor),
             data: bars.x.map((timestamp, i) => ({
                 value: [timestamp, bars.y[i]],
                 itemStyle: { color: getObj(`X${bars.y[i]}${units}`) }
@@ -305,10 +259,10 @@ return (
             {/*<button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>*/}
-            {globalLineBool ? (
+            {globalLineBool || showCompression ? (
 		<div className="graphDiv" ref={containerRef}>
-		    {!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>} 
-		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
+		    {/*!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>*/} 
+		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: (Array.isArray(filteredData()) ? filteredData() : [filteredData()]).map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}

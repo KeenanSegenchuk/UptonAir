@@ -27,8 +27,8 @@ function Landing() {
 
 	    {/* Brief overview of site's purpose */}
 	    <div style = {{textAlign:"center", border:"2px solid white", padding:"15px", width:"80%", marginLeft:"auto", marginRight:"auto", fontSize:"1.1em"}}>
-	        <p class="wmargin s12">Upton-Air.com was built by Sustainable Upton with the help of the town and the DEP in order to inform people on the local air quality.</p>
-	        <p class="wmargin s12">You can check current and historic air quality data on our dashboard page. For now our sensors only monitor small air particulates (PM2.5), and all data shown on the dashboard has been converted to AQI.</p>
+	        <p class="wmargin s12">Upton-Air.com was built by Sustainable Upton with the help of the town and the Mass Department of Environmental Protection in order to inform people on the local air quality.</p>
+	        <p class="wmargin s12">You can check current and historic air quality data on our dashboard page. For now our sensors only monitor small air particulates (PM2.5) and percent humidity. By default we measure air quality with the air quality index (AQI), an index developed by the U.S. EPA to break down pollutant levels into ranges which reflect their health effects.</p>
             
 	        {/* Maybe add a link to the dashboard page here */}
 	        <a href={dashboard_url} className="dashboardButton">Go to Dashboard</a>

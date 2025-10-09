@@ -182,12 +182,12 @@ function DashboardConfig() {
       		    </select>
 		</label> */}
 
-		<button onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close ChatBot" : "Open ChatBot"}</button>
+		<button onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close Chat Bot" : "Open Chat Bot"}</button>
 		{showChatBox && (
-		    /*<MoveableWindow title="Chat Window" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 400, height: 300 }}>
+		    <MoveableWindow title="Chat Bot" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 400, height: 300 }}>
 			<ChatBox/>
-		    </MoveableWindow>*/
-		    <ChatBox/>
+		    </MoveableWindow>
+		    /*<ChatBox/>*/
 		)}
 	    </div>
     );

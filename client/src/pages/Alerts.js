@@ -76,7 +76,7 @@ function Alerts() {
     const addContact = () => {
 	const ids = L2S(alertSensors);
 
-        api.get(`alerts/add/${email}/${alertName}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
+        api.post(`alerts/add/${email}/${alertName}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
             .then(response => {
                 showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
                 console.log("Response from contact info add request:", response);
@@ -88,7 +88,7 @@ function Alerts() {
 
     const removeContact = () => {
 
-        api.get(`alerts/remove/${email}/${alertName}`)
+        api.post(`alerts/remove/${email}/${alertName}`)
 	    .then(response => {
 		    const serverMessage = response.data?.message || 'Successfully removed alert';
 		    showNotification(`Success: ${serverMessage}`, true);
@@ -272,7 +272,7 @@ function Alerts() {
 		    <div style={{lineHeight:"1", paddingTop:"30px"}}>
 			<p>This alert is named "<b>{alertName}</b>" and is associated with the email: "<b>{email}</b>".</p> 
 			<br/><p>A notification will be triggered if <b>{unit}</b> readings from the selected sensors average over <b>{AQIcutoff}</b> for <b>{avgWindow}</b> minutes.</p>
-			<br/><p>You will not recieve another notification from this alert if one has been issued in the past <b>{cooldown}</b> hours.</p>
+			<br/><p>You will not receive another notification from this alert if one has been issued in the past <b>{cooldown}</b> hours.</p>
 		    </div>
 		</div>
 	    ) : (

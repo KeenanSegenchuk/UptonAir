@@ -12,6 +12,7 @@ from datetime import datetime
 from pgUtil import *
 from updateTask import update_loop
 from send_email import send_summary_email
+from chatbot import send_prompt
 
 app = Flask(__name__)
 CORS(app)
@@ -29,7 +30,6 @@ alert_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts') #API for subm
 data_bp = Blueprint('data', __name__, url_prefix='/api/data') #API for pulling data with various units
 raw_bp = Blueprint('raw', __name__, url_prefix='/api/raw') #API for pulling raw data
 sensor_info_bp = Blueprint('sensorinfo', __name__, url_prefix='/api/sensorinfo') #API for preformated sensorinfo JSON
-
 # PULL ARCHIVE
 @app.route("/api/full_data")
 def raw_data():
@@ -42,10 +42,26 @@ def raw_data():
         headers={"Content-Disposition": "attachment;filename=readings.csv"}
     )
 
+# CHATBOT
+@app.post('/api/chat')
+def chat():
+	payload = request.get_json().get("body")
+	if isinstance(payload, str):
+		payload = json.loads(payload)
+
+	prompt = json.dumps(payload.get("prompt"))
+	try:
+		sessionID = payload.get("id")
+	except:
+		sessionID = 0	
+	response = send_prompt(prompt, sessionID)
+	return jsonify({"response":response})
+
+
 # ALERTS
 # Add new email alert to database
-@alert_bp.route("add/<string:address>/<string:name>/<string:unit>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>")
-def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
+@alert_bp.route("add/<string:address>/<string:name>/<string:unit>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>", methods=["POST"])
+def add_alert(address, name, unit, min_AQI, ids, cooldown, avg_window):
 	if ids == "All":
 		ids = [id for id in getSensors() if id != 0]
 	else:
@@ -71,8 +87,8 @@ def add_alert(address, name, min_AQI, ids, cooldown, avg_window):
 	return responses[response]
 
 # Remove address from db
-@alert_bp.route("remove/<string:address>/<string:name>/")
-@alert_bp.route("remove/<string:address>/<string:name>")
+@alert_bp.route("remove/<string:address>/<string:name>/", methods=["POST"])
+@alert_bp.route("remove/<string:address>/<string:name>", methods=["POST"])
 def remove_alert(address, name):
 	print(f"Removing Alert: {address}, {name}")
 
@@ -89,7 +105,7 @@ def remove_alert(address, name):
 	response = pgRemoveAddress(cur, address, name)
 	pgClose(conn, cur)
 	responses = [
-		(jsonify(message="Email alert removed database."), 200),
+		(jsonify(message="Alert removed database."), 200),
 		(jsonify(error="Could not find an alert with given email and name."), 400),
 		(jsonify(error="Unknown Error."), 500)
 	]
@@ -122,7 +138,7 @@ def avg(units, start, end):
 # Average the data of given sensor for given timespan
 @data_bp.route("/avg/<string:units>/<int:start>-<int:end>/<int:sensor_id>")
 def avgS(units, start, end, sensor_id):
-	res = -1
+	res = "N/A"
 
 	#connect to postgres database
 	conn, cur = pgOpen()
@@ -168,7 +184,7 @@ def sensorinfo(units, sensor_id):
 	starts = [end - day*180, end - day * 30, end - day * 7, end - day * 1, end - hour]
 	
 	conn, cur = pgOpen()
-	avgs = [-1 for avg in averages]
+	avgs = ["N/A" for avg in averages]
 
 	for i, start in enumerate(starts):
 		timespan = averages[i]
@@ -180,8 +196,8 @@ def sensorinfo(units, sensor_id):
 		try:
 			avgs[i] = round(float(res[0][0]), 2)
 		except:
-			print(f"Error finding {averages[i]} avg for sensor {sensor_id}, defaulting to -1.") 
-			avgs[i] = -1
+			print(f"Error finding {averages[i]} avg for sensor {sensor_id}, defaulting to null.") 
+			avgs[i] = "N/A"
 	pgClose(conn, cur)
 
 	response = {

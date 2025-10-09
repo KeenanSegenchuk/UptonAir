@@ -34,7 +34,7 @@ export function getObj(obj) {
 			"white",
 			"white"];
 
-    const ranges = [0, 50, 100, 150, 200, 300, 10000];
+    const ranges = [-50, 50, 100, 150, 200, 300, 10000];
 
     const dataContexts={
 	  "6-Month": 6 * 30 * 86400,

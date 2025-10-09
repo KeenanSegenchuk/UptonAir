@@ -1,4 +1,5 @@
 *.csr
 *.pem
+.env
 data.txt
 flask-sever/data analysis/

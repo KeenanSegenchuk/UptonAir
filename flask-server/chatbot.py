@@ -1,13 +1,10 @@
+from pgUtil import pgPushChat
+import os
 from openai import OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-#this file defines the config for the chatgpt assistant
 
-
-client = OpenAI()
-
-dashboard_assistant = client.beta.assistants.create(
-	name="Job Posting Q&A Assistant",
-	instructions="""
+instructions="""
 You are an air quality expert. Use your knowledge and the following text to answer questions concisely in plain language that the average person can understand.
 
 If you lack sufficient information to provide an objective answer, list possibilities, ask clarifying questions, or guide the user to explore the data on the site.
@@ -70,40 +67,25 @@ context: {
 		unit: <main unit/data layer>
 		graphMode: <"line" or "bar">
 		timespan: <current timespan being graphed>
-		(only if bar mode) data: [set-length series of binned readings over timespan]
+		data: [compressed version of the data the user is currently graphing, uses rdp compression to maintain shape of data.
+			These data are not readings or averages but if you use strait lines to connect the point it will be a good approximation of the real data.]
 		(only if line mode) lineMode: <current lineMode ("units" or "sensors")>
 		(only if line and units mode) lineUnits: [units (current unit being linegraphed)]
 		(only if line and sensors mode) lineSensors: [sensors (current sensors being linegraphed)]
 	      }
 }
-""",
-	model="gpt-4o-mini",
-)
-
-#record assistant ids for later
-ids = ""
-ids += f"Dashboard Assistant ID: {dashboard_assistant.id}"
-
-
-alerts_assistant = client.beta.assistants.create(
-	name="Job Posting Q&A Assistant",
-	instructions="""
-
-""",
-	model="gpt-4o-mini",
-)
-
-alerts_contexts = """
-	{
-		[<string:name>,
-		<int:min_AQI>,
-		<string:ids>,
-		<int:cooldown>,
-		<int:avg_window>]
-	}
 """
 
-ids += f"Alerts Assistant ID: {alerts_assistant.id}"
-#log ids to file
-with open("assistant_ids.txt", "w") as f:
-	f.write(ids)
+def send_prompt(prompt, sessionID):
+	response = client.responses.create(
+		model="o4-mini",
+		instructions=instructions,
+		input=prompt
+	)
+	#print(f"OpenAI API response: {response}")
+	response = response.output[1].content[0].text
+	try:
+		pgPushChat((prompt, response, sessionID))
+	except:
+		print("Logging chatbot response failed.")
+	return response
