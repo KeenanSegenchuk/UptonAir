@@ -12,7 +12,7 @@ services:
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
       - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt (1) or persisted from the volume (0)
-      - LOOP=0 # 0 to disable update loop
+      - LOOP=1 # 0 to disable update loop
       - REBUILD_ALERTS=0 # WARNING: this will fully wipe and rebuild alerts table
     ports:
       - "5000:5000"  # Expose port 5000 to the host
