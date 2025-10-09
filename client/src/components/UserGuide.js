@@ -11,10 +11,10 @@ function UserGuide() {
             <h2 id="guide" className="tabbed s25">How to use Upton-Air.com</h2>
 
 	    <div style={{borderTop:"2px dashed white"}}/>
-	    <h3 className="tabbed s18">How to check local air quality:</h3>
+	    <h3 id="ug1" className="tabbed s18">How to check local air quality:</h3>
 	    <p class = "centered s12">
 		Up-to-date small particulate pollution data can be found on&nbsp; 
-		<a href="https://Upton-Air.com/dashboard" target="_blank">Upton-Air.com/dashboard</a>.
+		<a href="https://Upton-Air.com/dashboard" target="_blank" rel="noreferrer">Upton-Air.com/dashboard</a>.
 	    </p>
 
 	    <div style={{height:"20px"}}/>
@@ -42,7 +42,7 @@ function UserGuide() {
 
 
 	    <div style={{borderTop:"2px dashed white"}}/>
-            <h3 className="tabbed s18">How to compare AQI at different locations:</h3>
+            <h3 id="ug2" className="tabbed s18">How to compare AQI at different locations:</h3>
 	    <p class="centered s12">
 		There are also buttons to control the timeframe of the graphed data and the graph type.
 	    </p>
@@ -62,12 +62,12 @@ function UserGuide() {
 
 
 	    <div style={{borderTop:"2px dashed white"}}/>
-            <h3 className="tabbed s18">How to set up an air quality notification:</h3>
+            <h3 id="ug3" className="tabbed s18">How to set up an air quality notification:</h3>
 	    <p class = "centered s12">
 		You can set up an air quality notification on&nbsp; 
-		<a href="https://Upton-Air.com/alerts" target="_blank">Upton-Air.com/alerts</a>.
+		<a href="https://Upton-Air.com/alerts" target="_blank" rel="noreferrer">Upton-Air.com/alerts</a>.
 	    </p>
-	  {isMobile ? <p class='centered s12'><br/>This is still work in progress (WIP). Check the alert description at the bottom of the form to ensure it's configured correctly before submitting.</p> : 
+	  {isMobile ? <p class='centered s12'><br/>Check the alert description at the bottom of the form to ensure it's configured correctly before submitting.</p> : 
 	    <div style={{display:"flex", flexDirection: "row"}}>
 		<img alt="" src="figs/UG_alert.png" width="auto" height="auto" style={{maxWidth:"50%", padding:"15px", paddingRight:"3px"}}/>
 		<div style={{display:"inline"}}>

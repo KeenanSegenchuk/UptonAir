@@ -44,19 +44,19 @@ function Landing() {
             {/* Table of Contents */}
             <div style = {{marginTop: "10px", marginBottom:"10px"}}>
 		<a class="tabbed" href="#aqm" style={{fontSize:"2em"}}>Specifics about Air Quality Monitoring</a>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Air Quality Index (AQI)</p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Types of Air Pollution </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Analyzing the Data </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Measurements We Use </p>
+		<a href="#aqi" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Air Quality Index (AQI)</a>
+		<a href="#ap" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Types of Air Pollution </a>
+		<a href="#ana" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Analyzing the Data </a>
+		<a href="#measure" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Measurements We Use </a>
 		<p></p>
                 <a class="tabbed" href="#guide" style={{fontSize:"2em"}}>User Guide</a>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Check local air quality </p>
-                <p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Compare AQI at different locations </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Configure an air quality alert </p>
+		<a href="#ug1" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Check local air quality </a>
+                <a href="#ug2" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Compare AQI at different locations </a>
+		<a href="#ug3" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Configure an air quality alert </a>
 		<p></p>
 		<a class="tabbed" href="#contact" style={{fontSize:"2em"}}>Contact Us</a>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Share Feedback </p>
-		<p className="tabbed noLineSpacing" style={{fontSize:"1.5em"}}> - Get Involved </p>
+		<a href="#feedback" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Share Feedback </a>
+		<a href="#getinvolved" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Get Involved </a>
             </div>
 
 
@@ -70,13 +70,13 @@ function Landing() {
 
 
 		<div style={{borderTop:"2px dashed white"}}/>
-	    	<h3 className="tabbed s18">Air Quality Index</h3>
+	    	<h3 id="aqi" className="tabbed s18">Air Quality Index</h3>
 	    	<div className="infodiv"><InfoContainer infodoc="/infodocs/AQIranges.txt"/></div>    
             	<div style={{height:"25px"}}/>
 
 
 		<div style={{borderTop:"2px dashed white"}}/>
-	    	<h3 className="tabbed s18">Types of Air Pollution</h3>
+	    	<h3 id="ap" className="tabbed s18">Types of Air Pollution</h3>
 	    	<p class="s12 centered">The EPA currently uses the AQI scale to show health effects for different concentrations of 6 key air pollutants. These six include two types of solid particulate
 		air pollution (PM2.5 and PM10) and 4 gaseous chemicals (ground-level ozone, 
 		carbon monoxide, sulfur dioxide, and nitrogen dioxide). Our PurpleAir monitors were awarded
@@ -90,13 +90,13 @@ function Landing() {
  
 
 		<div style={{borderTop:"2px dashed white"}}/>
-	    	<h3 className="tabbed s18">Analyzing the Data</h3>
+	    	<h3 id="ana" className="tabbed s18">Analyzing the Data</h3>
 	    	<div className="infodiv"><InfoContainer infodoc="infodocs/Particulate Pollution Patterns.txt"/></div>
 	    	<div style={{height:"25px"}}/>
 
 
 		<div style={{borderTop:"2px dashed white"}}/>
-	    	<h3 className="tabbed s18">Measurements We Use</h3>
+	    	<h3 id="measure" className="tabbed s18">Measurements We Use</h3>
 		<p class="centered s12">
 			The Upton-Air dashboard reports a variety of different measurement to help you analyze local air quality readings. Below are descriptions of the measurements we report:
 		</p>
@@ -149,14 +149,14 @@ function Landing() {
 	    <div style={{border:"2px solid white"}}>
                 <h2 id="contact" className="tabbed s25">Contact Us</h2>
 		<div style={{borderTop:"2px dashed white"}}/>
-                <h3 class="tabbed s18">Share Feedback</h3>
+                <h3 id="feedback" class="tabbed s18">Share Feedback</h3>
 		<p class="s12 centered">We would very much appreciate any feedback or suggestions on the website. 
 		For now you can submit all feedback to&nbsp;
 		<a href="https://docs.google.com/forms/d/e/1FAIpQLSe21Vobf8oFnvnsSUp6Ru0wW0g5Xoceb27VNS_abwRut-pOoA/viewform">our google form.</a>
 		</p>
 		<div style={{height:"25px"}}/>
 		<div style={{borderTop:"2px dashed white"}}/>
-                <h3 class="tabbed s18">Get Involved</h3>
+                <h3 id="getinvolved" class="tabbed s18">Get Involved</h3>
 		<p class="s12 centered">If you would like to host an air monitor, get involved in our work, or just reach out to someone at Sustainable Upton, 
 		you can reach us via email:&nbsp;
 		<a href="mailto:sustainableuptonma@gmail.com">sustainableuptonma@gmail.com</a>
