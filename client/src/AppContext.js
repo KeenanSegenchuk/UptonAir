@@ -30,9 +30,9 @@ export const ContextProvider = ({ children }) => {
   const [sensor_idAvgs, setSensor_idAvgs] = useState({});
   const [buttonAvgs, setButtonAvgs] = useState({});
   const [showChatBox, setShowChatBox] = useState(false);
-  //const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
+  const [BASE_URL, API_URL] = ["https://upton-air.com/","https://upton-air.com/api/data"];
   //const [BASE_URL, API_URL] = ["http://localhost:3000/","http://localhost:5000/api/data"];
-  const [BASE_URL, API_URL] = ["http://localhost:5000/", "https://upton-air.com/api/data"];
+  //const [BASE_URL, API_URL] = ["http://localhost:5000/", "https://upton-air.com/api/data"];
 
   //filter data
   const selectData = useCallback(() => {
