@@ -36,16 +36,22 @@ export const ContextProvider = ({ children }) => {
 
   //filter data
   const selectData = useCallback(() => {
-	console.log("selectData updated... dependencies:", [globalLineBool, rawData, dataContext, lineMode, selectedSensors, lineUnits, sensor_id, dashboardConfig.units]);
+	//console.log("selectData updated... dependencies:", [globalLineBool, rawData, dataContext, lineMode, selectedSensors, lineUnits, sensor_id, dashboardConfig.units]);
 	return (globalLineBool ?
 		rawData.filter(obj => obj.context === dataContext && (lineMode === "sensors" ? (selectedSensors[obj.sensor] === true && obj.units === dashboardConfig.units) : (lineUnits.includes(obj.units) && obj.sensor === sensor_id)))
 		: rawData.filter(obj => (obj.sensor === sensor_id && obj.units === dashboardConfig.units && obj.context === dataContext))	
 	);
   }, [globalLineBool, rawData, dataContext, lineMode, selectedSensors, lineUnits, sensor_id, dashboardConfig.units]);
 
+  //track size of filtered data
+  const rawDataSize = useCallback(() => {
+    return selectData().reduce((sum, entry) => sum + (entry.data?.length ?? 0),0);
+  }, [selectData]);
+
+
   //get filtered raw/compressed data
   const data = useMemo(() => {
-    console.log("data useMemo Rerender... dependencies:", [selectData, showChatBox, showCompression, compressedData]);
+    //console.log("data useMemo Rerender... dependencies:", [selectData, showChatBox, showCompression, compressedData]);
     //compress data if chatBot window is open
     if (showChatBox && showCompression) {//return for graphing if set that way
 	return compressedData;
@@ -57,13 +63,13 @@ export const ContextProvider = ({ children }) => {
 
   //update compressedData
   useEffect(()=> {
-	console.log("contextProvider useEffect... dependencies:", [selectData, epsilon]);
+	//console.log("contextProvider useEffect... dependencies:", [selectData, epsilon]);
 	const compressedRes = selectData().map((entry) => ({units: entry.units, sensor: getObj("$"+entry.sensor), data:compressor.get(entry, epsilon)}));
-	console.log("compression result:", compressedRes[0]);
+	//console.log("compression result:", compressedRes[0]);
 	const totalLength = compressedRes.reduce((sum, entry) => sum + ((entry.data && entry.data.length) || 0),0);
 	setCompressedData(compressedRes);
-	setCompressedSize(totalLength);console.log("computed totalLength:", totalLength);
-
+	setCompressedSize(totalLength);
+	console.log(`Epsilon: ${epsilon}, CompressedSize: ${totalLength}`);
   }, [selectData, epsilon]);
 
   const contextVals = {
@@ -72,7 +78,7 @@ export const ContextProvider = ({ children }) => {
 	hover, setHover,
 	switches, setSwitches,
 	dataContext, setDataContext,
-	data, setData,
+	data, setData, rawDataSize,
 	BASE_URL,
 	API_URL,
 	showPopup, setPopup,

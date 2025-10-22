@@ -52,7 +52,7 @@ export default class DataCompressor{
 
     return resultList;
   }
-  
+
   get(series, epsilon) {
     //returns RDP-compressed series for given raw series and epsilon
     let res = this.seen.get(series)?.[epsilon];

@@ -13,7 +13,7 @@ function SensorInfo({ dummy }) {
       baseURL: API_URL,
     });
 
-    const debug = true;
+    const debug = false;
     const log = (text, val = -1) => {
 	if(debug && val === -1) console.log(text);
     	if(debug && val !== -1) console.log(text, val);

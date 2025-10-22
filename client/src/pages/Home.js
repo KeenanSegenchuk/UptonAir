@@ -43,10 +43,10 @@ function Home() {
 	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll', display: 'flex', flexDirection: 'column' }}>
 
 	    {/*Header*/}
-	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row"}}>
-       	        <LinkButton className="leftLinkButton" text={isMobile?"":"More Info"} right={false} href={BASE_URL}/>
+	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
+		<LinkButton className="leftLinkButton" text={isMobile?"Info":"More Info"} right={false} href={BASE_URL}/>
 		<h1 className="titleText">{isMobile ? "Dashboard" : "Upton Air Dashboard"}</h1>
-	        <LinkButton className="rightLinkButton" text={isMobile?"":"Get Notified"} href={alerts_url}/>
+	        <LinkButton className="rightLinkButton" text={isMobile?"Alerts":"Get Notified"} href={alerts_url}/>
 	    </div>
 
 	    {/*Page Body*/}

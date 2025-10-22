@@ -17,9 +17,9 @@ function Landing() {
         <div className="darkgreen" style = {{ paddingBottom:"80vh", color: "white", padding: "12px" }}>
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", height:"70px", width:"100%", padding:"0px"}}>
-	        <LinkButton className="leftLinkButton" text={isMobile?"":"To Alerts"} right={false} href={alerts_url}/>
+	        <LinkButton className="leftLinkButton" text={isMobile?"Alerts":"To Alerts"} right={false} href={alerts_url}/>
                 <h1 className="titleText">{isMobile?"Upton Air":"Upton Air Landing Page"}</h1>
-	        <LinkButton className="rightLinkButton" text={isMobile?"":"To Dashboard"} right={true} href={dashboard_url}/>
+	        <LinkButton className="rightLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={true} href={dashboard_url}/>
             </div>
 
 	    <div style = {{height:"25px"}}/>
@@ -108,7 +108,7 @@ function Landing() {
 		<div style={{height:"15px"}}/>
 		<p class="s12" style={{marginLeft:"15px"}}>PMEPA:</p>
 		<p class="s8" style={{marginLeft:"30px"}}>
-			PMEPA shows PM2.5 readings in ug/m^3 that are callibrated to better match with more expensive EPA sensors that are less sensitive to humidity changes.
+			PMEPA shows PM2.5 readings in ug/m^3 that are calibrated to better match with more expensive EPA sensors that are less sensitive to humidity changes.
 		</p>
 		<div style={{height:"15px"}}/>
 		<p class="s12" style={{marginLeft:"15px"}}>AQI:</p>
@@ -128,7 +128,7 @@ function Landing() {
 		<div style={{height:"15px"}}/>
 		<p class="s12" style={{marginLeft:"15px"}}>Humidity:</p>
 		<p class="s8" style={{marginLeft:"30px"}}>
-			This is just relative humidity as you'd see in any weather report. PurpleAir sensors are sensitive to changes in humidity, so we use humidity readings in an equation to callibrate PurpleAir readings with readings from more expensive and rigorously tested EPA sensors.
+			This is just relative humidity as you'd see in any weather report. PurpleAir sensors are sensitive to changes in humidity, so we use humidity readings in an equation to calibrate PurpleAir readings with readings from more expensive and rigorously tested EPA sensors.
 		</p>
 		<div style={{height:"15px"}}/>
 		<p class="s12" style={{marginLeft:"15px"}}>Percent Difference:</p>

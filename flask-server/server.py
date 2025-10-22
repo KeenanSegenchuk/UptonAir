@@ -22,7 +22,7 @@ datafile = "data.txt"
 @app.before_request
 def log_api_calls():
     if request.path.startswith('/api'):
-        print(f"[{int(datetime.utcnow().timestamp())}] API CALL: {request.method} {request.url}")
+        print(f"[{int(datetime.utcnow().timestamp())}]/[{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}] API CALL: {request.method} {request.url}")
 
 
 # API ROUTES
@@ -262,15 +262,6 @@ def serve_react_app(path):
         return send_from_directory(app.static_folder, path[len("static/"):])
     return send_from_directory(app.static_folder, 'index.html')
 
-# Since updateTask is moved to it's own image for production launch, 
-# when when launching dev server, I now use "/update" to trigger a database update
-@app.route('/update')
-def update():
-	if debug:
-		print("Update API called. This should not be in the production build.")
-		update_loop()
-		return ""
-	return ""
 
 #test()
 

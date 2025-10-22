@@ -104,15 +104,10 @@ function Alerts() {
     return (
       <div style={{width:"100%"}}>
 	{/*Header*/}
-	<div className="title" style={{width:"100%", display:"flex", height:"70px"}}>
-	    <LinkButton className="leftLinkButton" text={isMobile?"":"Back to Dashboard"} right={false} href={dashboard_url}/>
-            <h1         style={{
-			marginTop:"10px",
-            		position: "absolute",
-            		left: "50%",
-            		transform: "translateX(-50%)"}}
-            >{isMobile?"Alerts":"Upton Air Alerts"}</h1>
-	    <LinkButton className="rightLinkButton" text={isMobile?"":"Back to Landing Page"} right={true} href={BASE_URL}/>
+	<div className="title" style={{width:"100%", display:"flex", height:"70px", padding:"0px"}}>
+	    <LinkButton className="leftLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={false} href={dashboard_url}/>
+            <h1 className="titleText">{isMobile?"Alerts":"Upton Air Alerts"}</h1>
+	    <LinkButton className="rightLinkButton" text={isMobile?"Info":"Landing Page"} right={true} href={BASE_URL}/>
 	</div>
 	
         <div className="alerts-container">

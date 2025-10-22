@@ -1,5 +1,5 @@
 import "../App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
 import axios from 'axios';
@@ -14,14 +14,16 @@ function ChatBox( {assistant_id} ) {
     //LLM integration
     const [userPrompt, setUserPrompt] = useState("");
     const [lastPrompt, setLastPrompt] = useState("");
-    const [response, setResponse] = useState("test");
+    const [response, setResponse] = useState("");
     const [sessionID] = useState(() => Math.random().toString(36).slice(2));
 
     const [provideData, setProvideData] = useState(false);
+    const [autoCompress, setAutoCompress] = useState(true);
 
-    const {globalLineBool, compressedData, compressedSize, dataContext, data, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
+    const {globalLineBool, compressedData, compressedSize, rawDataSize, dataContext, data, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
     //^^^^^ ctx to provide to LLM. vvvvv ctx to provide to AppContext
     const {setShowChatBox, epsilon, setEpsilon, showCompression, setShowCompression} = useAppContext();
+
     const getCtx = () => {
 	let ctx = {
 		sensor_name: getObj("$" + sensor_id),
@@ -30,8 +32,9 @@ function ChatBox( {assistant_id} ) {
 		unit: units,
 		graphMode: globalLineBool ? "bar" : "line",
 		timespan: dataContext,
-		data: compressedData
+		data: compressedData.map(entry => ({...entry, data:entry.data.map(point => [formatTimestamp(point[0]), point[1]])})),
 	};
+
 	if (!globalLineBool) { //idk why globallinebool false means line mode, but it does
 		ctx = {...ctx, line_mode: lineMode};
 		if (lineMode === "units") ctx = {...ctx, line_units:lineUnits};
@@ -40,6 +43,17 @@ function ChatBox( {assistant_id} ) {
 	return ctx;
     };
 
+    function formatTimestamp(unixSeconds) {
+      const date = new Date(unixSeconds * 1000); // convert to milliseconds
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      const month = months[date.getMonth()];
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+
+      return `${month}${day}_${hours}:${minutes}`;
+    }  
 
     const sendPrompt = () => {
 	if (userPrompt === lastPrompt)
@@ -51,6 +65,11 @@ function ChatBox( {assistant_id} ) {
 	  context: getCtx()
 	});
 	
+	if(compressedSize > 750) {
+		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
+		return;
+	}
+
 	api.post("chat", {
 		  headers: { "Content-Type": "application/json" },
 		  body: JSON.stringify({ "prompt": prompt, "id":  sessionID}),
@@ -88,12 +107,50 @@ function ChatBox( {assistant_id} ) {
       </button>
     };
 
+
+    //autocompression function
+    const maxEpsilon = 30;
+    const [low, setLow] = useState(0);
+    const [high, setHigh] = useState(maxEpsilon);
+    const [lastRawSize, setLastRawSize] = useState(0);
+    useEffect(() => {
+	console.log(`Autocompressing... autoCompress: ${autoCompress}, low: ${low}, high: ${high}, epsilon: ${epsilon} , compressedSize: ${compressedSize}, rawSize: ${rawDataSize()}, lastRawSize: ${lastRawSize}`);
+
+	//reset binary search params when data changes
+	if(rawDataSize() != lastRawSize) {
+		console.log("Reseting binary search and returning...");
+		setHigh(maxEpsilon);
+		setLow(0);
+		setEpsilon(maxEpsilon/2);
+		setLastRawSize(rawDataSize());
+		return;
+	}
+
+	//exit when done compressing
+	if(!autoCompress || (500 < compressedSize && compressedSize < 600)) {return;}
+	//don't compress data if already small enough
+	if(rawDataSize() < 600) {setEpsilon(0); return;}
+
+	//binary search
+	if(compressedSize > 600) {
+		setLow(epsilon);
+		setEpsilon((high + epsilon)/2);
+	}
+	if(compressedSize < 500) {
+		setHigh(epsilon);
+		setEpsilon((epsilon + low)/2);
+	}
+		
+	//break from loop if data too large to fully compress
+	if(low > maxEpsilon - 1) {setAutoCompress(false);}
+    }, [autoCompress, compressedSize]);
+
     return (
         <div id="ChatBox.js"> {/* TODO: MAKE WINDOW MOVEABLE AND RESIZEABLE */}
 		<CloseButton/>
 		<center>
 			<h2>Ask a question:</h2>
-			<input type="text" value={userPrompt} onChange={(e) => setUserPrompt(e.target.value)} />
+			<input type="text" value={userPrompt} style={{width:"100%", boxSizing: "border-box"}} onChange={(e) => setUserPrompt(e.target.value)} />
 			<button onClick={sendPrompt} style={{width:"100%", padding:"15px"}}>Submit Question</button>
 			
 
@@ -105,6 +162,7 @@ function ChatBox( {assistant_id} ) {
 			    }}
 			>{response}</div>
 		</center>
+
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", paddingTop:"10px" }}>
 		  <h3 htmlFor="boolCheck">Advanced Context:</h3>
 		  <input
@@ -114,23 +172,44 @@ function ChatBox( {assistant_id} ) {
 		    style={{ cursor: "pointer", width: "18px", height: "18px" }}
 		  />
 		</div>
-		<span>Enabling advanced context allows you to compress the graph you see on the dashboard and show it to the chat bot.</span>
+		<span>Enabling advanced context allows the chat bot to see a compressed version of the current graph.</span>
+		<br/><div style={{height: "3px"}}/>
+		<span>When advanced context is enabled and the chat bot is open, the dashboard will display compressed data so you know exactly what the bot sees.</span>
 		
+
+		{/*OLD DATA COMPRESSION CONTROLS
 		{showCompression &&
 			<center>
-			    <div style={{marginTop:"0px", marginBottom:"25px", display:"flex", flexDirection: "column"}}>
-				<h4 style={{marginTop:"5px"}}>{`Compression Level: ${epsilon}, Size: ${compressedSize}`}</h4>
-				<input className="Marginless hideMobile"
-			          type="range"
-			          value={epsilon} min="0" max="30" step="0.1" 
-			          onChange={(e)=>{setEpsilon(e.target.value)}}
-			          style={{marginBottom: "-15px", marginTop: "-10px",  width: '60%', alignSelf: "center" }}
-			        />
-			    </div>  
+			    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", paddingTop:"10px" }}>
+			      <h5 style={{ marginTop:"0px", marginBottom:"0px" }} htmlFor="boolCheck">Auto Compress Data:</h5>
+			      <input
+			        type="checkbox"
+			        checked={autoCompress}
+			        onChange={(e) => setAutoCompress(e.target.checked)}
+			        style={{ cursor: "pointer", width: "18px", height: "18px" }}
+			      />
+			    </div>
+			    {autoCompress ? 
+				<div/>
+			     :
+			        <div style={{marginTop:"0px", marginBottom:"25px", display:"flex", flexDirection: "column"}}>
+				    <h4 style={{marginTop:"5px"}}>{`Compression Level: ${epsilon}, Size: ${compressedSize}`}</h4>
+				    <input className="Marginless hideMobile"
+			              type="range"
+			              value={epsilon} min="0" max={maxEpsilon} step="0.1" 
+			              onChange={(e)=>{setEpsilon(e.target.value)}}
+			              style={{marginBottom: "-15px", marginTop: "-10px",  width: '60%', alignSelf: "center" }}
+			    	    />
+				</div>
+			    } 
 			    <span style={{fontSize:".9em", marginTop:"0px"}}>Check the graph on the dashboard to check how the chat bot will see your data.</span> 
-			    {/*<button onClick={()=>{setShowCompression(prev => !prev);}}>{showCompression ? "Graph raw data on dashboard" : "Graph compressed data"}</button>*/} {/* Manually control whether graph data is compressed or not */}
 			</center>
 		}
+		*/}
+		{/*<button onClick={()=>{setShowCompression(prev => !prev);}}>{showCompression ? "Graph raw data on dashboard" : "Graph compressed data"}</button>*/} {/* Manually control whether graph data is compressed or not */}
+
+
+
 		<div style={{height: "15px"}}/>
 		<center>
 			<h3>Default Context:</h3>

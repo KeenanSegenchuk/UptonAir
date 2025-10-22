@@ -313,16 +313,7 @@ h3, h2 {
   padding: 0 1rem; /* optional padding for spacing */
 }
 
-.titleText {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 8px 0 8px 0;
-  text-align: center;
-  line-height: 1.35;
-  width: auto; /* remove width: 100% */
-  pointer-events: none; /* optional, so text doesn't block button clicks */
-}
+
 
 
 /* Options */
@@ -342,13 +333,20 @@ h3, h2 {
 
 /* The LinkButton can keep margin-left:auto inline or via CSS */
 
-.rightLinkButton {
-    margin-left:auto;
-    margin-right:0px;
-}
+.rightLinkButton,
 .leftLinkButton {
-    margin-left:0px;
-    margin-right:auto;
+    flex: 2; 
+    display: flex;
+    justify-content: center;
+}
+.titleText {
+    flex: 4;
+    display: flex;
+    justify-content: center;
+    font-size: clamp(1rem, 2vw + 0.5rem, 2rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 /*Allignment styles*/
 .sinkBox {

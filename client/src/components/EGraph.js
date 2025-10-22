@@ -12,11 +12,8 @@ function EGraph() {
 	 */   	
 
 	//setup data management
-	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode, showCompression} = useAppContext(); 
+	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode, showCompression, showChatBox} = useAppContext(); 
 	const contexts = getObj("DataContexts");
-
-	console.log("linemode:", lineMode);
-	console.log("units:", units);
 
     	const debug = false;
     	const log = (text, val = -1) => {
@@ -116,9 +113,11 @@ function EGraph() {
         //filter for current data context
         const filteredData = () => {
 	    //filter logic now in appContext
-	    if(!globalLineBool) {
-	    	return data[0]; 
-	    } else { return data;}
+	    const fd = (Array.isArray(data) ? data : [data]);
+	    log("FILTERED DATA: ", fd);
+	    if(globalLineBool || (showChatBox && showCompression)) {
+	    	return fd; 
+	    } else { return fd[0];}
         };
 
 
@@ -147,7 +146,7 @@ function EGraph() {
 	const formatLine = (l) => {
 		return {
 			type: "line",
-			name: lineMode === "sensors" ? getObj("$"+l.sensor) : l.units,
+			name: lineMode === "sensors" ? ((typeof l.sensor === "string") ? l.sensor : getObj("$" + l.sensor)) : l.units,
 			id: l.sensor + l.units,
 			symbol: "none",
 			lineStyle: {
@@ -254,15 +253,15 @@ useEffect(() => {
 
 return (
     <div id = "EGraph.js" className="Marginless">
-        <h1 className="headerText">{dataContext} Readings {(globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
+        <h1 className="headerText">{dataContext}{showCompression ? " Compressed " : " "}Readings {(globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
         <div className="graphContainer">
             {/*<button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>*/}
-            {globalLineBool || showCompression ? (
+            {globalLineBool || (showCompression && showChatBox) ? (
 		<div className="graphDiv" ref={containerRef}>
 		    {/*!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>*/} 
-		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: (Array.isArray(filteredData()) ? filteredData() : [filteredData()]).map(formatLine)}}
+		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}

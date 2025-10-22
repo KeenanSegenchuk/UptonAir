@@ -4,6 +4,7 @@ import os
 from PMtoAQI import *
 from log import *
 from fileUtil import getSensorMap
+from datetime import datetime
 
 '''
 	pgUtil.py contains useful functions for interfacing with the postgreSQL database
@@ -299,7 +300,7 @@ def pgPushAddress(cur, row):
 	try:
 		cur.execute("""
 			INSERT INTO alerts (address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
-			VALUES (%s, %s, %s, %S, %s, %s, %s, %s, %s)	
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)	
 		""", row)
 	except psycopg2.errors.UniqueViolation:
 		return 1
@@ -438,21 +439,40 @@ def pgBuildChatLogs(rebuild=False):
 		cur.execute("DROP TABLE IF EXISTS chatlogs;")
 		cur.execute(f"""CREATE TABLE IF NOT EXISTS chatlogs (
 			prompt TEXT,
+			ctx TEXT,
 			response TEXT,
-			sessionID TEXT
+			sessionID TEXT,
+			time INT
 		);""")
 
 	pgClose(conn, cur)
 
 def pgPushChat(row):
 	conn, cur = pgOpen()
+	timestamp = int(datetime.now().timestamp())
 	cur.execute("""
-		INSERT INTO chatlogs (prompt, response, sessionID)
-		VALUES (%s, %s, %s)	
-	""", row)
+		INSERT INTO chatlogs (prompt, ctx, response, sessionID, time)
+		VALUES (%s, %s, %s, %s, %s)	
+	""", row + [timestamp])
 	pgClose(conn, cur)
 
-
+def pgGetMemory(sessionID, memLen):
+	conn, cur = pgOpen()
+	now = int(datetime.now().timestamp())
+	day_ago = now - 86400  # 24 hours = 86400 seconds
+	
+	cur.execute("""
+		SELECT prompt, response
+		FROM chatlogs
+		WHERE sessionID = %s
+		  AND time BETWEEN %s AND %s
+		ORDER BY time DESC
+		LIMIT %s
+	""", (sessionID, day_ago, now, memLen))
+	
+	rows = cur.fetchall()
+	pgClose(conn, cur)
+	return rows
 
 
 
@@ -466,7 +486,6 @@ def pgPushChat(row):
 
 #more general functions
 import json
-from datetime import datetime
 
 #convenient to print useful stuff to logs
 def pgLog(triggered_alerts, filename="log.txt"):

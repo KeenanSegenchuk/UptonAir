@@ -20,7 +20,7 @@ function UserGuide() {
 	    <div style={{height:"20px"}}/>
 
 	    <p class="centered s12">
-		The air monitors throughout town are shown as dots on a map, and the color an number on the dot corresponds to the average AQI reported by that monitor over the past hour.
+		The air monitors throughout town are shown as dots on a map. The color and number on the dot corresponds to the average AQI reported by that monitor over the past hour.
 	    </p>	
 	    <img alt="" src="figs/UG_dashboard.png" class="figure"/>
 	    <p class="centered s12">		

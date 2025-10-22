@@ -14,8 +14,17 @@ const LinkButton = ({ href, text, external = false, right = true, pulse = false 
           rel="noopener noreferrer"
           className={classNames}
         >
-          <span className="button-text">{text}</span>
-          <span className="button-icon">{right ? '→' : '←'}</span>
+          {right ? 
+		<div>	
+		   <span className="button-text">{text}</span>
+          	   <span className="button-icon">{'→'}</span>
+		</div>
+	   :
+		<div>
+          	   <span className="button-icon">{'←'}</span>
+		   <span className="button-text">{" " + text}</span>
+		</div>
+	  }
           <span className="hover-effect"></span>
         </a>
       ) : (
@@ -23,8 +32,17 @@ const LinkButton = ({ href, text, external = false, right = true, pulse = false 
           to={href} 
           className={classNames}
         >
-          <span className="button-text">{text}</span>
-          <span className="button-icon">{right ? '→' : '←'}</span>
+          {right ? 
+		<div>	
+		   <span className="button-text">{text}</span>
+          	   <span className="button-icon">{'→'}</span>
+		</div>
+	   :
+		<div>
+          	   <span className="button-icon">{'←'}</span>
+		   <span className="button-text">{" " + text}</span>
+		</div>
+	  }
           <span className="hover-effect"></span>
         </Link>
       )}
