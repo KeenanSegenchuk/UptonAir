@@ -453,7 +453,7 @@ def pgPushChat(row):
 	cur.execute("""
 		INSERT INTO chatlogs (prompt, ctx, response, sessionID, time)
 		VALUES (%s, %s, %s, %s, %s)	
-	""", row + [timestamp])
+	""", (*row, timestamp))
 	pgClose(conn, cur)
 
 def pgGetMemory(sessionID, memLen):

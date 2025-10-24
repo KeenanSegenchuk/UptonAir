@@ -89,27 +89,69 @@ def get_memory(sessionID, mem_len):
 	return memory
 
 def send_prompt(prompt, sessionID):
-	prompt_raw = json.loads(prompt)
-	prompt_ctx = json.loads(prompt.get("context"))
-	prompt_raw = prompt.get("user_prompt")
-	prompt_ctx["data"] = "Removed from db entry to save space."
-	prompt_ctx = json.dumps(prompt_ctx)
-	
+def send_prompt(prompt_json, sessionID):
+	"""
+	Handles chatbot message flow:
+	- Parses JSON prompt
+	- Retrieves memory from DB
+	- Calls OpenAI model
+	- Logs chat to DB
+	"""
+	# --- Parse user prompt safely ---
 	try:
-		prompt = get_memory(sessionID, 3) + [{"role": "user", "content": prompt}] 
-	except:
-		print("!Unknown error adding memory in send_prompt!")
+		prompt_data = json.loads(prompt_json)
+	except Exception as e:
+		print(f"[send_prompt] Failed to parse prompt JSON: {e}")
+		prompt_data = {}
 
-	response = client.responses.create(
-		model="o4-mini",
-		instructions=instructions,
-		input=prompt
-	)
-	#print(f"OpenAI API response: {response}")
-	response = response.output[1].content[0].text
+	user_prompt = prompt_data.get("user_prompt", "")
+	ctx_raw = prompt_data.get("context", "{}")
+
+	# Context might be dict or JSON string
+	if isinstance(ctx_raw, str):
+		try:
+			prompt_ctx = json.loads(ctx_raw)
+		except Exception:
+			prompt_ctx = {}
+	elif isinstance(ctx_raw, dict):
+		prompt_ctx = ctx_raw
+	else:
+		prompt_ctx = {}
+
+	# Trim bulky context
+	prompt_ctx["data"] = "Removed from db entry to save space."
+	prompt_ctx_str = json.dumps(prompt_ctx)
+
+	# --- Build memory context ---
 	try:
-		print(f"Logging chatbot response: {response}")
-		pgPushChat((prompt, response, sessionID))
-	except:
-		print("Logging chatbot response failed.")
-	return response
+		memory = get_memory(sessionID, 3)
+	except Exception as e:
+		print(f"[send_prompt] Warning: failed to retrieve memory ({e})")
+		memory = []
+
+	full_prompt = memory + [{"role": "user", "content": user_prompt}]
+
+	# --- Query model safely ---
+	try:
+		response = client.responses.create(
+			model="o4-mini",
+			instructions=instructions,
+			input=full_prompt
+		)
+		# Extract model text (structure may vary)
+		try:
+			response_text = response.output[1].content[0].text
+		except Exception:
+			# fallback: try alternate key
+			response_text = getattr(response, "output_text", str(response))
+	except Exception as e:
+		print(f"[send_prompt] Model call failed: {e}")
+		response_text = "Sorry, something went wrong generating a response."
+
+	# --- Log chat safely ---
+	try:
+		pgPushChat((user_prompt, prompt_ctx_str, response_text, sessionID))
+	except Exception as e:
+		print(f"[send_prompt] Failed to log chat: {e}")
+
+	return response_text
