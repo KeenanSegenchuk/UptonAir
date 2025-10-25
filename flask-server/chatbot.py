@@ -97,10 +97,16 @@ def send_prompt(prompt_json, sessionID):
 	- Logs chat to DB
 	"""
 	# --- Parse user prompt safely ---
-	try:
-		prompt_data = json.loads(prompt_json)
-	except Exception as e:
-		print(f"[send_prompt] Failed to parse prompt JSON: {e}")
+	if isinstance(prompt_json, str):
+		try:
+			prompt_data = json.loads(prompt_json)
+		except Exception as e:
+			print(f"[send_prompt] Failed to parse prompt JSON: {e}")
+			prompt_data = {}
+	elif isinstance(prompt_json, dict):
+		prompt_data = prompt_json
+	else:
+		print(f"[send_prompt] Unexpected type for prompt_json: {type(prompt_json)}")
 		prompt_data = {}
 
 	user_prompt = prompt_data.get("user_prompt", "")
