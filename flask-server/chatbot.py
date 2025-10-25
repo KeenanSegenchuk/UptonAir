@@ -88,7 +88,6 @@ def get_memory(sessionID, mem_len):
 		memory += [{"role": "user", "content": prompt}, {"role": "assistant", "content": response}]
 	return memory
 
-def send_prompt(prompt, sessionID):
 def send_prompt(prompt_json, sessionID):
 	"""
 	Handles chatbot message flow:
