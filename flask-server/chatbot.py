@@ -84,7 +84,7 @@ def get_memory(sessionID, mem_len):
 	data = pgGetMemory(sessionID, mem_len)
 
 	memory = []
-	for prompt, response in data:
+	for prompt, response in reversed(data):
 		memory += [{"role": "user", "content": prompt}, {"role": "assistant", "content": response}]
 	return memory
 
@@ -97,6 +97,8 @@ def send_prompt(prompt_json, sessionID):
 	- Logs chat to DB
 	"""
 	# --- Parse user prompt safely ---
+	print(f"Prompting LLM... prompt_json's current type: {type(prompt_json)}")
+
 	if isinstance(prompt_json, str):
 		try:
 			prompt_data = json.loads(prompt_json)
