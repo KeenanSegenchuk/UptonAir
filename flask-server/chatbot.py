@@ -112,12 +112,12 @@ def send_prompt(prompt_json, sessionID):
 	try:
 		user_prompt = prompt_data.get("user_prompt", "")
 	except:
-		print(f"[send_prompt] Failed to parse user_prompt from prompt_data: {prompt_data}") 
+		print(f"[send_prompt] Failed to parse user_prompt from {type(prompt_data)} prompt_data: {prompt_data}") 
 		return "[server error] Failed to parse prompt."
 	try:
 		ctx_raw = prompt_data.get("context", "{}")
 	except:
-		print(f"[send_prompt] Failed to parse context from prompt_data: {prompt_data}")
+		print(f"[send_prompt] Failed to parse context from {type(prompt_data)} prompt_data: {prompt_data}")
 		return "[server error] Failed to parse context."
 
 	# Context might be dict or JSON string
