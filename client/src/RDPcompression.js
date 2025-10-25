@@ -65,4 +65,16 @@ export default class DataCompressor{
 
     return res;
   }
+
+  getCompressedSize(series, epsilon) {
+    let res = this.seen.get(series)?.[epsilon];
+
+    if(!res) {
+      //compress series and save to seen 
+      res = this.compress(series.data, epsilon);
+      (this.seen.get(series) ?? this.seen.set(series, {}).get(series))[epsilon] = res;
+    }
+
+    return res ? res.length : 0;
+  }
 }

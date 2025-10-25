@@ -18,9 +18,8 @@ function ChatBox( {assistant_id} ) {
     const [sessionID] = useState(() => Math.random().toString(36).slice(2));
 
     const [provideData, setProvideData] = useState(false);
-    const [autoCompress, setAutoCompress] = useState(true);
 
-    const {globalLineBool, compressedData, compressedSize, rawDataSize, dataContext, data, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
+    const {globalLineBool, compressedData, compressedSizeFN, rawDataSize, dataContext, data, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
     //^^^^^ ctx to provide to LLM. vvvvv ctx to provide to AppContext
     const {setShowChatBox, epsilon, setEpsilon, showCompression, setShowCompression} = useAppContext();
 
@@ -65,7 +64,7 @@ function ChatBox( {assistant_id} ) {
 	  context: getCtx()
 	});
 	
-	if(compressedSize > 750) {
+	if(compressedSizeFN(epsilon) > 750) {
 		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
 		return;
 	}
@@ -114,10 +113,16 @@ function ChatBox( {assistant_id} ) {
     const [high, setHigh] = useState(maxEpsilon);
     const [lastRawSize, setLastRawSize] = useState(0);
     useEffect(() => {
-	console.log(`Autocompressing... autoCompress: ${autoCompress}, low: ${low}, high: ${high}, epsilon: ${epsilon} , compressedSize: ${compressedSize}, rawSize: ${rawDataSize()}, lastRawSize: ${lastRawSize}`);
+	const compressedSize = compressedSizeFN(epsilon);
+	console.log(`Autocompressing... showCompression: ${showCompression}, low: ${low}, high: ${high}, epsilon: ${epsilon} , compressedSize: ${compressedSize}, rawSize: ${rawDataSize()}, lastRawSize: ${lastRawSize}`);
+
+	//exit when done compressing
+	if(!showCompression || (500 < compressedSize && compressedSize < 600)) {return;}
+	//don't compress data if already small enough
+	if(rawDataSize() < 600) {setEpsilon(0); return;}
 
 	//reset binary search params when data changes
-	if(rawDataSize() != lastRawSize) {
+	if(rawDataSize() !== lastRawSize) {
 		console.log("Reseting binary search and returning...");
 		setHigh(maxEpsilon);
 		setLow(0);
@@ -126,24 +131,21 @@ function ChatBox( {assistant_id} ) {
 		return;
 	}
 
-	//exit when done compressing
-	if(!autoCompress || (500 < compressedSize && compressedSize < 600)) {return;}
-	//don't compress data if already small enough
-	if(rawDataSize() < 600) {setEpsilon(0); return;}
-
 	//binary search
 	if(compressedSize > 600) {
 		setLow(epsilon);
 		setEpsilon((high + epsilon)/2);
+		console.log("Increasing Epsilon");
 	}
 	if(compressedSize < 500) {
 		setHigh(epsilon);
 		setEpsilon((epsilon + low)/2);
+		console.log("Lowering Epsilon");
 	}
 		
 	//break from loop if data too large to fully compress
-	if(low > maxEpsilon - 1) {setAutoCompress(false);}
-    }, [autoCompress, compressedSize]);
+	if(low > maxEpsilon - 1) {setShowCompression(false);}
+    }, [epsilon, showCompression, rawDataSize]);
 
     return (
         <div id="ChatBox.js"> {/* TODO: MAKE WINDOW MOVEABLE AND RESIZEABLE */}

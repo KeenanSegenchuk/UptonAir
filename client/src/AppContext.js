@@ -15,7 +15,6 @@ export const ContextProvider = ({ children }) => {
   const [dataContext, setDataContext] = useState("7-Day");
   const [rawData, setData] = useState([]); //uncompressed data
   const [compressedData, setCompressedData] = useState([]); //...
-  const [compressedSize, setCompressedSize] = useState(0);
   const compressor = new DataCompressor(); //data compressor for feeding it to LLM
   const [epsilon, setEpsilon] = useState(0); //epsilon for compressing data
   const [showCompression, setShowCompression] = useState(false); //control whether we wanna display compressed or raw data in graph
@@ -63,14 +62,17 @@ export const ContextProvider = ({ children }) => {
 
   //update compressedData
   useEffect(()=> {
+	//dont compress if not needed
+	if(!showCompression) {return;}
+
 	//console.log("contextProvider useEffect... dependencies:", [selectData, epsilon]);
 	const compressedRes = selectData().map((entry) => ({units: entry.units, sensor: getObj("$"+entry.sensor), data:compressor.get(entry, epsilon)}));
 	//console.log("compression result:", compressedRes[0]);
 	const totalLength = compressedRes.reduce((sum, entry) => sum + ((entry.data && entry.data.length) || 0),0);
+
 	setCompressedData(compressedRes);
-	setCompressedSize(totalLength);
 	console.log(`Epsilon: ${epsilon}, CompressedSize: ${totalLength}`);
-  }, [selectData, epsilon]);
+  }, [showCompression, selectData, epsilon]);
 
   const contextVals = {
 	getLine, setLine,
@@ -96,7 +98,8 @@ export const ContextProvider = ({ children }) => {
 	selectSensor: (sensor) => setSelectedSensors((prev) => ({...prev, [sensor]: true})),
 	selectedSensors,
 	lineMode, setLineMode,
-	compressedData, setCompressedData, compressedSize,
+	compressedData, setCompressedData, 
+	compressedSizeFN: (epsilon) => selectData().reduce((sum, entry) => sum + compressor.getCompressedSize(entry, epsilon), 0),
 	epsilon, setEpsilon,
 	showCompression, setShowCompression,
 	sensor_idAvgs, setSensor_idAvgs,
