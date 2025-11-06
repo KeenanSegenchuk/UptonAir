@@ -88,90 +88,28 @@ def get_memory(sessionID, mem_len):
 		memory += [{"role": "user", "content": prompt}, {"role": "assistant", "content": response}]
 	return memory
 
-def send_prompt(prompt_json, sessionID):
-	"""
-	Handles chatbot message flow:
-	- Parses JSON prompt
-	- Retrieves memory from DB
-	- Calls OpenAI model
-	- Logs chat to DB
-	"""
-	# --- Parse user prompt safely ---
-	print(f"Prompting LLM... prompt_json's current type: {type(prompt_json)}")
-
-	if isinstance(prompt_json, str):
-		try:
-			prompt_data = json.loads(prompt_json)
-		except Exception as e:
-			print(f"[send_prompt] Failed to parse prompt JSON: {e}")
-			prompt_data = {}
-	elif isinstance(prompt_json, dict):
-		prompt_data = prompt_json
-	else:
-		print(f"[send_prompt] Unexpected type for prompt_json: {type(prompt_json)}")
-		prompt_data = {}
-
-	try:
-		user_prompt = prompt_data.get("user_prompt", "")
-	except:
-		print(f"[send_prompt] Failed to parse user_prompt from {type(prompt_data)} prompt_data: {prompt_data}") 
-		return "[server error] Failed to parse prompt."
-	try:
-		ctx_raw = prompt_data.get("context", "{}")
-	except:
-		print(f"[send_prompt] Failed to parse context from {type(prompt_data)} prompt_data: {prompt_data}")
-		return "[server error] Failed to parse context."
-
-	# --- Add context to prompt ---
-	user_prompt = f"prompt: ({user_prompt}), context: ({ctw_raw})"
-	
-	# Context might be dict or JSON string
-	if isinstance(ctx_raw, str):
-		try:
-			prompt_ctx = json.loads(ctx_raw)
-		except Exception as e:
-			print(f"An exception occured trying to load context: {e}")
-			prompt_ctx = {}
-	elif isinstance(ctx_raw, dict):
-		prompt_ctx = ctx_raw
-	else:
-		print("Error: removing context")
-		prompt_ctx = {}
-
-	# Trim bulky context
+def send_prompt(prompt, sessionID):
+	prompt_raw = json.loads(prompt)
+	prompt_ctx = json.loads(prompt.get("context"))
+	prompt_raw = prompt.get("user_prompt")
 	prompt_ctx["data"] = "Removed from db entry to save space."
-	prompt_ctx_str = json.dumps(prompt_ctx)
-
-	# --- Build memory context ---
+	prompt_ctx = json.dumps(prompt_ctx)
+	
 	try:
-		memory = get_memory(sessionID, 3)
-	except Exception as e:
-		print(f"[send_prompt] Warning: failed to retrieve memory ({e})")
-		memory = []
+		prompt = get_memory(sessionID, 3) + [{"role": "user", "content": prompt}] 
+	except:
+		print("!Unknown error adding memory in send_prompt!")
 
-	full_prompt = memory + [{"role": "user", "content": user_prompt}]
-
-	# --- Query model safely ---
+	response = client.responses.create(
+		model="o4-mini",
+		instructions=instructions,
+		input=prompt
+	)
+	#print(f"OpenAI API response: {response}")
+	response = response.output[1].content[0].text
 	try:
-		response = client.responses.create(
-			model="o4-mini",
-			instructions=instructions,
-			input=full_prompt
-		)
-		# Extract model text (structure may vary)
-		try:
-			response_text = response.output[1].content[0].text
-		except Exception:
-			# fallback: try alternate key
-			response_text = getattr(response, "output_text", str(response))
-	except Exception as e:
-		print(f"[send_prompt] Model call failed: {e}")
-		response_text = "Sorry, something went wrong generating a response."
-
-	# --- Log chat safely ---
-	try:
-		pgPushChat((user_prompt, prompt_ctx_str, response_text, sessionID))
-	except Exception as e:
-		print(f"[send_prompt] Failed to log chat: {e}")
-
-	return response_text
+		print(f"Logging chatbot response: {response}")
+		pgPushChat((prompt, response, sessionID))
+	except:
+		print("Logging chatbot response failed.")
+	return response

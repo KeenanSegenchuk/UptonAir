@@ -49,8 +49,8 @@ def chat():
 	if isinstance(payload, str):
 		payload = json.loads(payload)
 
-	#prompt = json.dumps(payload.get("prompt"))
-	prompt = payload.get("prompt")
+	prompt = json.dumps(payload.get("prompt"))
+	#prompt = payload.get("prompt")
 	try:
 		sessionID = payload.get("id")
 	except:
