@@ -90,6 +90,7 @@ def get_memory(sessionID, mem_len):
 
 def send_prompt(prompt, sessionID):
 	#parse prompt
+	print(prompt)
 	prompt_raw = json.loads(prompt)
 	prompt_ctx = json.loads(prompt_raw.get("context"))
 	prompt_raw = prompt_raw.get("user_prompt")
@@ -116,3 +117,4 @@ def send_prompt(prompt, sessionID):
 	except:
 		print("Logging chatbot response failed.")
 	return response
+
