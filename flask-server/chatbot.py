@@ -96,7 +96,7 @@ def send_prompt(prompt_raw, sessionID):
 	prompt_raw = json.loads(prompt_raw)
 	print(f"type: {type(prompt_raw)}, prompt: {prompt_raw}")
 
-	prompt_ctx = json.loads(prompt_raw.get("context"))
+	prompt_ctx = prompt_raw.get("context")
 	prompt_raw = prompt_raw.get("user_prompt")
 	prompt_ctx["data"] = "Removed from db entry to save space."
 	prompt_ctx = json.dumps(prompt_ctx)
