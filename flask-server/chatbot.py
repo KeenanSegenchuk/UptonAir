@@ -88,10 +88,10 @@ def get_memory(sessionID, mem_len):
 		memory += [{"role": "user", "content": prompt}, {"role": "assistant", "content": response}]
 	return memory
 
-def send_prompt(prompt, sessionID):
+def send_prompt(prompt_raw, sessionID):
 	#parse prompt
+	prompt = json.dumps(prompt_raw)
 	print(prompt)
-	prompt_raw = json.loads(prompt)
 	prompt_ctx = json.loads(prompt_raw.get("context"))
 	prompt_raw = prompt_raw.get("user_prompt")
 	prompt_ctx["data"] = "Removed from db entry to save space."
