@@ -122,15 +122,20 @@ def send_prompt(prompt_json, sessionID):
 		print(f"[send_prompt] Failed to parse context from {type(prompt_data)} prompt_data: {prompt_data}")
 		return "[server error] Failed to parse context."
 
+	# --- Add context to prompt ---
+	user_prompt = f"prompt: ({user_prompt}), context: ({ctw_raw})"
+	
 	# Context might be dict or JSON string
 	if isinstance(ctx_raw, str):
 		try:
 			prompt_ctx = json.loads(ctx_raw)
-		except Exception:
+		except Exception as e:
+			print(f"An exception occured trying to load context: {e}")
 			prompt_ctx = {}
 	elif isinstance(ctx_raw, dict):
 		prompt_ctx = ctx_raw
 	else:
+		print("Error: removing context")
 		prompt_ctx = {}
 
 	# Trim bulky context
