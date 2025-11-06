@@ -51,6 +51,7 @@ def chat():
 
 	#prompt = json.dumps(payload.get("prompt"))
 	prompt = payload.get("prompt")
+	print(f"type: {type(prompt)}, prompt: {prompt}")
 	try:
 		sessionID = payload.get("id")
 	except:
