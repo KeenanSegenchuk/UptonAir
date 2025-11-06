@@ -31,7 +31,7 @@ function ChatBox( {assistant_id} ) {
 		unit: units,
 		graphMode: globalLineBool ? "bar" : "line",
 		timespan: dataContext,
-		data: compressedData.map(entry => ({...entry, data:entry.data.map(point => [formatTimestamp(point[0]), point[1]])})),
+		data: showCompression ? compressedData.map(entry => ({...entry, data:entry.data.map(point => [formatTimestamp(point[0]), point[1]])})) : "advanced context not provided",
 	};
 
 	if (!globalLineBool) { //idk why globallinebool false means line mode, but it does
@@ -64,7 +64,7 @@ function ChatBox( {assistant_id} ) {
 	  context: getCtx()
 	});
 	
-	if(compressedSizeFN(epsilon) > 750) {
+	if(showCompression && compressedSizeFN(epsilon) > 750) {
 		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
 		return;
 	}
@@ -126,7 +126,12 @@ function ChatBox( {assistant_id} ) {
 		console.log("Reseting binary search and returning...");
 		setHigh(maxEpsilon);
 		setLow(0);
-		setEpsilon(maxEpsilon/2);
+		if(epsilon === maxEpsilon/2) {
+			//make sure this useffect triggers
+			setEpsilon(maxEpsilon+1/2)
+		} else {
+			setEpsilon(maxEpsilon/2);
+		}
 		setLastRawSize(rawDataSize());
 		return;
 	}
@@ -152,7 +157,11 @@ function ChatBox( {assistant_id} ) {
 		<CloseButton/>
 		<center>
 			<h2>Ask a question:</h2>
-			<input type="text" value={userPrompt} style={{width:"100%", boxSizing: "border-box"}} onChange={(e) => setUserPrompt(e.target.value)} />
+			<input type="text" value={userPrompt} style={{width:"100%", boxSizing: "border-box"}} onChange={(e) => setUserPrompt(e.target.value)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter") 
+						sendPrompt(); 
+			}}/>
 			<button onClick={sendPrompt} style={{width:"100%", padding:"15px"}}>Submit Question</button>
 			
 

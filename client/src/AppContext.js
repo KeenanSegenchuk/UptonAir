@@ -63,7 +63,9 @@ export const ContextProvider = ({ children }) => {
   //update compressedData
   useEffect(()=> {
 	//dont compress if not needed
-	if(!showCompression) {return;}
+	if(!showCompression) {
+		setCompressedData([]);
+		return;}
 
 	//console.log("contextProvider useEffect... dependencies:", [selectData, epsilon]);
 	const compressedRes = selectData().map((entry) => ({units: entry.units, sensor: getObj("$"+entry.sensor), data:compressor.get(entry, epsilon)}));

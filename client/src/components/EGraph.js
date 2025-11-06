@@ -146,7 +146,7 @@ function EGraph() {
 	const formatLine = (l) => {
 		return {
 			type: "line",
-			name: lineMode === "sensors" ? ((typeof l.sensor === "string") ? l.sensor : getObj("$" + l.sensor)) : l.units,
+			name: lineMode === "sensors" ? ((typeof l.sensor === "string" && !/\d/.test(l.sensor)) ? l.sensor : getObj("$" + l.sensor)) : l.units,
 			id: l.sensor + l.units,
 			symbol: "none",
 			lineStyle: {
