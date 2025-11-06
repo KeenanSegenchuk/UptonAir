@@ -64,6 +64,8 @@ function ChatBox( {assistant_id} ) {
 	  context: getCtx()
 	});
 	
+	console.log(prompt);
+
 	if(showCompression && compressedSizeFN(epsilon) > 750) {
 		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
 		return;
