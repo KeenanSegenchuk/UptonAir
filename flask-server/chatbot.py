@@ -89,12 +89,15 @@ def get_memory(sessionID, mem_len):
 	return memory
 
 def send_prompt(prompt, sessionID):
+	#parse prompt
 	prompt_raw = json.loads(prompt)
-	prompt_ctx = json.loads(prompt.get("context"))
-	prompt_raw = prompt.get("user_prompt")
+	prompt_ctx = json.loads(prompt_raw.get("context"))
+	prompt_raw = prompt_raw.get("user_prompt")
 	prompt_ctx["data"] = "Removed from db entry to save space."
 	prompt_ctx = json.dumps(prompt_ctx)
-	
+	#prompt_raw has str prompt, prompt_ctx has the context
+
+	#attach up to 3 previous chats
 	try:
 		prompt = get_memory(sessionID, 3) + [{"role": "user", "content": prompt}] 
 	except:
@@ -109,7 +112,7 @@ def send_prompt(prompt, sessionID):
 	response = response.output[1].content[0].text
 	try:
 		print(f"Logging chatbot response: {response}")
-		pgPushChat((prompt, response, sessionID))
+		pgPushChat((prompt_raw, prompt_ctw, response, sessionID))
 	except:
 		print("Logging chatbot response failed.")
 	return response
