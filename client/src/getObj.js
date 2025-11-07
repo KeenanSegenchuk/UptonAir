@@ -56,8 +56,8 @@ export function getObj(obj) {
 	"humidity":"%",
     };
     const unitDescriptions = {
-	"PMEPA":"EPA Calibrated Raw PM2.5",
-	"PM":"Unadjusted Raw PM2.5",
+	"PMEPA":"EPA Calibrated PM2.5",
+	"PM":"Unadjusted PM2.5",
 	"PMA":"Raw PM2.5 Channel A",
 	"PMB":"Raw PM2.5 Channel B",
 	"AQIEPA":"EPA Calibrated AQI",
@@ -358,5 +358,6 @@ export function getObj(obj) {
     		console.log("obj");
     		return []
     }
+
 
 } 
