@@ -199,7 +199,7 @@ function EGraph() {
 	if(bars.x) {
   	  bars = {
             type: "bar",
-            name: (typeof b.sensor === "string") ? b.sensor : getObj("$" + b.sensor),
+            name: (typeof l.sensor === "string" && !/\d/.test(l.sensor)) ? b.sensor : getObj("$" + b.sensor),
             data: bars.x.map((timestamp, i) => ({
                 value: [timestamp, bars.y[i]],
                 itemStyle: { color: getObj(`X${bars.y[i]}${units}`) }
