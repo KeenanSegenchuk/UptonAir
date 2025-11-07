@@ -133,7 +133,7 @@ function Landing() {
 		<div style={{height:"15px"}}/>
 		<p class="s12" style={{marginLeft:"15px"}}>Percent Difference:</p>
 		<p class="s8" style={{marginLeft:"30px"}}>
-			This is the difference between PMA and PMB as a percent of their average. It allows us to measure how well the channels of a given air monitor are lining up which can provide insights on whether spikes in the data are real pollution readings or anomalies like bugs getting into the sensor or it acting up for some other reason.
+			This is the difference between PMA and PMB as a percent of their average. It allows us to measure how well the channels of a given air monitor are lining up which can provide insights on whether spikes in the data are real pollution readings or anomalies like the sensor malfunctioning or bugs getting into it.
 		</p>
             	<div style={{height:"25px"}}/>
 
