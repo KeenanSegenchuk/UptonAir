@@ -103,7 +103,7 @@ function Map({ buttons }) {
       </div>
       
       {/* Config Modal Overlay */}
-      {showConfig && (
+      <div style={{display: showConfig : "block":"none"}}>
         <div
           style={{
             position: "absolute",
@@ -151,7 +151,7 @@ function Map({ buttons }) {
             <DashboardConfig />
           </div>
         </div>
-      )}
+	  </div>
 
       {/* HoverButton at top center */}
       <div
@@ -186,5 +186,6 @@ function Map({ buttons }) {
     </div>
   );
 }
+
 
 export default Map;
