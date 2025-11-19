@@ -103,7 +103,7 @@ function Map({ buttons }) {
       </div>
       
       {/* Config Modal Overlay */}
-      <div style={{display: showConfig : "block":"none"}}>
+      <div style={{display: showConfig ? "block":"none"}}>
         <div
           style={{
             position: "absolute",
@@ -189,3 +189,4 @@ function Map({ buttons }) {
 
 
 export default Map;
+
