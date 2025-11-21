@@ -1,55 +1,43 @@
-// setup.js
-const sensor_setup = false;
+//on-build client configuration setup
+//copies env vars into client-accesible config
+//copies over sensor list and pulls lat/lon vals from purpleair
+
+const sensor_setup = true;
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+//helper functions
+const { fetchLatLon, applyEnvToConfig } = require('./setupFNs');
 
-const sensorSource = path.resolve(__dirname, '../sensor-pos.json');
+const sensorSource = path.resolve(__dirname, '../sensor-info.json');
 const sensorDestination = path.resolve(__dirname, 'src/sensor-pos.json');
 
-async function fetchLatLon(sensorId) {
-  if(sensorId == "0")
-    return {
-      lat: 42.174540,
-      lon: -71.602290
-    };
-
-  const url = `https://api.purpleair.com/v1/sensors/${sensorId}?fields=latitude,longitude`;
-  const options = {
-    headers: {
-      'X-API-Key': "97AFA31E-6D6C-11F0-AF66-42010A800028"
-    }
-  };
-
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    throw new Error(`API request failed: ${res.status} ${res.statusText}`);
-  }
-
-  const data = await res.json();
-
-  // DEBUG print raw API response (to see what's happening)
-  console.log(`Raw API response for sensor ${sensorId}:`, JSON.stringify(data));
-
-  if (!data.sensor || data.sensor.latitude == null || data.sensor.longitude == null) {
-    throw new Error(`Missing latitude/longitude in API response for sensor ${sensorId}`);
-  }
-
-  return {
-    lat: data.sensor.latitude,
-    lon: data.sensor.longitude
-  };
-}
+const geojsonSource = path.resolve(__dirname, '../town.geojson');
+const geojsonDestination = path.resolve(__dirname, 'src/town.geojson');
 
 async function main() {
-  if(!sensor_setup) return;
+  //copy relevant project env vars into client config
+  applyEnvToConfig();
+
+  //copy town.geojson into src code
+  if (!fs.existsSync(geojsonSource)) {
+    throw new Error(`Source file not found: ${geojsonSource}`);
+  }
+  const geojson = fs.readFileSync(geojsonSource, 'utf-8');
+  fs.writeFileSync(geojsonDestination, geojson);
+
 
   try {
+    //optional: skip sensor setup 
+    if(!sensor_setup) {return;}
+
+    //make sure files exist
     if (!fs.existsSync(sensorSource)) {
       throw new Error(`Source file not found: ${sensorSource}`);
     }
 
+    //load sensor configuration
     const sensorsRaw = fs.readFileSync(sensorSource, 'utf-8');
     const sensors = JSON.parse(sensorsRaw);
 

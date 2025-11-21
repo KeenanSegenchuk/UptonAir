@@ -291,6 +291,9 @@ h3, h2 {
 .green { 
     background:#38ba5b;
 }
+.bordered {
+    border: 2px solid white;
+}
 .contentBackground {
     background:#E7D2AB;
 }

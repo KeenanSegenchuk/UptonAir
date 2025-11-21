@@ -24,6 +24,9 @@ function DashboardConfig() {
       return () => ro.disconnect();
     }, []);
 
+    //force line graph mode to reduce complexity on mobile
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if(isMobile) {setGlobalLineBool(true);}
 
     const { getObj } = require("../getObj");
     const sensors = getObj("sensors");
@@ -97,7 +100,7 @@ function DashboardConfig() {
 
 		<label className="s16">
 		    Graph Style:<br/>
-		    <select className="s9" value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
+		    <select className="s9" disabled={isMobile} value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
                         <option value="bar">Bar Graph</option>
                         <option value="line">Line Graph</option>
                         {/* maybe add back later <option value="img">Image</option>*/}

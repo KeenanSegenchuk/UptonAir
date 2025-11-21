@@ -33,6 +33,19 @@ export const ContextProvider = ({ children }) => {
   //const [BASE_URL, API_URL] = ["http://localhost:3000/","http://localhost:5000/api/data"];
   //const [BASE_URL, API_URL] = ["http://localhost:5000/", "https://upton-air.com/api/data"];
 
+  //if only one sensor is selected in lineMode === "sensors", keep that sensor when switching to single select
+  const [wasMultiSensor, setWasMultiSensor] = useState(false);
+  useEffect(() => {
+	if(lineMode === "sensors" && globalLineBool) {setWasMultiSensor(true);}
+	else if(wasMultiSensor) {
+		const selectedIDs = Object.keys(selectedSensors).filter(k => selectedSensors[k]);
+		if(selectedIDs.length === 1)
+			setSensor_id(selectedIDs[0]);
+		else
+			setSensor_id("0");
+	}
+  }, [lineMode, globalLineBool])
+
   //filter data
   const selectData = useCallback(() => {
 	//console.log("selectData updated... dependencies:", [globalLineBool, rawData, dataContext, lineMode, selectedSensors, lineUnits, sensor_id, dashboardConfig.units]);

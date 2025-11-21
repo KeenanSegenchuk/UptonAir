@@ -71,7 +71,7 @@ function ChatBox( {assistant_id} ) {
 		return;
 	}
 
-	setResponse("Waiting for response...");
+	setResponse("Waiting for response from server...");
 
 	api.post("chat", {
 		  headers: { "Content-Type": "application/json" },

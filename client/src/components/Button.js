@@ -30,7 +30,7 @@ function Button({ id, x, y }) {
     const name = getObj("$" + id);
     const borderColor = getObj("C" + id);
     const labelOffsets = getObj("O" + id);
-    const { globalLineBool, units, hover, switches, data, setData, setPopup, lineMode, newLineUnit, lineUnits, isLineSelected, toggleLineSelect, selectSensor, setButtonAvgs } = useAppContext();
+    const { globalLineBool, units, hover, switches, data, setData, lineMode, newLineUnit, lineUnits, isLineSelected, toggleLineSelect, selectSensor, setButtonAvgs } = useAppContext();
     const [borderStyle, setBorderStyle] = useState("none");
     const hoverKey = "labels";
 
@@ -189,21 +189,14 @@ function Button({ id, x, y }) {
     }, [val, units]);
 
     const handleButtonClick = (sensorValue, event) => {
-        if ((globalLineBool && lineMode === "sensors") || switches.get("select")) {
-	    if(!switches.get("select")) {
-	        setSensor_id(id);
-	        if(isMobile) {
-		    setPopup(true);
-	        }
-	    }
+        if ((globalLineBool && lineMode === "sensors")) {
 	    if(selected){//if currently selected deselect and get data
-		if(!isMobile || switches.get("select")) {
-		        setSelected(false);
-			getData(false);
-		}
+		setSelected(false);
+		getData(false);
 	    }else{
 		setSelected(true);
 		getData(true);
+	 	setSensor_id(id);
 	    }
 	    toggleLineSelect(id);
 	    return;
@@ -212,11 +205,8 @@ function Button({ id, x, y }) {
 	{ 
 		lineUnits.forEach((unit) => getData(false, unit));
 	}
-	console.log(sensorValue);
 	setSensor_id(id);
-	if(isMobile) {
-	    setPopup(true);
-	}
+	console.log(sensorValue);
         event.preventDefault(); 
         //check if new data needs to be pulled
 	getData();

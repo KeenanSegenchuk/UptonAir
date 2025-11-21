@@ -25,7 +25,7 @@ function Map({ buttons }) {
   //import town border from geojson
   const [townBorder, setTownBorder] = useState(null);
   useEffect(() => {
-    fetch('/upton.geojson')
+    fetch('/town.geojson')
       .then((response) => response.json())
       .then((data) => setTownBorder(data))
       .catch((error) => console.error('Error loading GeoJSON:', error));
@@ -154,35 +154,36 @@ function Map({ buttons }) {
 	  </div>
 
       {/* HoverButton at top center */}
-      <div
-        style={{
-          position: "absolute",
-          top: "3%",
-          left: "50%",
-	  transform: "translate(-50%, 0%)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000
-        }}
-      >
-        {isMobile ? (
-          <ToggleButton
+      {isMobile && 
+        <div
+          style={{
+            position: "absolute",
+            top: "2.5%",
+            left: "50%",
+	    transform: "translate(-50%, 0%)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+	    width: "40%"
+          }}
+        >
+	  <button
+		className="bordered green"
+		onClick={() => setPopup(true)}
+		style={{ height: "45px", width: "100%", fontSize: "1em"}}
+	  >Show Graph</button>
+          {/*
+	   <ToggleButton
             className="Button"
             textOn={"Select Multiple|Graph Multiple"}
             textOff={"Graph One"}
             toggleKey="select"
             style={{ height: "30px", fontSize:".85em"}}
-          />
-        ) : (
-          /*<DButton
-            className="Button"
-            text={"Hover/Click here to show location names."}
-            dkey="labels"
-            style={{ height: "30px" }}
-          />*/
-        <div/>)}
-      </div>
+           />
+	  */}
+        </div>
+      }
     </div>
   );
 }

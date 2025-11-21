@@ -1,0 +1,7 @@
+{
+  "URL": "your-domain.com",
+  "WEBPAGE_TITLE": "Your Website Title",
+  "HOMEPAGE": "landing",
+  "CHATBOT_ENABLED": "true",
+  "ALERTS_ENABLED": "true"
+}

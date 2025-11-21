@@ -27,6 +27,23 @@ function SensorInfo({ dummy }) {
     const [loading, setLoading] = useState(true);
     const [contextIndex, setIndex] = useState(2);
     const {setDataContext, setPopup, switches, units} = useAppContext();
+
+    //working on making it combine timespan averages for multiple sensors/units (line graph)
+    const {globalLineBool, lineMode, lineUnits, selectedSensors} = useAppContext();
+    const getSelected = (o) => {return Object.keys(o).filter(k => o[k]);}
+    const objLen = (o) => {return Object.values(o).filter(v => v).length;}
+    const headerText = () => {
+	if(lineMode === "units" || !globalLineBool) {
+		return `Current Sensor: ${getObj("$" + sensor_id)} [${getObj(`W${units}`)}]`;
+	} else if(lineMode === "sensors") {
+		return `Current Sensor: ${(objLen(selectedSensors) !== 1) ? "Multiple Sensors" : getObj("$" + getSelected(selectedSensors)[0])} [${getObj(`W${units}`)}]`;
+	} else {
+		return "Error parsing line graph mode.";
+	}
+    };
+
+
+    //probably deprecated
     const mobileMultiSelect = switches.get("select");
 
     const d = Date.now();
@@ -56,37 +73,66 @@ function SensorInfo({ dummy }) {
 	        log(`Given context: ${dataContexts[contextIndex].context}`);
 	        log(`Units: ${units}`);
 		
-	        const fd = data.find(entry => entry.sensor === sensor_id && entry.units === units);
-	        log(`Filter Result: `, fd);
+		let fd;
+		if(globalLineBool && lineMode === "sensors" && objLen(selectedSensors) !== 1) {
+			fd = (() => {
+				let entries = data.filter(e => selectedSensors[e.sensor] && e.units === units).map(e => e.data);
+				if(entries.length === 0) {return null;}
+				console.log(entries);
+				const lenAvgs = entries[0].avgs.length;
+				return {
+					avgs: Array.from({ length: lenAvgs}, (_, i) =>
+						entries.reduce((sum, e) => sum + e.avgs[i], 0) / entries.length
+					),
+					banner_avg:
+						entries.reduce((sum, e) => sum + e.banner_avg, 0) / entries.length
+				};
+			})();
+		} else if(globalLineBool && lineMode === "sensors") {
+		        fd = data.find(entry => entry.sensor === getSelected(selectedSensors)[0] && entry.units === units);
+		} else {
+		        fd = data.find(entry => entry.sensor === sensor_id && entry.units === units);
+	        }
+		console.log(`Filter Result: `, fd);
 		
-		return fd ? fd.data : {avgs: [-1, -1, -1, -1], banner_avg: -1};
+		return fd.data ? fd.data : (fd ? fd : {avgs: [-1, -1, -1, -1], banner_avg: -1});
 	    } catch (err) {
 	        console.error("filteredData error:", err);
 	        return {avgs: [-1, -1, -1, -1], banner_avg: -1};
 	    }
         };
 	
+    useEffect(() => {
+	//keep timespan averages synced with selectedSensors
+	const fd = filteredData();
+	setSensor_idAvgs({...Object.fromEntries(fd.avgs.map((avg, index) => [dataContexts[index].context,avg])), "1-Hour":fd.banner_avg});
+    }, [selectedSensors, lineUnits]);
 
     useEffect(() => {
 	//update sensorInfo whenever sensor_id or units changes
-	const fd = filteredData();
-	setSensor_idAvgs({...Object.fromEntries(fd.avgs.map((avg, index) => [dataContexts[index].context,avg])), "1-Hour":fd.banner_avg});
-        
 	log(`Checking data from ${sensor_id} where units = ${units}`);
-	if (!checkData()) {
+
+	if(checkData()) {
+		const fd = filteredData();
+		setSensor_idAvgs({...Object.fromEntries(fd.avgs.map((avg, index) => [dataContexts[index].context,avg])), "1-Hour":fd.banner_avg});
+	} else {
           log(`Pulling data from ${sensor_id} where units = ${units}`);
           api.get(`sensorinfo/${units}/${sensor_id}`)
             .then(response => {
               log("queried api/sensorinfo. response:",  response.data);
-              setData(prev => [
-                ...prev,
-                {
-                  sensor: sensor_id,
-                  context: dataContexts[contextIndex].context,
-                  units: units,
-                  data: response.data
-                }
-              ]);
+              setData(prev => {
+		const filtered = prev.filter(e => !(e.sensor === sensor_id && e.context === dataContexts[contextIndex].context && e.units === units));
+		
+		return [
+                  ...filtered,
+                  {
+                    sensor: sensor_id,
+                    context: dataContexts[contextIndex].context,
+                    units: units,
+                    data: response.data
+                  }
+              	];
+	      });
               setLoading(false);
             })
             .catch(error => {
@@ -124,7 +170,7 @@ function SensorInfo({ dummy }) {
     return (
 	<div id="SensorInfo.js" className="sensorDiv">
 	    <div className={mobileMultiSelect ? "hideMobile" : ""}>		    
-	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">Current Sensor: {getObj("$" + sensor_id)} [{getObj(`W${units}`)}]</h1>
+	        <h1 style={{fontSize:isMobile ? "1.5em" : "3em", padding: "10px"}} className="headerText">{headerText()}</h1>
 	        <Banner avg={Math.round(100*filteredData().banner_avg) / 100} units = {units}/>
 
     	        <h1 className="headerText">Recent Averages ({getObj(`U${units}`)})</h1>

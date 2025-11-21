@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e  # exit immediately if a command fails
+
+# take down docker containers
+echo "Taking down docker compose containers..."
+docker compose down
+
+# Go to client and build frontend
+echo "Building client..."
+cd ./client
+npm run build
+
+# Go back to repo root
+cd ..
+
+# Rebuild docker images without cache
+echo "Rebuilding Docker images..."
+docker compose build --no-cache
+
+# Start containers
+echo "Starting containers..."
+docker compose up -d
