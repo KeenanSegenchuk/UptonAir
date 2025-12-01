@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import "../App.css";
 import Map from "../components/Map";
 import SensorInfo from "../components/SensorInfo";
 import LinkButton from "../components/LinkButton";
-import InfoContainer from "../components/InfoContainer";
 import { useAppContext } from "../AppContext";
+import config from "../config.json";
 
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
@@ -45,7 +45,7 @@ function Home() {
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
 		<LinkButton className="leftLinkButton" text={isMobile?"Info":"More Info"} right={false} href={BASE_URL}/>
-		<h1 className="titleText">{isMobile ? "Dashboard" : "Upton Air Dashboard"}</h1>
+		<h1 className="titleText">{isMobile ? "Dashboard" : config.WEBPAGE_TITLE + " Dashboard"}</h1>
 	        <LinkButton className="rightLinkButton" text={isMobile?"Alerts":"Get Notified"} href={alerts_url}/>
 	    </div>
 

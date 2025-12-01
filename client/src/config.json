@@ -3,5 +3,8 @@
   "WEBPAGE_TITLE": "Your Website Title",
   "HOMEPAGE": "landing",
   "CHATBOT_ENABLED": "true",
-  "ALERTS_ENABLED": "true"
+  "ALERTS_ENABLED": "true",
+  "LATITUDE": "42.173996",
+  "LONGITUDE": "-71.60191",
+  "MAP_ZOOM": "13"
 }

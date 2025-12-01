@@ -120,7 +120,7 @@ function graphUtil(func) {
 	    //check for colorstops where position > 1
 	    if (half <= 1) {
 		pushBoth(current, half);
-	    } else if(current == 1) {
+	    } else if(current === 1) {
 	        colorStops.push({ offset: current, color: darkBlue });
 	    } else if(current < 1) {
 	        colorStops.push({ offset: current, color: darkBlue });

@@ -4,6 +4,7 @@ import "../App.css";
 import LinkButton from "../components/LinkButton";
 import InfoContainer from "../components/InfoContainer";
 import UserGuide from "../components/UserGuide";
+import config from "../config.json";
 
 //This is the landing page for Upton-Air, it explains the project and how to use the other pages
 function Landing() {
@@ -18,7 +19,7 @@ function Landing() {
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", height:"70px", width:"100%", padding:"0px"}}>
 	        <LinkButton className="leftLinkButton" text={isMobile?"Alerts":"To Alerts"} right={false} href={alerts_url}/>
-                <h1 className="titleText">{isMobile?"Upton Air":"Upton Air Landing Page"}</h1>
+                <h1 className="titleText">{isMobile?"Upton Air": config.WEBPAGE_TITLE + " Landing Page"}</h1>
 	        <LinkButton className="rightLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={true} href={dashboard_url}/>
             </div>
 

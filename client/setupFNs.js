@@ -82,6 +82,9 @@ function applyEnvToConfig() {
   const CONFIG_KEYS = [
     "URL",
     "WEBPAGE_TITLE",
+    "LATITUDE",
+    "LONGITUDE",
+    "MAP_ZOOM",
     "HOMEPAGE",
     "CHATBOT_ENABLED",
     "ALERTS_ENABLED"

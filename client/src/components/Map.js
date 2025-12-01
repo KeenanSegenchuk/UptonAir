@@ -8,6 +8,7 @@ import DButton from "./DButton";
 import ToggleButton from "./ToggleButton";
 import DashboardConfig from "./DashboardConfig";
 import { useAppContext } from "../AppContext";
+import config from '../config.json';
 
 function Map({ buttons }) {
   // control map popup on mobile
@@ -44,8 +45,11 @@ function Map({ buttons }) {
 
       {/* The Map */}
       <MapContainer
-        center={[42.173996, -71.60191]} // Choose your map center
-        zoom={13}
+	center={[
+	  Number(config.LATITUDE),
+	  Number(config.LONGITUDE)
+	]}
+	zoom={Number(config.MAP_ZOOM)}
         style={{ height: '100%', width: '100%' }}
       >
         {map_type === "roads" ? (

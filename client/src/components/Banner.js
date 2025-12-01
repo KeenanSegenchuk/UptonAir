@@ -1,10 +1,6 @@
 import "../App.css";
 function Banner({ avg, units }) {
     const { getObj } = require("../getObj");
-    const qualities = getObj("qualities");
-    const colors = getObj("c");
-    const textColors= getObj("t");
-    const ranges = getObj("r");
 
     let color;
     let textColor

@@ -19,9 +19,6 @@ function Button({ id, x, y }) {
 	else    console.log(txt);
     }
 
-    //check if mobile to let buttons enable sensorinfo popup
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-
     //setup vars and static vals
     const [val, setVal] = useState({"PMA":-1, "PMB":-1, "PMEPA":-1, "PM": -1, "AQI":-1, "AQIEPA":-1, "percent_difference":-1, "humidity":-1});
     const ranges = getObj("r");

@@ -1,14 +1,13 @@
 # Upton Air Quality Management
 ## Overview
-This repository contains data from Air Quality sensors in Upton, Massachusetts. We currently have 10 sensors up and running and will use this website to display their data. The server and client both have their own READMEs so go check those out.
+This repository contains the source code for [Upton Air](upton-air.com), a website used by a local organization, Sustainable Upton, to track air quality around the town.
 
-Here's what I've got so far:
-![image](https://github.com/KeenanSegenchuk/UptonAir/blob/main/images/HomeBarGraph.PNG)
+The goal of this repository is to make it as easy as possible for other towns to setup their own version. Checkout SETUP.txt to see how you can customize and launch your own version of this site.
 
+To check out the most current stable version of the site, visit [upton-air.com](upton-air.com).
 
-By default the webpage shows the average for all the sensors in the town, but you can select one on the map to view its data. The bar graph and summary data corresponds to the sensor listed at the top of the right side of the page, but you can graph the data from multiple sensors using the Line Graph as shown below:
-![image](https://github.com/KeenanSegenchuk/UptonAir/blob/main/images/HomeLineGraph.PNG)
+##Features
+Some features include a map with realtime sensor reading overlays, graphing capabilities for comparing historical data, configurable notifications, and a chatGPT popup window which can see the graphed data.
 
-There's also some more explicatory info if you scroll down. This info is defined in /client/public/infodocs.
-
-<br> You can view the Purple Air sensors here: https://map.purpleair.com/1/mAQI/a10/p604800/cC0#10.23/42.1606/-71.7123
+##Contact
+If you wish to contribute to this repository or have any questions when launching your own site, feel free to reach out at ksegenchuk@gmail.com

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import { useAppContext } from "../AppContext";
 
 const DButton = React.memo(({ text, dkey, style }) => {

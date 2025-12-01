@@ -4,6 +4,8 @@ import "../App.css";
 import "../DeepseekCSSorcery/Alerts.css";
 import LinkButton from "../components/LinkButton";
 import { useAppContext } from "../AppContext";
+import config from "../config.json";
+
 const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 const units = getObj("u");
@@ -106,7 +108,7 @@ function Alerts() {
 	{/*Header*/}
 	<div className="title" style={{width:"100%", display:"flex", height:"70px", padding:"0px"}}>
 	    <LinkButton className="leftLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={false} href={dashboard_url}/>
-            <h1 className="titleText">{isMobile?"Alerts":"Upton Air Alerts"}</h1>
+            <h1 className="titleText">{isMobile?"Alerts": config.WEBPAGE_TITLE + " Alerts"}</h1>
 	    <LinkButton className="rightLinkButton" text={isMobile?"Info":"Landing Page"} right={true} href={BASE_URL}/>
 	</div>
 	

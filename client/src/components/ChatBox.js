@@ -17,9 +17,7 @@ function ChatBox( {assistant_id} ) {
     const [response, setResponse] = useState("");
     const [sessionID] = useState(() => Math.random().toString(36).slice(2));
 
-    const [provideData, setProvideData] = useState(false);
-
-    const {globalLineBool, compressedData, compressedSizeFN, rawDataSize, dataContext, data, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
+    const {globalLineBool, compressedData, compressedSizeFN, rawDataSize, dataContext, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
     //^^^^^ ctx to provide to LLM. vvvvv ctx to provide to AppContext
     const {setShowChatBox, epsilon, setEpsilon, showCompression, setShowCompression} = useAppContext();
 
