@@ -110,6 +110,7 @@ function EGraph() {
 	), [width]);
 
 
+
         //filter for current data context
         const filteredData = () => {
 	    //filter logic now in appContext
@@ -128,19 +129,8 @@ function EGraph() {
 	    setN(parseInt(e.target.value));
 	};
 
- 	//Update daylight gradient when timespan changes
-	const [gradient, setGradient] = useState({});
-	useEffect(() => {
-		setGradient({
-		    graphic: [{
-	              ...gradConf,
-	              style: {
-	                fill: graphUtil("midnightGradient")(start, end, 500)
-	              },
-		    }]
-		});
-		//console.log("New gradient: ", gradient);
-	}, [start, end, gradConf]);
+
+
 
   //Format data series for each line
 	const formatLine = (l) => {
@@ -207,10 +197,9 @@ function EGraph() {
           };
 	}
 	return bars;
-
     };
 
-    const graphFormat = {
+    const [graphFormat, setGraphFormat] = useState({
 	xAxis: {
 		type: 'time',
                 axisLabel: {
@@ -239,13 +228,130 @@ function EGraph() {
 		    return value.min < 0 ? -3 : 0;
 		  }
     	},
+	dataZoom: [
+		{ type: 'slider', xAxisIndex: 0, start: 0, end: 100 },     // slider scroll/zoom bar
+		{ type: 'inside', xAxisIndex: 0 }      // inside zoom / pan (mouse wheel / touch / drag)
+	],
     	tooltip: {
         	trigger: 'axis'
 	},
 	legend: {
 		show: globalLineBool //&& !isMobile
 	}
-    };
+    }); 
+    const tickLabelFormats = [
+	    function (value) {
+        	const date = new Date(value);
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours;
+
+                return `${hours}:${minutes}${ampm}`;
+            },
+            function (value) {
+        	const date = new Date(value);
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${month}/${day}`;
+            }
+    ];    
+
+    //track zoom level
+    const [gradient, setGradient] = useState({});
+    const [zoom, setZoom] = useState({ start: start, end: end });
+    const chartRef = useRef(null);
+
+    useEffect(() => {
+        const chart = chartRef.current?.getEchartsInstance();
+        if (!chart) return;
+
+        const handleZoom = (e) => {
+	    const xAxis = chart.getModel().getComponent('xAxis').axis; 
+	    const [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+	    //trigger gradient update by setting zoom
+            setZoom({ start: startTime, end: endTime });
+            
+	    const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
+            const formatter = tickLabelFormats[formatIndex];
+
+	    setGraphFormat(prev => ({
+              ...prev,
+              dataZoom: [
+                { type: "slider", xAxisIndex: 0, start: e.start, end: e.end },
+                { type: "inside", xAxisIndex: 0, start: e.start, end: e.end }
+              ],
+              xAxis: {
+                ...prev.xAxis, // keep existing xAxis config
+                axisLabel: {
+                  ...prev.xAxis?.axisLabel,
+                  formatter: formatter
+                }
+              }
+            }));
+        };
+
+        chart.on('datazoom', handleZoom);
+        return () => chart.off('datazoom');
+    }, []);
+
+    useEffect(() => {
+	const chart = chartRef.current?.getEchartsInstance();
+        if (!chart) return;
+
+        const updateAxisAndGradient = () => {
+        	const xAxis = chart?.getModel()?.getComponent('xAxis').axis; 
+		if (!xAxis) return;
+        	const [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+        	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
+                const formatter = tickLabelFormats[formatIndex];
+        
+        	//update axis label setter
+        	setGraphFormat(prev => ({
+                      ...prev,
+                      xAxis: {
+                        ...prev.xAxis, // keep existing xAxis config
+                        axisLabel: {
+                          ...prev.xAxis?.axisLabel,
+                          formatter: formatter
+                        }
+                      }
+                }));
+        
+		console.log(`gradient... startTime:${startTime}, endTime:${endTime}, start:${start}, end:${end}`);
+        	//trigger gradient update by setting zoom
+                setGradient({
+        	    graphic: [{
+                      ...gradConf,
+                      style: {
+                        fill: graphUtil("midnightGradient")(startTime, endTime, 500)
+                      },
+        	    }]
+        	});
+		console.log(graphUtil("midnightGradient")(startTime, endTime, 500));
+        };
+
+	//requestAnimationFrame(() => {updateAxisAndGradient()});
+	setTimeout(() => {updateAxisAndGradient()}, 0);
+	return () => clearTimeout();
+    }, [data]);
+    
+
+    //Update daylight gradient when timespan changes
+    useEffect(() => {
+	log(`start:${start}, zoomedStart:${zoom.start}`);
+	setGradient({
+	    graphic: [{
+              ...gradConf,
+              style: {
+                fill: graphUtil("midnightGradient")(zoom.start, zoom.end, 500)
+              },
+	    }]
+	});
+	//console.log("New gradient: ", gradient);
+    }, [/*start, end, */zoom, gradConf]);
+
 
 useEffect(() => {
     window.dispatchEvent(new Event('resize'));
@@ -261,10 +367,12 @@ return (
             {globalLineBool || (showCompression && showChatBox) ? (
 		<div className="graphDiv" ref={containerRef}>
 		    {/*!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>*/} 
-		    <ReactECharts key={dataContext} option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
+		    <ReactECharts key={dataContext} 
+				option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}} 
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}
+				ref={chartRef}
 		    />
 		</div>
             ) : (
@@ -283,6 +391,7 @@ return (
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}
 				opts={{renderer:"svg"}}
+				ref={chartRef}
 		    />
 		</div>
             )}    

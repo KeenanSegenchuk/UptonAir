@@ -55,7 +55,7 @@ Workflows:
 			Run "docker-compose up",
 			or "docker-compose up --build" to rebuild and launch.
 		When updating:
-			Just run update script
+			Just run ./update script
 
 			OR
 
@@ -72,6 +72,6 @@ Workflows:
 			once the client is launched you can update the data by visiting localhost:3000/update
 		in client:
 			to install dependencies, run the command "npm install"
-			to run launch the client, run "npm start"
+			to run launch the client, run "npm start" !!! Any time you change the .env, .geojson, or .json files in this folder you must use $ "npm run build" or run setup.js in ./client to push them to the client folder.
 		type the url http//localhost:3000 in your browser to view the page
 	

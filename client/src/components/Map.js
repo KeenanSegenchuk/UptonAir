@@ -26,7 +26,7 @@ function Map({ buttons }) {
   //import town border from geojson
   const [townBorder, setTownBorder] = useState(null);
   useEffect(() => {
-    fetch('/town.geojson')
+    fetch('./town.geojson')
       .then((response) => response.json())
       .then((data) => setTownBorder(data))
       .catch((error) => console.error('Error loading GeoJSON:', error));

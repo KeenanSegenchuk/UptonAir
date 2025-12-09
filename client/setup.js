@@ -14,7 +14,7 @@ const sensorSource = path.resolve(__dirname, '../sensor-info.json');
 const sensorDestination = path.resolve(__dirname, 'src/sensor-pos.json');
 
 const geojsonSource = path.resolve(__dirname, '../town.geojson');
-const geojsonDestination = path.resolve(__dirname, 'src/town.geojson');
+const geojsonDestination = path.resolve(__dirname, 'public/town.geojson');
 
 async function main() {
   //copy relevant project env vars into client config

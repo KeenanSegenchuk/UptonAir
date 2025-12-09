@@ -26,7 +26,7 @@ function SensorInfo({ dummy }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [contextIndex, setIndex] = useState(2);
-    const {setDataContext, setPopup, switches, units} = useAppContext();
+    const {setDataContext, switches, units} = useAppContext();
 
     //working on making it combine timespan averages for multiple sensors/units (line graph)
     const {globalLineBool, lineMode, lineUnits, selectedSensors} = useAppContext();
@@ -78,7 +78,7 @@ function SensorInfo({ dummy }) {
 			fd = (() => {
 				let entries = data.filter(e => selectedSensors[e.sensor] && e.units === units).map(e => e.data);
 				if(entries.length === 0) {return null;}
-				console.log(entries);
+				log(entries);
 				const lenAvgs = entries[0].avgs.length;
 				return {
 					avgs: Array.from({ length: lenAvgs}, (_, i) =>
@@ -93,7 +93,7 @@ function SensorInfo({ dummy }) {
 		} else {
 		        fd = data.find(entry => entry.sensor === sensor_id && entry.units === units);
 	        }
-		console.log(`Filter Result: `, fd);
+		log(`Filter Result: `, fd);
 		
 		return fd.data ? fd.data : (fd ? fd : {avgs: [-1, -1, -1, -1], banner_avg: -1});
 	    } catch (err) {
