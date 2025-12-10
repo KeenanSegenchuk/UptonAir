@@ -1,5 +1,5 @@
 import json
-sensorFile = "../sensor-info.json"
+sensorFile = "sensor-info.json"
 
 
 def getLastTimestamp(filename = "data.txt"):

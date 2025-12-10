@@ -20,7 +20,7 @@ services:
       - pgdb
     volumes:
       - ./flask-server/data.txt:/app/flask-server/data.txt
-      - ./sensor-pos.json:/app/flask-server/sensor-pos.json
+      - ./sensor-info.json:/app/flask-server/sensor-info.json
       - ./config.txt:/app/flask-server/config.txt
 
   pgdb:
