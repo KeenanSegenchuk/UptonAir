@@ -1,4 +1,6 @@
 import json
+sensorFile = "sensor-info.json"
+
 
 def getLastTimestamp(filename = "data.txt"):
 	#get last timestamp from data file
@@ -16,14 +18,14 @@ def getLastTimestamps(filename = "data.txt"):
 
 def getSensors():
 	#return a list of all sensor ids as they are in our database
-	with open("sensor-pos.json", "r") as json_file:
+	with open(sensorFile, "r") as json_file:
 		sensors = json.load(json_file)
 	sensors = [int(sensor["id"]) for sensor in sensors]
 	return sensors
 
 def getPAirSensors():
 	#return a list of all sensor ids as they are on purpleair
-	with open("sensor-pos.json", "r") as json_file:
+	with open(sensorFile, "r") as json_file:
 		sensors = json.load(json_file)
 	sensors = [int(sensor.get("pAir_id") or sensor["id"]) for sensor in sensors]
 	return sensors
@@ -31,7 +33,7 @@ def getPAirSensors():
 def getSensorMap():
 	#return dict that maps purplair ids to db ids
 	sensor_map = {}
-	with open("sensor-pos.json", "r") as json_file:
+	with open(sensorFile, "r") as json_file:
 		sensors = json.load(json_file)
 	for sensor in sensors:
 		if sensor.get("pAir_id"):
@@ -40,7 +42,7 @@ def getSensorMap():
 
 def getSensorNames(ids):
 	#return list of ids and names
-	with open("sensor-pos.json", "r") as json_file:
+	with open(sensorFile, "r") as json_file:
 		sensors = json.load(json_file)
 
 	sensor_dict = {int(sensor["id"]): sensor["name"] for sensor in sensors}
