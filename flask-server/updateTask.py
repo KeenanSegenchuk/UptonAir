@@ -25,7 +25,8 @@ def alert_loop():
             try:
                 send_email3(alert)
             except Exception as e:
-                log(f"Send_Email Exception: {e}");
+                print(f"Send_Email Exception: {e}")
+                log(f"Send_Email Exception: {e}")
         return
     print("No alerts triggered. See important-logs.txt for more alert logs.")
 

@@ -203,7 +203,6 @@ def send_email2(alert_obj):
         server.sendmail(sender_email, email_address, msg.as_string())
 
 def send_email3(alert_obj):
-    print("Entering send_email3")
     alert_info = alert_obj["alert"]
     triggered_ids = alert_obj["triggered_ids"]  # List of [id, avg]
     other_ids = alert_obj["other_ids"] #same format as triggered_ids
@@ -257,8 +256,6 @@ def send_email3(alert_obj):
         f"<tr><td style='padding: 4px 12px;'>{sensor_name}</td><td style='padding: 4px 12px;'>{aqi}</td></tr>"
         for sensor_name, aqi in other_sensor_data
     )
-
-    print("before building html")
 
     # HTML Message
     html = f"""
@@ -328,8 +325,6 @@ def send_email3(alert_obj):
     sender_email = "uptonAQalerts@gmail.com"
     password = os.getenv("EMAIL_PASSWORD")
 
-    print("Other print")
-    print(f"Built Email: {msg.as_String()}")
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         # GMail Login
         server.login(sender_email, password)

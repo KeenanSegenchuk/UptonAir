@@ -32,14 +32,12 @@ export const ContextProvider = ({ children }) => {
   const [showChatBox, setShowChatBox] = useState(false);
 
   const { protocol, hostname } = window.location;
-
+  const BASE_URL = protocol + "//" + config.URL + "/";
   //vvvvv USING LOCAL SERVER vvvvv
-//  const[BASE_URL, API_URL] = [protocol + "//" + config.URL + "/", 
-//	protocol + "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/")];
+  const API_URL = "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/");
 
   //vvvvv USING UPTON-AIR SERVER vvvvv
-  const[BASE_URL, API_URL] = [protocol + "//" + config.URL + "/", 
-	"https://" + "upton-air.com/api/"];
+//  const API_URL = "https://" + "upton-air.com/api/";
 
 
   
