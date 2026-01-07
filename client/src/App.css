@@ -60,7 +60,9 @@
     transform: rotate(360deg);
   }
 }
-/*----Styles for mobile----*/
+
+
+/*----Styles for mobile layout----*/
 @media (min-width: 768px) {
   .headerText {
     margin-top: 10px;
@@ -275,14 +277,25 @@ h3, h2 {
 .s9  {
     font-size:.9em;
 }
-/*Min Heights*/
-.mh105 {min-height:10.5%}
-.mh66 {min-height:6.6%}
+
+/*Height Classes*/
+.height205 {height:20.5%}
+.height105 {height:10.5%}
+.height66 {height:6.6%}
+
+.minh105 {min-height:10.5%}
+.minh66 {min-height:6.6%}
+
+
+.hideOverflow {
+  overflow: hidden;
+}
 
 .verticalCenter {
   display: flex;
   align-items: center;
 }
+
 
 /*Homepage Title*/
 .blue{

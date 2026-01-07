@@ -1,5 +1,5 @@
 {
-  "URL": "upton-air.com",
+  "URL": "localhost:3000",
   "WEBPAGE_TITLE": "Upton Air",
   "HOMEPAGE": "landing",
   "CHATBOT_ENABLED": "true",

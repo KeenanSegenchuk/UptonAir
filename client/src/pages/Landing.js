@@ -53,7 +53,8 @@ function Landing() {
                 <a class="tabbed" href="#guide" style={{fontSize:"2em"}}>User Guide</a>
 		<a href="#ug1" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Check local air quality </a>
                 <a href="#ug2" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Compare AQI at different locations </a>
-		<a href="#ug3" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Configure an air quality alert </a>
+                <a href="#ug3" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Compare different readings at the same location </a>
+		<a href="#alerts" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Configure an air quality alert </a>
 		<p></p>
 		<a class="tabbed" href="#contact" style={{fontSize:"2em"}}>Contact Us</a>
 		<a href="#feedback" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Share Feedback </a>

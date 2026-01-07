@@ -8,7 +8,7 @@ function Button({ id, x, y }) {
     //build api route
     const {API_URL} = useAppContext();
     const api = axios.create({
-      baseURL: API_URL,
+      baseURL: API_URL + "data/",
     });
 
     //debug logging
@@ -53,13 +53,18 @@ function Button({ id, x, y }) {
     //check when switching back to sensor-select for line graph
     useEffect(() => {
 	if (selected && lineMode === "sensors") {
-	    console.log(`LineMode changes, fetching line, Sensor: ${name}`);
+	    log(`LineMode changed to sensors, fetching line, Sensor: ${name}`);
 	    getData();
 	}
-    }, [lineMode]);
+	if (sensor_id === id && lineMode === "units") {
+	    log(`LineMode changed to units, fetching line, Sensor: ${name}`);
+	    getData();
+	}
+    }, [lineMode]);	
+console.log("SENSOR_ID:", sensor_id);
+
 
     //----Data update handling----//
-
 
     //check if data already exists for current sensor
     const checkData = (forceUnits) => {

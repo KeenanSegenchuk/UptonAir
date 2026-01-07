@@ -30,19 +30,28 @@ export const ContextProvider = ({ children }) => {
   const [sensor_idAvgs, setSensor_idAvgs] = useState({});
   const [buttonAvgs, setButtonAvgs] = useState({});
   const [showChatBox, setShowChatBox] = useState(false);
-  const[BASE_URL, API_URL] = ["https://" + config.URL + "/","https://" + config.URL + "/api/data"];
+
+  const { protocol, hostname } = window.location;
+
+  //vvvvv USING LOCAL SERVER vvvvv
+//  const[BASE_URL, API_URL] = [protocol + "//" + config.URL + "/", 
+//	protocol + "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/")];
+
+  //vvvvv USING UPTON-AIR SERVER vvvvv
+  const[BASE_URL, API_URL] = [protocol + "//" + config.URL + "/", 
+	"https://" + "upton-air.com/api/"];
 
 
+  
   //if only one sensor is selected in lineMode === "sensors", keep that sensor when switching to single select
+  //otherwise sensor_id will default to last clicked sensor, even if the click unselected that sensor
   const [wasMultiSensor, setWasMultiSensor] = useState(false);
   useEffect(() => {
-	if(lineMode === "sensors" && globalLineBool) {setWasMultiSensor(true);}
-	else if(wasMultiSensor) {
+	if(lineMode === "sensors" && globalLineBool) {setWasMultiSensor(true);} 
+	else if(wasMultiSensor && lineMode === "sensors") {
 		const selectedIDs = Object.keys(selectedSensors).filter(k => selectedSensors[k]);
 		if(selectedIDs.length === 1)
 			setSensor_id(selectedIDs[0]);
-		else
-			setSensor_id("0");
 	}
   }, [lineMode, globalLineBool])
 

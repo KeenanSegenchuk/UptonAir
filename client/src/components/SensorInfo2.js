@@ -10,7 +10,7 @@ import { getObj } from "../getObj";
 function SensorInfo2({ sensor_id, dummy }) {
     const {API_URL} = useAppContext();
     const api = axios.create({
-      baseURL: API_URL,
+      baseURL: API_URL + "data/",
     });
 
     const [data, setData] = useState(null);

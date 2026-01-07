@@ -13,17 +13,18 @@ const unitDesc = getObj("ud");
 
 
 function Alerts() {
-    const {BASE_URL} = useAppContext();
-    const API_URL = BASE_URL + "api/";
+    const {BASE_URL, API_URL} = useAppContext();
     const dashboard_url = BASE_URL + "dashboard";
     const api = axios.create({
       baseURL: API_URL,
     });
+    console.log("api url", API_URL);
 
     const [email, setEmail] = useState('');
     const [unit, setUnit] = useState("AQIEPA");
     const [AQIcutoff, setAQIcutoff] = useState(75);
     const [alertName, setAlertName] = useState('');
+    const [alertType, setAlertType] = useState('avg');
     const [alertSensors, setAlertSensors] = useState(
 		Object.values(sensors)
                         .filter(sensor => sensor.id !== "0")
@@ -78,7 +79,7 @@ function Alerts() {
     const addContact = () => {
 	const ids = L2S(alertSensors);
 
-        api.post(`alerts/add/${email}/${alertName}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
+        api.post(`alerts/add/${email}/${alertName}/${alertType}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
             .then(response => {
                 showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
                 console.log("Response from contact info add request:", response);
@@ -203,6 +204,33 @@ function Alerts() {
                         </label>
                     ))}
                 </div>
+		<center> Trigger alert when: </center>
+                <div style={{   margin: "10px",
+				display: 'flex', 
+				flexDirection: 'row',
+				justifyContent: 'space-between',
+				flexWrap: "wrap",
+				maxHeight: "130px" }}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="All"
+                            checked={alertType === "avg"} 
+                            onChange={(e) => setAlertType(e.target.checked ? "avg" : "any")}
+                        />
+                        Sensor <b>average</b> exceeds threshold.
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="All"
+                            checked={alertType === "any"} 
+                            onChange={(e) => setAlertType(e.target.checked ? "any" : "avg")}
+                        />
+                        <b>Any</b> sensor exceeds threshold.
+                    </label>
+                </div>
+
 		<div style={{   justifyContent:"center",
 				width:"100%",
 				display: "flex",
@@ -223,8 +251,8 @@ function Alerts() {
 		                </option>
 		            ))}
 		        </select>
-		    </div>
-                    <div style={{ flex: 1, margin:"10px" }}><center>Threshold ({units[unit]}):</center>
+		</div>
+                <div style={{ flex: 1, margin:"10px" }}><center>Threshold ({units[unit]}):</center>
 		    <input
                         type="number"
                         value={AQIcutoff}
@@ -232,8 +260,10 @@ function Alerts() {
                         placeholder="threshold to trigger alert"
                         className="input-field"
 			style={{width:"100%", boxSizing: "border-box"}}
-                    /></div>
-		</div>    
+                    />
+		</div>
+		</div>   
+ 
 		<div style={{   display: "flex",
 				flexDirection: "row"}}>
 		    <div style={{   flex: 1,
@@ -268,7 +298,7 @@ function Alerts() {
 		</div>
 		    <div style={{lineHeight:"1", paddingTop:"30px"}}>
 			<p>This alert is named "<b>{alertName}</b>" and is associated with the email: "<b>{email}</b>".</p> 
-			<br/><p>A notification will be triggered if <b>{unit}</b> readings from the selected sensors average over <b>{AQIcutoff}</b> for <b>{avgWindow}</b> minutes.</p>
+			<br/><p>A notification will be triggered if <b>{unit}</b> readings from {(alertType==="avg") ? (<>the selected sensors <b>average</b> over</>) : (<><b>any</b> of the selected sensors exceeds</>)} <b>{AQIcutoff}</b> for <b>{avgWindow}</b> minutes.</p>
 			<br/><p>You will not receive another notification from this alert if one has been issued in the past <b>{cooldown}</b> hours.</p>
 		    </div>
 		</div>

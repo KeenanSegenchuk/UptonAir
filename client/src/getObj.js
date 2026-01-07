@@ -58,8 +58,8 @@ export function getObj(obj) {
     const unitDescriptions = {
 	"PMEPA":"EPA Calibrated PM2.5",
 	"PM":"Unadjusted PM2.5",
-	"PMA":"Raw PM2.5 Channel A",
-	"PMB":"Raw PM2.5 Channel B",
+	"PMA":"Unadjusted PM2.5 Channel A",
+	"PMB":"Unadjusted PM2.5 Channel B",
 	"AQIEPA":"EPA Calibrated AQI",
 	"AQI":"Unadjusted AQI",
 	"humidity":"Humidity",

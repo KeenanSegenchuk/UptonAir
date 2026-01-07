@@ -40,7 +40,9 @@ from datetime import datetime
 	  pgBuildChatLogs: () => () :inits table to store conversations with chatbot
 	  pgPushChat: (tuple) => () :pushes row to db (prompt, response) 
 '''	  
-			
+		
+
+#  pgOpen: () => (connection, cursor) :connects to the database and returns the connection and a pointer	
 def pgOpen():
 	DB_URL = os.getenv("DB_URL")
 	if DB_URL:
@@ -56,11 +58,13 @@ def pgOpen():
 
 	return [conn, cur]
 
+#  pgClose: (connection, cursor) => () :commits the cursor and closes the connection
 def pgClose(conn, cur):
 	conn.commit()
 	cur.close()
 	conn.close()
 
+#  pgCheck: (cur, str) => (bool) :checks if table exists
 def pgCheck(cur, table):       
 	# SQL query to check if the table exists
 	query = """
@@ -74,6 +78,7 @@ def pgCheck(cur, table):
 	cur.execute(query,(table,))
 	return cur.fetchone()[0]
 
+#  formatLines: ([str]) => ([tuple]) :converts lines from raw purpleair to tuples or strings with AQI fields added
 def formatLines(lines, format = "tuple"):
 	#converts lines from raw purpleair to tuples or strings with AQI fields added
 	lines = [line.split(",") for line in lines]
@@ -290,6 +295,7 @@ def pgBuildAlertsTable(rebuild):
 			last_alert INT,
 			n_triggered INT,
 			unit TEXT,
+			alert_type TEXT, #"any" or "avg", decides if alert can be triggered by any selected sensor or the average of all selected
 			CONSTRAINT unique_name_address UNIQUE (address, name)
 		);""")
 
@@ -299,8 +305,8 @@ def pgPushAddress(cur, row):
 	#add new addresses or update their rows
 	try:
 		cur.execute("""
-			INSERT INTO alerts (address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
-			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)	
+			INSERT INTO alerts (address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered)
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)	
 		""", row)
 	except psycopg2.errors.UniqueViolation:
 		return 1
@@ -325,7 +331,7 @@ def pgRemoveAddress(cur, address, name):
 	return 2
 
 def pgListAllAlerts(cur):
-	cur.execute("SELECT address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
+	cur.execute("SELECT address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts")
 	rows = cur.fetchall()
 	
 	print(rows)
@@ -333,7 +339,7 @@ def pgListAllAlerts(cur):
 def pgListAlerts(cur, address):
 	cur.execute(
 		"""
-		SELECT address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
+		SELECT address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered
 		FROM alerts
 		WHERE address = %s
 		""",
@@ -352,7 +358,7 @@ def pgCheckAlerts():
     
     # Get all alerts that are eligible to trigger
     cur.execute("""
-        SELECT * FROM alerts
+        SELECT address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts
         WHERE %s - last_alert >= cooldown * 60 * 60 
     """, (now,))
     alerts = cur.fetchall()
@@ -360,7 +366,7 @@ def pgCheckAlerts():
     triggered_alerts = []
 
     for alert in alerts:
-        address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+        address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 
         window_start = now - avg_window * 60
         log(f"Selected alert: {alert}")
@@ -397,7 +403,7 @@ def pgCheckAlerts():
         # If any triggers occurred, record the result then update db entry
         #if triggered_ids:
 	# If avg >= threshold, send alert
-        if avg_all >= min_AQI: 
+        if (avg_all >= min_AQI) if (alert_type == 'avg') else triggered_ids: 
             log(f"Alert Tiggered: {name}, {triggered_ids}")
             if True:
                 triggered_alerts.append({
@@ -410,6 +416,7 @@ def pgCheckAlerts():
                         "cooldown": cooldown,
                         "avg_window": avg_window,
                         "last_alert": last_alert,
+			"alert_type": alert_type,
                         "n_triggered": n_triggered + 1  # this is what it *will* be after the update
                     },
                     "triggered_ids":triggered_ids,

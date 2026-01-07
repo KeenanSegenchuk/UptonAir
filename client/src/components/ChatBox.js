@@ -5,8 +5,7 @@ import { getObj } from "../getObj";
 import axios from 'axios';
 
 function ChatBox( {assistant_id} ) {
-    const {BASE_URL} = useAppContext();
-    const API_URL = BASE_URL + "api/";
+    const {BASE_URL, API_URL} = useAppContext();
     const api = axios.create({
       baseURL: API_URL,
     });

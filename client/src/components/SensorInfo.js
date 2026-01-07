@@ -10,7 +10,7 @@ import { getObj } from "../getObj";
 function SensorInfo({ dummy }) {
     const {API_URL, sensor_id, setSensor_idAvgs} = useAppContext();
     const api = axios.create({
-      baseURL: API_URL,
+      baseURL: API_URL + "data/",
     });
 
     const debug = false;
@@ -191,7 +191,7 @@ function SensorInfo({ dummy }) {
 		})}
             </div>
 	    <div className={mobileMultiSelect ? "showMobile" : "hide"} style={{height:"25px"}}> </div>
-	    <div classname="hideMobile" style={{height:"25px"}}></div>
+	    <div className="hideMobile" style={{height:"25px"}}></div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	</div>
     );

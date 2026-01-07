@@ -15,9 +15,6 @@ function Home() {
     //setup urls
     const {API_URL, BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
-    const api = axios.create({
-      baseURL: API_URL,
-    });
 
     //other vars
     const [loading, setLoading] = useState(false);

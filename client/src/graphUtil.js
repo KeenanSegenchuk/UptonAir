@@ -150,7 +150,7 @@ function graphUtil(func) {
     };
   //average data into n bars
     const getBars = (b, n, start, end) => {
-        if (b.data.length === n) return b.data;
+        //if (b.data.length === n) return b.data;
 
         //const start = b.data[0][0];
         //const end = b.data[b.data.length - 1][0];
@@ -178,7 +178,7 @@ function graphUtil(func) {
                 Y[i] = 0; 
             }
         }
-
+	
         return {
             x: X,
             y: Y,

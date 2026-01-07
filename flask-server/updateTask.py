@@ -61,7 +61,8 @@ def update_loop():
         #check for alerts
         try:
                 alert_loop()
-        except:
+        except Exception as e:
+                print(f"Error checking for alerts: {e}")
                 send_alert("DATABASE NOT STALE, ALERT_LOOP THREW ERROR")
         #send text alert to admin if database is not up to date
         checkStatus()

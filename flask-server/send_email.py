@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 
 def send_email(alert):
-    address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered, AQI = alert
+    address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered, AQI = alert
     AQI = round(AQI, 2)
     email_address = address  # Mapping DB 'address' to actual email address
 
@@ -203,12 +203,14 @@ def send_email2(alert_obj):
         server.sendmail(sender_email, email_address, msg.as_string())
 
 def send_email3(alert_obj):
+    print("Entering send_email3")
     alert_info = alert_obj["alert"]
     triggered_ids = alert_obj["triggered_ids"]  # List of [id, avg]
     other_ids = alert_obj["other_ids"] #same format as triggered_ids
     avg_aqi = alert_obj["avg_aqi"]
 
     # Unpack alert info
+    alert_type = alert_info["alert_type"]
     address = alert_info["address"]
     name = alert_info["name"]
     unit = alert_info["unit"]
@@ -256,6 +258,8 @@ def send_email3(alert_obj):
         for sensor_name, aqi in other_sensor_data
     )
 
+    print("before building html")
+
     # HTML Message
     html = f"""
     <html>
@@ -298,7 +302,8 @@ def send_email3(alert_obj):
         <p>
           <strong>Alert Threshold:</strong> {min_AQI} {unit}<br>
           <strong>Cooldown Period:</strong> {cooldown} hour(s)<br>
-          <strong>Last Triggered:</strong> {last_alert_str} ago<br>
+          <strong>Trigger When:</strong> <strong>{alert_type}>/strong> exceeds threshold<br>
+	  <strong>Last Triggered:</strong> {last_alert_str} ago<br>
           <!--<strong>Total Times Triggered:</strong> {n_triggered}-->
         </p>
 
@@ -323,6 +328,8 @@ def send_email3(alert_obj):
     sender_email = "uptonAQalerts@gmail.com"
     password = os.getenv("EMAIL_PASSWORD")
 
+    print("Other print")
+    print(f"Built Email: {msg.as_String()}")
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         # GMail Login
         server.login(sender_email, password)
@@ -337,7 +344,7 @@ def send_summary_email(alerts, email_address):
 	# Build HTML table rows
 	rows_html = ""
 	for alert in alerts:
-		address, name, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
+		address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered = alert
 		rows_html += f"""
 			<tr>
 				<td style="padding: 6px 12px;">{address}</td>
@@ -347,6 +354,7 @@ def send_summary_email(alerts, email_address):
 				<td style="padding: 6px 12px;">{ids}</td>
 				<td style="padding: 6px 12px;">{cooldown} hr</td>
 				<td style="padding: 6px 12px;">{avg_window} min</td>
+				<td style="padding: 6px 12px;">{alert_type}</td>
 				<td style="padding: 6px 12px;">{last_alert}</td>
 				<td style="padding: 6px 12px;">{n_triggered}</td>
 			</tr>
@@ -368,6 +376,7 @@ def send_summary_email(alerts, email_address):
 						<th style="text-align: left; padding: 6px 12px;">IDs</th>
 						<th style="text-align: left; padding: 6px 12px;">Cooldown</th>
 						<th style="text-align: left; padding: 6px 12px;">Avg Window</th>
+						<th style="text-align: left; padding: 6px 12px;">Trigger On</th>
 						<th style="text-align: left; padding: 6px 12px;">Last Alert</th>
 						<th style="text-align: left; padding: 6px 12px;">Times Triggered</th>
 					</tr>

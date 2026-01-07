@@ -14,6 +14,7 @@ function EGraph() {
 	//setup data management
 	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode, showCompression, showChatBox} = useAppContext(); 
 	const contexts = getObj("DataContexts");
+	const chartRef = useRef(null);
 
     	const debug = false;
     	const log = (text, val = -1) => {
@@ -22,16 +23,6 @@ function EGraph() {
     	}
 	log(`ECharts rerendering... Sensor: ${getObj("$"+sensor_id)} Context: ${dataContext} Units: ${units}`);
 	log(`Data: `, data);
-
-	//times
-	const [end] = useState(() => Math.floor(Date.now() / 1000));
-	const [start, setStart] = useState(end - contexts[dataContext]);
-	useEffect(() => {setStart(end - contexts[dataContext]);
-			 const maxN = contexts[dataContext]/600;
-			 log(`Max N in context: ${maxN}... actual N: ${nBars}`);
-			 if(maxN < nBars)
-				setN(maxN);
-	}, [dataContext, end, contexts]);
 
 	//communicate graph mode with map via app context
 	const {globalLineBool, setGlobalLineBool} = useAppContext();
@@ -77,6 +68,21 @@ function EGraph() {
 	  return () => ro.disconnect();
 	}, []);
 
+	//times
+	const [end] = useState(() => Math.floor(Date.now() / 1000));
+	const [start, setStart] = useState(end - contexts[dataContext]);
+	useEffect(() => {setStart(end - contexts[dataContext]);
+			const maxN = contexts[dataContext]/600;
+			log(`Max N in context: ${maxN}... actual N: ${nBars}... chart width: ${width}`);
+			/* 
+			if(maxN < nBars)
+				setN(maxN);
+			*/
+			if(maxN < width)
+				setN(maxN);
+			else
+				setN(Math.floor(width));
+	}, [dataContext, end, contexts]);
 
 	//set graph style for mobile/desktop
 	const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -165,10 +171,18 @@ function EGraph() {
   //get the bars for graphing current sensor
   const getBars = () => {
     const selectedData = filteredData(); //.find(entry => entry.sensor === sensor_id);
-    //console.log("Selected Data:", selectedData);
+    log("Selected Data:", selectedData);
     let response = { data: [[0,0]], type: "bar", name: "Empty", itemStyle: {color:"red"} };
-    if(selectedData)
+
+    if(selectedData?.data?.length >= nBars) {
+	log("formatting bar using nBars...");
 	response = formatBars(selectedData, nBars);
+    }
+    else if(selectedData?.data?.length) {
+	log(`formatting bar using data len... ${selectedData?.data?.length}`);
+	response = formatBars(selectedData, selectedData?.data?.length);
+    }
+
     log("nBars", nBars);
     log("Bar-Formatted Data:", response?.data?.map(e => e.value));
     return response;
@@ -261,7 +275,6 @@ function EGraph() {
     //track zoom level
     const [gradient, setGradient] = useState({});
     const [zoom, setZoom] = useState({ start: start, end: end });
-    const chartRef = useRef(null);
 
     useEffect(() => {
         const chart = chartRef.current?.getEchartsInstance();
@@ -359,7 +372,7 @@ useEffect(() => {
 
 return (
     <div id = "EGraph.js" className="Marginless">
-        <h1 className="headerText">{dataContext}{showCompression ? " Compressed " : " "}Readings {(globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
+        <h1 className="headerText">{dataContext}{showCompression ? " Compressed " : " "}Readings {(!globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
         <div className="graphContainer">
             {/*<button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
@@ -377,7 +390,7 @@ return (
 		</div>
             ) : (
 		<div className="graphDiv" ref={containerRef}>
-		    <h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
+		    {/*<h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
 		    <center><input className="Marginless hideMobile"
 		        type="range"
 		        min="7" //1 bar per day
@@ -385,7 +398,7 @@ return (
 		        value={nBars}
 		        onChange={handleSlider}
 		        style={{ width: '60%' }}
-		    /></center>
+		    /></center>*/}
     		    {/* Log changes before render for debugging */}
 		    
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
