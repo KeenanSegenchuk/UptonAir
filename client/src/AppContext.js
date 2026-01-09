@@ -32,7 +32,7 @@ export const ContextProvider = ({ children }) => {
   const [showChatBox, setShowChatBox] = useState(false);
 
   const { protocol, hostname } = window.location;
-  const BASE_URL = protocol + "//" + config.URL + "/";
+  const BASE_URL = protocol + "//" + hostname + "/";
   //vvvvv USING LOCAL SERVER vvvvv
   const API_URL = "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/");
 
