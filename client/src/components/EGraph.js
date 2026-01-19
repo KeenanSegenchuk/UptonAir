@@ -16,7 +16,7 @@ function EGraph() {
 	const contexts = getObj("DataContexts");
 	const chartRef = useRef(null);
 
-    	const debug = false;
+    	const debug = true;
     	const log = (text, val = -1) => {
 		if(debug && val === -1) console.log(text);
     		if(debug && val !== -1) console.log(text, val);
@@ -178,6 +178,9 @@ function EGraph() {
 	log("formatting bar using nBars...");
 	response = formatBars(selectedData, nBars);
     }
+
+    //this fails in cases with missing data the x data points could all be within 1/x th of the timeframe from eachother so theyre all in the same bar
+
     else if(selectedData?.data?.length) {
 	log(`formatting bar using data len... ${selectedData?.data?.length}`);
 	response = formatBars(selectedData, selectedData?.data?.length);
@@ -194,9 +197,9 @@ function EGraph() {
 	try {
             bars = graphUtil("getBars")(b, n, start, end);
         } catch(error) {
-	    console.log("Error binning data into bars.", bars);
-	    console.log("b: ", b);
-	    console.log(`n: ${n}, start: ${start}, end: ${end}`);
+	    log("Error binning data into bars.", bars);
+	    log("b: ", b);
+	    log(`n: ${n}, start: ${start}, end: ${end}`);
 	    console.warn(error);
 	    return bars;
 	}
@@ -332,7 +335,7 @@ function EGraph() {
                       }
                 }));
         
-		console.log(`gradient... startTime:${startTime}, endTime:${endTime}, start:${start}, end:${end}`);
+		log(`gradient... startTime:${startTime}, endTime:${endTime}, start:${start}, end:${end}`);
         	//trigger gradient update by setting zoom
                 setGradient({
         	    graphic: [{
@@ -342,7 +345,7 @@ function EGraph() {
                       },
         	    }]
         	});
-		console.log(graphUtil("midnightGradient")(startTime, endTime, 500));
+		log(graphUtil("midnightGradient")(startTime, endTime, 500));
         };
 
 	//requestAnimationFrame(() => {updateAxisAndGradient()});

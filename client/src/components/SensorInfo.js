@@ -52,10 +52,15 @@ function SensorInfo({ dummy }) {
     const week = day * 7;
     const end = Math.floor(d/sec);
 
-    const dataContexts = [{context: "6-Month", end: end, start: Math.floor((d-180*day)/sec)}, 
+    const dataContexts = [{context: "2-Year", end: end, start: Math.floor((d-730*day)/sec)},
+		{context: "6-Month", end: end, start: Math.floor((d-182*day)/sec)}, 
 		{context: "30-Day", end: end, start: Math.floor((d-30*day)/sec)}, 
 		{context: "7-Day", end: end, start: Math.floor((d-week)/sec)}, 
-		{context: "24-Hour", end: end, start: Math.floor((d-day)/sec)}];
+		//the last entry will show as the 1-hour avg on the banner
+		{context: "1-Hour", end: end, start: Math.floor((d-(day/24))/sec)}];
+
+    const timeframes = dataContexts.map(e => String(e.context)).join(",");
+    const starts = dataContexts.map(e => String(e.start)).join(",");
 
     //check if data already exists for current sensor
     const checkData = () => {
@@ -117,7 +122,7 @@ function SensorInfo({ dummy }) {
 		setSensor_idAvgs({...Object.fromEntries(fd.avgs.map((avg, index) => [dataContexts[index].context,avg])), "1-Hour":fd.banner_avg});
 	} else {
           log(`Pulling data from ${sensor_id} where units = ${units}`);
-          api.get(`sensorinfo/${units}/${sensor_id}`)
+          api.get(`sensorinfo/${units}/${sensor_id}/${timeframes}/${starts}`)
             .then(response => {
               log("queried api/sensorinfo. response:",  response.data);
               setData(prev => {

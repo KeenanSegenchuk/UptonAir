@@ -177,20 +177,18 @@ def timeS(units, start, end, sensor_id):
 	return json.dumps(data, indent=4)
 
 #Get data averages for each sensor for past x days/hours
-@data_bp.route("/sensorinfo/<string:units>/<int:sensor_id>")
-def sensorinfo(units, sensor_id):	
-	averages = ["6 months", "30 days", "1 week", "24 hours", "1 hour"]
-	hour = 60 * 60
-	day = 24 * hour
+@data_bp.route("/sensorinfo/<string:units>/<int:sensor_id>/<string:timeframes>/<string:starts>")
+def sensorinfo(units, sensor_id, timeframes, starts):
 	end = datetime.now().timestamp()
-	starts = [end - day*180, end - day * 30, end - day * 7, end - day * 1, end - hour]
+	starts = starts.split(",")
+	timeframes = timeframes.split(",")
 	
 	conn, cur = pgOpen()
-	avgs = ["N/A" for avg in averages]
+	avgs = ["N/A" for avg in starts]
 
 	for i, start in enumerate(starts):
-		timespan = averages[i]
-		#print(f"\Timespan: {timespan} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
+		
+		#print(f"\Timespan: {timeframes[i]} — {datetime.fromtimestamp(start)} to {datetime.fromtimestamp(end)}")
 
 		pgQueryAvg(cur, start, end, sensor_id, units)
 		res = cur.fetchall()
@@ -198,14 +196,14 @@ def sensorinfo(units, sensor_id):
 		try:
 			avgs[i] = round(float(res[0][0]), 2)
 		except:
-			print(f"Error finding {averages[i]} avg for sensor {sensor_id}, defaulting to null.") 
+			print(f"Error finding {timeframes[i]} avg for sensor {sensor_id}, defaulting to null.") 
 			avgs[i] = "N/A"
 	pgClose(conn, cur)
 
 	response = {
 		"id": sensor_id,
 		"avgs": avgs[:-1],
-		"inputs": averages,
+		"inputs": timeframes,
 		"banner_avg": avgs[-1]
 	}
 	return response
