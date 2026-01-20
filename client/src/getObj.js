@@ -37,6 +37,7 @@ export function getObj(obj) {
     const ranges = [-50, 50, 100, 150, 200, 300, 10000];
 
     const dataContexts={
+	  "2-Year": 24 * 30 * 86400,
 	  "6-Month": 6 * 30 * 86400,
 	  "30-Day": 30 * 86400,
 	  "7-Day": 7 * 86400,
