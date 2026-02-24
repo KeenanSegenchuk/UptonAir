@@ -8,9 +8,11 @@ from pgUtil import getTimestamp
 from fileUtil import getSensors, getPAirSensors
 
 
-ignore_pull_limit = os.getenv("IGNORE_MAX_PULL")
 
 async def pullfn(return_data = False):
+    if not hasattr(pullfn, "ignore_pull_limit): 
+        pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL")
+
     #get sensor IDs
     sensors = [sensor for sensor in getPAirSensors() if sensor != 0]
 
@@ -47,7 +49,7 @@ async def pullfn(return_data = False):
     #populate data with responses from purpleair's api
     data = []
     for sensor in sensors:
-        if ignore_pull_limit or lastSample[sensors.index(sensor)] == -1:
+        if pullfn.ignore_pull_limit or lastSample[sensors.index(sensor)] == -1:
             timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
         else:
             timeurl = "start_timestamp=" + str(max(lastSample[sensors.index(sensor)], starttime)) + "&end_timestamp=" + str(endtime)
@@ -79,7 +81,7 @@ async def pullfn(return_data = False):
             new_lines += [line]
             file.write(line + "\n")
 
-    ignore_pull_limit = false
+    pullfn.ignore_pull_limit = false
 
     #return oldest data point added to data so we know not to re-sort the data from before that
     try:
