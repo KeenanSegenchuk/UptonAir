@@ -93,6 +93,7 @@ async def pullfn(return_data = False):
         #return if no data was recieved from the API call
         return 0   
     if return_data:
+        print("Returning Pulled Data...")
         return [oldest_point, new_lines]
     else:
         return oldest_point
