@@ -38,18 +38,19 @@ def update_loop():
             print(f"Error pulling data: {e}")
             traceback.print_exc()
             return
-        print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
-        if os.getenv("CLEANING") != "true": 
-            os.environ['CLEANING'] = "true"
-            cleanfn("data.txt", cutoff - update_time_seconds)
-            os.environ['CLEANING'] = "false"
-            print("Finished Updating CSV.")
-        else:
-            print("Already Cleaning data.txt...")
+        #print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
+        #if os.getenv("CLEANING") != "true": 
+        #    os.environ['CLEANING'] = "true"
+        #    cleanfn("data.txt", cutoff - update_time_seconds)
+        #    os.environ['CLEANING'] = "false"
+        #    print("Finished Updating CSV.")
+        #else:
+        #    print("Already Cleaning data.txt...")
 
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
             
+        print(f"Pushing {len(new_lines)} lines of data to readings table...")
         conn, cur = pgOpen()
         pgPushData(cur, new_lines)
         pgClose(conn, cur)
