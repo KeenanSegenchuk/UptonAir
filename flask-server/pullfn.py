@@ -11,7 +11,7 @@ from fileUtil import getSensors, getPAirSensors
 
 async def pullfn(return_data = False):
     if not hasattr(pullfn, "ignore_pull_limit"): 
-        pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL") == 1
+        pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL") == "1"
 
     #get sensor IDs
     sensors = [sensor for sensor in getPAirSensors() if sensor != 0]
