@@ -31,7 +31,7 @@ def PMtoAQI(humidity, PMA, PMB):
 	while i2 < len(pranges):
 		if avg <= pranges[i2]:
 			AQI = f_AQI(iranges[i1], iranges[i2], pranges[i1], pranges[i2], avg)
-			if type(humidity) is None:
+			if humidity is None:
 				PM_EPA = -1
 			else:
 				PM_EPA = epaformulas[i](avg, humidity)
