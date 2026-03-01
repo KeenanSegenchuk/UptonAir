@@ -1,4 +1,6 @@
 def PMtoAQI(humidity, PMA, PMB):
+	if type(humidity) == null or type(PMA) == null or type(PMB) == null:
+		return
 	if type(humidity) == str:
 		humidity = float(humidity)
 	if type(PMA) == str:

@@ -50,6 +50,7 @@ async def pullfn(return_data = False):
     data = []
     for sensor in sensors:
         if pullfn.ignore_pull_limit:
+            print(f"pulling from sensor: {sensor}, using lastsample: {lastSample[sensors.index(sensor)]}") 
             timeurl = "start_timestamp=" + str(lastSample[sensors.index(sensor)]) + "&end_timestamp=" + str(int(endtime))
         elif lastSample[sensors.index(sensor)] == -1:
             timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
