@@ -38,7 +38,7 @@ def update_loop():
             print(f"Error pulling data: {e}")
             traceback.print_exc()
             return
-	print("returned from pullfn")
+        print("returned from pullfn")
 
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
