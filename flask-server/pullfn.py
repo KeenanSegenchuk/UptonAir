@@ -10,7 +10,7 @@ from fileUtil import getSensors, getPAirSensors
 
 
 async def pullfn(return_data = False):
-    if not hasattr(pullfn, "ignore_pull_limit): 
+    if not hasattr(pullfn, "ignore_pull_limit"): 
         pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL")
 
     #get sensor IDs
