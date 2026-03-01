@@ -108,7 +108,7 @@ def formatLines(lines, format = "tuple"):
 			#print(f"map.get: {sensor_map.get(line[1])}")
 			line[1] = sensor_map[line[1]]
 	
-	#print(f"formated lines: {lines}")
+	print("Returning from formatLines")
 
 	if format == "tuple":
 		return [tuple(line) for line in lines]
