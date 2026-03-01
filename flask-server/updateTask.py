@@ -38,14 +38,7 @@ def update_loop():
             print(f"Error pulling data: {e}")
             traceback.print_exc()
             return
-        #print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
-        #if os.getenv("CLEANING") != "true": 
-        #    os.environ['CLEANING'] = "true"
-        #    cleanfn("data.txt", cutoff - update_time_seconds)
-        #    os.environ['CLEANING'] = "false"
-        #    print("Finished Updating CSV.")
-        #else:
-        #    print("Already Cleaning data.txt...")
+	print("returned from pullfn")
 
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
@@ -56,6 +49,15 @@ def update_loop():
         pgClose(conn, cur)
         print(f"New max timestamp: {maxTimestamp()}")            
 
+
+        print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
+        if os.getenv("CLEANING") != "true": 
+            os.environ['CLEANING'] = "true"
+            cleanfn("data.txt", cutoff - update_time_seconds)
+            os.environ['CLEANING'] = "false"
+            print("Finished Updating CSV.")
+        else:
+            print("Already Cleaning data.txt...")
 
         #wait so that data can finish updating before checking for alerts
         sleep(alert_delay)
