@@ -1,4 +1,11 @@
 def PMtoAQI(humidity, PMA, PMB):
+	if not hasattr(PMtoAQI, "count"): 
+		PMtoAQI.count = 0
+	else:
+		PMtoAQI.count += 1
+	print(f"Entering PMtoAQI, count: {PMtoAQI.count}")
+
+
 	if humidity == "null":
 		humidity = None
 	if type(humidity) == str:
