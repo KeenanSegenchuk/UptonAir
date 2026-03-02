@@ -91,12 +91,12 @@ def formatLines(lines, format = "tuple"):
 	#check for invalid values
 	print("Formatting pulled lines")
 	nlines = [
-		line[0:2] + [float(-1)] if line[2] == "null" else [line[2]] + [
+		line[0:2] + ([float(-1)] if line[2] == "null" else [line[2]]) + [
 			int(float(line[3]) < float(line[4])),
 			min(float(line[3]), float(line[4])),
 			999, 999, 999
 		] if float(line[3]) > 750 and float(line[4]) > 750 else
-		line[0:2] + [float(-1)] if line[2] == "null" else [line[2]] + [
+		line[0:2] + ([float(-1)] if line[2] == "null" else [line[2]]) + [
 			int(float(line[3]) < float(line[4])),
 			min(float(line[3]), float(line[4])),
 			-1, -1, -1
