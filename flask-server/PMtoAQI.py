@@ -3,7 +3,8 @@ def PMtoAQI(humidity, PMA, PMB):
 		PMtoAQI.count = 0
 	else:
 		PMtoAQI.count += 1
-	print(f"Entering PMtoAQI, count: {PMtoAQI.count}")
+		if PMtoAQI.count%100 == 0:
+			print(f"Entering PMtoAQI, count: {PMtoAQI.count}")
 
 
 	if humidity == "null":
