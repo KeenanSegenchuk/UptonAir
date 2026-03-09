@@ -16,7 +16,7 @@ function EGraph() {
 	const contexts = getObj("DataContexts");
 	const chartRef = useRef(null);
 
-    	const debug = true;
+    	const debug = false;
     	const log = (text, val = -1) => {
 		if(debug && val === -1) console.log(text);
     		if(debug && val !== -1) console.log(text, val);
@@ -382,7 +382,7 @@ return (
             </button>*/}
             {globalLineBool || (showCompression && showChatBox) ? (
 		<div className="graphDiv" ref={containerRef}>
-		    {/*!isMobile && lineMode === "sensors" ? <center style={{padding:"15px"}}>*Click a button on the map to toggle displaying it on the line graph</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>*/} 
+		    {lineMode === "sensors" ? <center style={{padding:"15px"}}>Multiple Sensors</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>} 
 		    <ReactECharts key={dataContext} 
 				option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}} 
     				style={graphStyle}
@@ -402,8 +402,7 @@ return (
 		        onChange={handleSlider}
 		        style={{ width: '60%' }}
 		    /></center>*/}
-    		    {/* Log changes before render for debugging */}
-		    
+		    <center style={{padding:"15px"}}>{getObj('$' + sensor_id)}, {dataContext} Historical Data</center>
 		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}
 				opts={{renderer:"svg"}}

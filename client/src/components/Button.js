@@ -167,7 +167,7 @@ console.log("SENSOR_ID:", sensor_id);
 			{console.log("Error getting button value."); 
 			return;}
 		setVal(prevVal => ({...prevVal,[units]: response.data}));
-		setButtonAvgs(prev => ({...prev,name:response.data}));
+		setButtonAvgs(prev => ({...prev,[name]:response.data}));
             })
             .catch(error => {
                 console.error('Error fetching data:', error);

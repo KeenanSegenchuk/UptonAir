@@ -25,7 +25,7 @@ function SensorInfo({ dummy }) {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [contextIndex, setIndex] = useState(2);
+    const [contextIndex, setIndex] = useState(3);
     const {setDataContext, switches, units} = useAppContext();
 
     //working on making it combine timespan averages for multiple sensors/units (line graph)

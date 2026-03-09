@@ -8,7 +8,7 @@ function DashboardConfig() {
     //this element can be used to configure the dashboard page, changing the map, data layer, etc.
 
     //load cookies to configure map background and data units
-    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, setSensor_id, showChatBox, setShowChatBox } = useAppContext();
+    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox } = useAppContext();
     const [mapType, setMapType] = useState('satellite');
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
@@ -100,13 +100,31 @@ function DashboardConfig() {
 
 		<label className="s16">
 		    Graph Style:<br/>
-		    <select className="s9" disabled={isMobile} value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
+		    <select className="s9"  value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
                         <option value="bar">Bar Graph</option>
                         <option value="line">Line Graph</option>
-                        {/* maybe add back later <option value="img">Image</option>*/}
                     </select>
 		</label>
 
+		{/* single-select sensor */}
+		{!(globalLineBool && lineMode==="sensors") && (
+		    <>	
+			<label className="s16">
+			  Select Sensor:<br />
+			  <select
+			    className="s9"
+			    value={sensor_id}
+			    onChange={(e) => {setSensor_id(e.target.value)}}
+			  >
+			      {getObj("s").map(id => (
+			          <option key={id} value={id}>{getObj("$" + id)}</option>
+			      ))}
+			  </select>
+			</label>
+		    </>
+		)}
+
+		{/*Line Mode Options*/}
 		{globalLineBool && (
 		    <>
 			{/* toggle between units and sensors */}	
@@ -185,9 +203,16 @@ function DashboardConfig() {
       		    </select>
 		</label> */}
 
-		<button onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close Chat Bot" : "Open Chat Bot"}</button>
+		<div style={{"display":"flex", "paddingTop":"15px"}}>
+			<span style={{"fontSize":"30px"}}>🤖</span>
+			<button
+			style={{"fontSize": "20px", "padding": "2% 2%", "width":"100%"}} 
+			onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close Chat Bot" : "Open Chat Bot"}</button>
+			<span style={{"fontSize":"30px"}}>🤖</span>
+		</div>
+
 		{showChatBox && (
-		    <MoveableWindow title="Chat Bot" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 400, height: 300 }}>
+		    <MoveableWindow title="Chat Bot" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 800, height: 600 }}>
 			<ChatBox/>
 		    </MoveableWindow>
 		    /*<ChatBox/>*/

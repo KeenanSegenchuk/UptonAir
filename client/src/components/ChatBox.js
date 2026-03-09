@@ -1,4 +1,5 @@
 import "../App.css";
+import "./css/ChatBox.css";
 import React, { useState, useEffect } from "react";
 import { useAppContext } from "../AppContext";
 import { getObj } from "../getObj";
@@ -26,7 +27,7 @@ function ChatBox( {assistant_id} ) {
 		sensor_avgs: sensor_idAvgs,
 		button_avgs: buttonAvgs,
 		unit: units,
-		graphMode: globalLineBool ? "bar" : "line",
+		graphMode: globalLineBool ? "line" : "bar",
 		timespan: dataContext,
 		data: showCompression ? compressedData.map(entry => ({...entry, data:entry.data.map(point => [formatTimestamp(point[0]), point[1]])})) : "advanced context not provided",
 	};
@@ -157,26 +158,28 @@ function ChatBox( {assistant_id} ) {
         <div id="ChatBox.js"> {/* TODO: MAKE WINDOW MOVEABLE AND RESIZEABLE */}
 		<CloseButton/>
 		<center>
-			<h2>Ask a question:</h2>
-			<input type="text" value={userPrompt} style={{width:"100%", boxSizing: "border-box"}} onChange={(e) => setUserPrompt(e.target.value)}
+			<h2 className="chatboxheader2">Ask a question:</h2>
+			<input className="chatboxresponse" type="text" value={userPrompt} style={{width:"90%", boxSizing: "border-box"}} onChange={(e) => setUserPrompt(e.target.value)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter") 
 						sendPrompt(); 
 			}}/>
-			<button onClick={sendPrompt} style={{width:"100%", padding:"15px"}}>Submit Question</button>
+			<button className="chatboxbutton" onClick={sendPrompt}>Submit Question</button>
 			
 
-			<h3>Response:</h3>
+			<h3 className="chatboxheader3">Response:</h3>
 			<div
+			    className="chatboxresponse"
 			    style={{
 				padding: "8px", border: "1px solid #ccc", borderRadius: "8px", overflowY: "auto",
 				backgroundColor: "#fafafa", fontFamily: "monospace", whiteSpace: "pre-wrap",
+				width: "88%"
 			    }}
 			>{response}</div>
 		</center>
 
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", paddingTop:"10px" }}>
-		  <h3 htmlFor="boolCheck">Advanced Context:</h3>
+		  <h3  className="chatboxheader3" htmlFor="boolCheck">Advanced Context:</h3>
 		  <input
 		    type="checkbox"
 		    checked={showCompression}
@@ -184,10 +187,12 @@ function ChatBox( {assistant_id} ) {
 		    style={{ cursor: "pointer", width: "18px", height: "18px" }}
 		  />
 		</div>
-		<span>Enabling advanced context allows the chat bot to see a compressed version of the current graph.</span>
-		<br/><div style={{height: "3px"}}/>
-		<span>When advanced context is enabled and the chat bot is open, the dashboard will display compressed data so you know exactly what the bot sees.</span>
 		
+		<center>
+			<span className="chatboxspan">Enabling advanced context allows the chat bot to see a compressed version of the current graph.</span>
+			<br/><div style={{height: "3px"}}/>
+			<span className="chatboxspan">When advanced context is enabled and the chat bot is open, the dashboard will display compressed data so you know exactly what the bot sees.</span>
+		</center>		
 
 		{/*OLD DATA COMPRESSION CONTROLS
 		{showCompression &&
@@ -224,10 +229,14 @@ function ChatBox( {assistant_id} ) {
 
 		<div style={{height: "15px"}}/>
 		<center>
-			<h3>Default Context:</h3>
-			<div>
+			<h3 className="chatboxheader3">Default Context:</h3>
+			<span className="chatboxspan">
 				By default the chatbot can see the current state of the dashboard except the data on the graph. To show data to the chatbot, you can enable "Advanced Context" above and compress the data.
-			</div>
+			</span>
+	
+			<pre>
+				{JSON.stringify(getCtx(), null, 2)}
+			</pre>
 		</center>
 
 		<center>

@@ -34,10 +34,10 @@ export const ContextProvider = ({ children }) => {
   const { protocol, hostname } = window.location;
   const BASE_URL = protocol + "//" + hostname + (hostname === "localhost") && ":3000" + "/";
   //vvvvv USING LOCAL SERVER vvvvv
-  const API_URL = "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/");
+//  const API_URL = "//" + hostname + ((hostname === "localhost") ? ":5000/api/" : "/api/");
 
   //vvvvv USING UPTON-AIR SERVER vvvvv
-//  const API_URL = "https://" + "upton-air.com/api/";
+  const API_URL = "https://" + "upton-air.com/api/";
 
 
   

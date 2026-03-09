@@ -1,0 +1,56 @@
+.chatboxheader2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #222;
+}
+
+.chatboxheader3 {
+  font-size: 1.5em;
+  font-weight: 1500;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+.chatboxresponse {
+  background: #f6f8fa;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  border: 1px solid #e1e4e8;
+  white-space: pre-wrap;
+}
+
+.chatboxspan {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #444;
+  margin-right: 6px;
+}
+
+.chatboxbutton {
+  font-size: 18px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.chatboxbutton:hover {
+  background: #43a047;
+  transform: translateY(-1px);
+}
+
+.chatboxbutton:active {
+  transform: translateY(0px);
+}
