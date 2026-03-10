@@ -54,19 +54,5 @@
         "id": "222531",
 	"name": "BVT HS",
 	"color": "cyan"
-    },
-    {
-        "id": "128729",
-	"name": "Uxbridge",
-	"color": "black"
     }
 ]
-
-/*
-removed,
-    {
-        "id": "128729",
-	"name": "Uxbridge",
-	"color": "black"
-    }
-*/
