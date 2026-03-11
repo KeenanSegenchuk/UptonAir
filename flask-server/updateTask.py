@@ -74,7 +74,7 @@ def update_loop():
 
 if __name__ == "__main__":
 	print("Data-Updater checking for db connection and readings table:")
-	while not pgInit("data.txt", os.getenv("REINIT_DB") == "1"):
+	while not pgInit("data.txt", os.getenv("REINIT_DB") == "REINIT"):
 		print("pgInit could not connect to the database...")
 		print("Waiting 20 seconds then trying to connect again.")
 		sleep(20)
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
 	#make sure alerts table exists
 	try:
-		pgBuildAlertsTable(os.getenv("REBUILD_ALERTS") == "1")
+		pgBuildAlertsTable(os.getenv("REBUILD_ALERTS") == "REBUILD")
 	except:
 		print("WARNING: Alerts table does not exist and/or building failed.")
 	else:
@@ -95,6 +95,23 @@ if __name__ == "__main__":
 		print("WARNING: ChatLogs table does not exist and/or building failed.")
 	else:
 		print("Succesfully located chatlgos table.")
+
+	#fill gaps in database
+	if (os.getenv("FILL_GAPS") == "1"):
+		print("FILL_GAPS Enabled. Checking for gaps in DB...")
+		#pull gapped data
+		gaps = pgFindGaps(min_time = 1749665708)
+		print(f"Pulling data to fill gaps: {gaps}")
+		data = []
+		for start, end in gaps:
+			data += asyncio.run(pull(start, end))
+		
+		#format and archive data
+		data = formatLines(data, "tuple")
+		conn, cur = pgOpen()
+		pgPushData(cur, data)
+		pgClose(conn, cur)
+
 
 	#add generated columns 
 	#pgAddPercentDifferenceColumn()

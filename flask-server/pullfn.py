@@ -7,7 +7,47 @@ import os
 from pgUtil import getTimestamp
 from fileUtil import getSensors, getPAirSensors
 
+async def pull(starttime, endtime):
+    #init constants for building api call 
+    baseurl = ("https://api.purpleair.com/v1/sensors/")
+    historyurl = ("/history/csv?")
+    timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
+    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
+    key = os.getenv("PURPLEAIR_API_KEY")
 
+    #populate data with responses from purpleair's api
+    sensors = [sensor for sensor in getPAirSensors() if sensor != 0]
+    data = []
+    for sensor in sensors:
+        timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
+	
+	#build api call
+        print(f'Pulling data from sensor: {sensor}')
+        url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
+        header = {"X-API-Key": key}
+	#pull from purpleair's api
+        try:
+            response = requests.get(url, headers=header)
+            response.raise_for_status()
+        except requests.exceptions.ConnectionError as ce:
+            print(f"Connection error occurred: {ce}")
+            return []
+        except requests.exceptions.HTTPError as he:
+            print(f"HTTP error occurred: {he}")
+            return []
+        for line in response.content.decode('utf-8').splitlines():
+            data.append(line)
+            print(f'line: {line}')
+
+    #keep track of new data to push to postgres
+    new_lines = []
+    #append to existing data
+    for line in data:
+        if len(line) > 0 and line[0] in "0123456789":
+            new_lines += [line]
+            file.write(line + "\n")
+
+    return new_lines
 
 async def pullfn(return_data = False):
     if not hasattr(pullfn, "ignore_pull_limit"): 

@@ -26,11 +26,12 @@ from datetime import datetime
  	  pgQuery: see fn :returns qury for some time-sensor slice of the database a list of comma-delimited strings
 	  pgPushData: (cur, [tuple]) => () :pushes all rows in list of tuples to database
 	  pgInit: (str, bool) => (bool) :tries to connect to database, returns False if cannot, then checks for, and if not there, initializes data table
-	  pgFindGaps: (int = 1200, int = 300) => ([(int, int)]) :
+	  pgFindGaps: (int = 1200, int = 300, int = 0) => ([(int, int)]) :
   	    Scans the readings table for gaps in the timestamp sequence where the difference 
   	    between adjacent entries exceeds `min_gap` seconds (default 1200). 
   	    Returns a list of (start, end) tuples with a buffer (default 300 sec) 
   	    added after the start and before the end of each gap.
+            Can exclude checking before certain point (default 0)
 	 Alerts:
 	  pgAlert: (int) => ([str]) :checks if any alerts have been triggered in the last <int> seconds, returns addresses of triggered alerts
 	  pgBuildAlertsTable: (cur) => () :initializes alerts table
@@ -80,7 +81,6 @@ def pgCheck(cur, table):
 
 #  formatLines: ([str]) => ([tuple]) :converts lines from raw purpleair to tuples or strings with AQI fields added
 def formatLines(lines, format = "tuple"):
-	print("entering formatLines...")
 	#converts lines from raw purpleair to tuples or strings with AQI fields added
 	lines = [line.split(",") for line in lines]
 
@@ -89,7 +89,6 @@ def formatLines(lines, format = "tuple"):
 
 	#print(sensor_map)
 	#check for invalid values
-	print("Formatting pulled lines")
 	nlines = [
 		line[0:2] + ([float(-1)] if line[2] == "null" else [line[2]]) + [
 			int(float(line[3]) < float(line[4])),
@@ -104,7 +103,6 @@ def formatLines(lines, format = "tuple"):
 		line[0:2] + ([float(-1)] if line[2] == "null" else [line[2]]) + line[3:] + PMtoAQI(line[2], line[3], line[4])
 		for line in lines
 	]
-	print("done formatting!")
 	#convert id from purpleair id to database id
 	i = 0
 	for line in nlines:
@@ -116,8 +114,6 @@ def formatLines(lines, format = "tuple"):
 		i += 1
 	lines = nlines	
 
-
-	print("Returning from formatLines")
 
 	if format == "tuple":
 		return [tuple(line) for line in lines]
@@ -256,20 +252,23 @@ def pgInit(path, rebuild = False):
 	
 	return True
 
-def pgFindGaps(min_gap=1200, buffer=300):
+def pgFindGaps(min_gap=1200, buffer=300, min_time=0):
 	"""
 	Returns a list of (start, end) tuples representing gaps in the readings table 
 	where the time difference between consecutive entries exceeds `min_gap` seconds.
 	Each tuple is adjusted by `buffer` seconds on both sides.
+
+	This function purposefully ONLY finds gaps across ALL sensors, not instances where individual sensors have a gap in their data.
 	"""
 	conn, cur = pgOpen()
 
 	# Fetch ordered list of timestamps
 	cur.execute("""
 		SELECT time FROM readings 
+		WHERE time > %s
 		GROUP BY time 
 		ORDER BY time ASC
-	""")
+	""", (min_time,))
 	times = [row[0] for row in cur.fetchall()]
 	pgClose(conn, cur)
 
