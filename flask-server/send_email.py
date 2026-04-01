@@ -299,7 +299,7 @@ def send_email3(alert_obj):
         <p>
           <strong>Alert Threshold:</strong> {min_AQI} {unit}<br>
           <strong>Cooldown Period:</strong> {cooldown} hour(s)<br>
-          <strong>Trigger When:</strong> <strong>{alert_type}>/strong> exceeds threshold<br>
+          <strong>Trigger When:</strong> <strong>{alert_type}</strong> exceeds threshold<br>
 	  <strong>Last Triggered:</strong> {last_alert_str} ago<br>
           <!--<strong>Total Times Triggered:</strong> {n_triggered}-->
         </p>
