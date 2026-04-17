@@ -117,7 +117,7 @@ def send_prompt(prompt_raw, sessionID):
 	response = response.output[1].content[0].text
 	try:
 		print(f"Logging chatbot response: {response}")
-		pgPushChat((prompt_raw, prompt_ctw, response, sessionID))
+		pgPushChat((prompt_raw, prompt_ctx, response, sessionID))
 	except:
 		print("Logging chatbot response failed.")
 	return response

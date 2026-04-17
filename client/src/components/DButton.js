@@ -7,13 +7,8 @@ const DButton = React.memo(({ text, dkey, style }) => {
   const {setHover} = useAppContext();
 
   //hover functionality
-  const mouseIn=()=> {
-	console.log("Hovering key: " + dkey);
-	setHover(dkey);
-  };
-  const mouseOut=()=> {
-	setHover("");
-  };
+  const mouseIn  = () => setHover(dkey);
+  const mouseOut = () => setHover("");
 
   //toggle functionality
   useEffect(() => {

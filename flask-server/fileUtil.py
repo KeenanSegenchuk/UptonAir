@@ -14,7 +14,7 @@ def getLastTimestamp(filename = "data.txt"):
 		
 def getLastTimestamps(filename = "data.txt"):
 	#get last timestamp for each sensor
-	return #TODO
+	raise NotImplementedError("getLastTimestamps")
 
 def getSensors():
 	#return a list of all sensor ids as they are in our database

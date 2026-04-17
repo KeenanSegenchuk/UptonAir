@@ -149,7 +149,21 @@ function SensorInfo({ dummy }) {
     }, [sensor_id, units]);
 
     if (loading) {
-        return <h1>Loading...</h1>;
+        return (
+            <div style={{ padding: "10px", width: "100%" }}>
+                <div className="skeleton" style={{ height: "2em", width: "60%", margin: "10px auto" }} />
+                <div className="skeleton" style={{ height: "60px", width: "80%", margin: "10px auto", borderRadius: "8px" }} />
+                <div style={{ display: "flex", justifyContent: "center", gap: "2px", margin: "10px" }}>
+                    {[0,1,2,3].map(i => (
+                        <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <div className="skeleton" style={{ height: "40px" }} />
+                            <div className="skeleton" style={{ height: "35px" }} />
+                        </div>
+                    ))}
+                </div>
+                <div className="skeleton" style={{ height: "300px", width: "100%", marginTop: "10px" }} />
+            </div>
+        );
     }
 
     /*if (error) {

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ContextProvider } from "./AppContext";
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import('./pages/Home'));
@@ -23,7 +24,7 @@ function App() {
                     <Suspense fallback={<div>Loading...</div>}>
                         <Routes>
                             <Route path="/" element={<Landing />} />
-			    <Route path="/dashboard" element={<Dashboard />} />
+			    <Route path="/dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
                             <Route path="/alerts" element={<Alerts />} />
                         </Routes>
                     </Suspense>

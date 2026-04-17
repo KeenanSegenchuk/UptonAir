@@ -8,7 +8,7 @@ function DashboardConfig() {
     //this element can be used to configure the dashboard page, changing the map, data layer, etc.
 
     //load cookies to configure map background and data units
-    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox } = useAppContext();
+    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox, darkMode, toggleDarkMode } = useAppContext();
     const [mapType, setMapType] = useState('satellite');
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
@@ -206,10 +206,15 @@ function DashboardConfig() {
 		<div style={{"display":"flex", "paddingTop":"15px"}}>
 			<span style={{"fontSize":"30px"}}>🤖</span>
 			<button
-			style={{"fontSize": "20px", "padding": "2% 2%", "width":"100%"}} 
+			style={{"fontSize": "20px", "padding": "2% 2%", "width":"100%"}}
 			onClick={()=>setShowChatBox(prev=>!prev)}>{showChatBox ? "Close Chat Bot" : "Open Chat Bot"}</button>
 			<span style={{"fontSize":"30px"}}>🤖</span>
 		</div>
+
+		<button
+		  style={{"fontSize": "16px", "padding": "8px", "width":"100%", "marginTop":"8px"}}
+		  onClick={toggleDarkMode}
+		>{darkMode ? "Light Mode" : "Dark Mode"}</button>
 
 		{showChatBox && (
 		    <MoveableWindow title="Chat Bot" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 800, height: 600 }}>

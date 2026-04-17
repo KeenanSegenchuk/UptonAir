@@ -1,0 +1,54 @@
+UptonAir - Professional Improvement Checklist
+==============================================
+
+[x] = done  [ ] = todo  [~] = in progress
+
+--- NEW FEATURES ---
+[ ] Add alert type to check if a sensor has stopped reporting.
+
+--- SECURITY ---
+[x] Rate-limit /api/chat (10/min, 100/day per IP)
+[x] Rate-limit /api/alerts/add (5/hour per IP)
+[x] Rate-limit /api/alerts/remove (10/hour per IP)
+[x] Handle 429 responses on Alerts page (add + remove)
+[x] Validate alert email address format (frontend + backend)
+[x] Whitelist ALLOWED_UNITS in pgUtil.py — blocks SQL injection in pgCheckAlerts and all /data/* routes
+skip this [ ] Add email verification step on alert signup (confirm link)
+[x] Add CSRF protection to alert add/remove endpoints
+
+--- BUGS ---
+[x] ChatBox.js: CloseButton missing return statement (renders nothing)
+[x] chatbot.py: Typo prompt_ctw → prompt_ctx
+[x] pgUtil.py: Typo fomart → format in formatLines() (was listed as fileUtil.py)
+[x] fileUtil.py: return #TODO → raise NotImplementedError in getLastTimestamps()
+
+--- BACKEND ---
+[x] Replace bare except: blocks — pgUtil.py, pullfn.py (ValueError), PMtoAQI.py (TypeError), server.py (Exception); removed nonsensical try/except around dict.get() in chat()
+[x] Add /health endpoint (DB status + last fetch time) for Docker health checks
+[x] Fully Implement structured logging in log.py (replace print() calls)
+[x] Add retry/backoff on PurpleAir API calls (use tenacity or manual retry loop)
+[x] Add Docker health checks and restart policies in docker-compose.yml
+
+--- FRONTEND ---
+[x] Break up AppContext.js into focused custom hooks (useSensorData, useGraphConfig, useChatState)
+[x] Move hardcoded API_URL in AppContext.js:40 to config.json injection
+[x] Add React error boundary around the dashboard
+[x] Add loading and error states to graphs (currently blank on failure)
+[ ] Add "Trigger Alert When" option that is when "A sensor stops reporting data."
+[ ] When "sensor stops reporting data" selected, replace below alert fields with "alert when downtime exceeds (hours):" and email cooldown
+[ ] Customize alert description above submit button for new option.
+
+--- LOOK & FEEL ---
+[x] Dark mode toggle (store preference in localStorage)
+[x] Loading skeleton components while data fetches
+[x] Standardize graph legend visibility across chart types
+[x] Make ChatBox moveable/resizable (existing TODO in code removed)
+[x] Empty state messaging when no sensor selected or no data in range
+[x] Alert signup confirmation screen / success message
+[ ] Make "Trigger Alert When" options have circle check boxes rather than square & make them stack vertically if too wide to all fit on 1 line.
+
+--- PRODUCTION READINESS ---
+[x] API documentation — Flasgger/Swagger UI at /apidocs (all 9 routes documented)
+[x] Unit tests — PMtoAQI (all formula ranges + edge cases), email regex, ALLOWED_UNITS (flask-server/test_unit.py)
+skip for now [ ] Error tracking (Sentry or equivalent)
+skip for now & prolly 4ever [ ] Admin panel for sensor and alert management

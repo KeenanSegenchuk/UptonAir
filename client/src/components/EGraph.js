@@ -216,6 +216,11 @@ function EGraph() {
 	return bars;
     };
 
+    // Sync legend visibility when globalLineBool changes
+    useEffect(() => {
+      setGraphFormat(prev => ({ ...prev, legend: { show: globalLineBool } }));
+    }, [globalLineBool]);
+
     const [graphFormat, setGraphFormat] = useState({
 	xAxis: {
 		type: 'time',
@@ -382,14 +387,26 @@ return (
             </button>*/}
             {globalLineBool || (showCompression && showChatBox) ? (
 		<div className="graphDiv" ref={containerRef}>
-		    {lineMode === "sensors" ? <center style={{padding:"15px"}}>Multiple Sensors</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>} 
-		    <ReactECharts key={dataContext} 
-				option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}} 
+		    {lineMode === "sensors" ? <center style={{padding:"15px"}}>Multiple Sensors</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>}
+		    <div style={{ position: "relative" }}>
+		      <ReactECharts key={dataContext}
+				option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
     				style={graphStyle}
 				notMerge={true}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
-		    />
+		      />
+		      {filteredData().length === 0 && (
+		        <div style={{
+		          position: "absolute", inset: 0,
+		          display: "flex", alignItems: "center", justifyContent: "center",
+		          backgroundColor: "rgba(255,255,255,0.7)",
+		          pointerEvents: "none"
+		        }}>
+		          <span style={{ fontSize: "1.2em", color: "#555" }}>No data — select a sensor or wait for data to load</span>
+		        </div>
+		      )}
+		    </div>
 		</div>
             ) : (
 		<div className="graphDiv" ref={containerRef}>
@@ -403,13 +420,25 @@ return (
 		        style={{ width: '60%' }}
 		    /></center>*/}
 		    <center style={{padding:"15px"}}>{getObj('$' + sensor_id)}, {dataContext} Historical Data</center>
-		    <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
+		    <div style={{ position: "relative" }}>
+		      <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
-		    />
+		      />
+		      {!filteredData()?.data?.length && (
+		        <div style={{
+		          position: "absolute", inset: 0,
+		          display: "flex", alignItems: "center", justifyContent: "center",
+		          backgroundColor: "rgba(255,255,255,0.7)",
+		          pointerEvents: "none"
+		        }}>
+		          <span style={{ fontSize: "1.2em", color: "#555" }}>No data available</span>
+		        </div>
+		      )}
+		    </div>
 		</div>
-            )}    
+            )}
 	    <center className="bodyText">*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
         </div>
     </div>

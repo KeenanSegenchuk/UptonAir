@@ -1,14 +1,35 @@
 import requests
 from cleanfn import cleanfn
-from time import time
+from time import time, sleep
 import asyncio
 import sys
 import os
 from pgUtil import getTimestamp
 from fileUtil import getSensors, getPAirSensors
 
+
+def _request_with_retry(url, headers, max_retries=3):
+    """
+    Attempt an HTTP GET with exponential backoff on connection or HTTP errors.
+    Sleeps 2**attempt seconds between retries (1s, 2s, 4s for max_retries=3).
+    Raises the final exception if all attempts are exhausted.
+    """
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            return response
+        except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
+            if attempt < max_retries - 1:
+                wait = 2 ** attempt
+                print(f"Request failed (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {wait}s...")
+                sleep(wait)
+            else:
+                raise
+
+
 async def pull(starttime, endtime):
-    #init constants for building api call 
+    #init constants for building api call
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
@@ -20,20 +41,16 @@ async def pull(starttime, endtime):
     data = []
     for sensor in sensors:
         timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
-	
-	#build api call
+
+        #build api call
         print(f'Pulling data from sensor: {sensor}')
         url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
         header = {"X-API-Key": key}
-	#pull from purpleair's api
+        #pull from purpleair's api
         try:
-            response = requests.get(url, headers=header)
-            response.raise_for_status()
-        except requests.exceptions.ConnectionError as ce:
-            print(f"Connection error occurred: {ce}")
-            return []
-        except requests.exceptions.HTTPError as he:
-            print(f"HTTP error occurred: {he}")
+            response = _request_with_retry(url, header)
+        except Exception as e:
+            print(f"Failed to pull from sensor {sensor} after retries: {e}")
             return []
         for line in response.content.decode('utf-8').splitlines():
             data.append(line)
@@ -50,7 +67,7 @@ async def pull(starttime, endtime):
     return new_lines
 
 async def pullfn(return_data = False):
-    if not hasattr(pullfn, "ignore_pull_limit"): 
+    if not hasattr(pullfn, "ignore_pull_limit"):
         pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL") == "1"
 
     #get sensor IDs
@@ -61,7 +78,7 @@ async def pullfn(return_data = False):
     twoweeks = 2*7*24*60*60
     onehour = 60*60
     #only pull data from within the last hour
-    starttime = int(time()) - onehour 
+    starttime = int(time()) - onehour
 
     #open data file
     file = open("data.txt", "r").read().splitlines()
@@ -79,7 +96,7 @@ async def pullfn(return_data = False):
 
     print(f"Pulling data after last entry: {lastSample}...")
 
-    #init constants for building api call 
+    #init constants for building api call
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
@@ -90,26 +107,22 @@ async def pullfn(return_data = False):
     data = []
     for sensor in sensors:
         if pullfn.ignore_pull_limit:
-            print(f"pulling from sensor: {sensor}, using lastsample: {lastSample[sensors.index(sensor)]}") 
+            print(f"pulling from sensor: {sensor}, using lastsample: {lastSample[sensors.index(sensor)]}")
             timeurl = "start_timestamp=" + str(lastSample[sensors.index(sensor)]) + "&end_timestamp=" + str(int(endtime))
         elif lastSample[sensors.index(sensor)] == -1:
             timeurl = "start_timestamp=" + str(int(starttime)) + "&end_timestamp=" + str(int(endtime))
         else:
             timeurl = "start_timestamp=" + str(max(lastSample[sensors.index(sensor)], starttime)) + "&end_timestamp=" + str(endtime)
-	
-	#build api call
+
+        #build api call
         print(f'Pulling data from sensor: {sensor}')
         url = baseurl + str(sensor) + historyurl + timeurl + datafieldsurl
         header = {"X-API-Key": key}
-	#pull from purpleair's api
+        #pull from purpleair's api
         try:
-            response = requests.get(url, headers=header)
-            response.raise_for_status()
-        except requests.exceptions.ConnectionError as ce:
-            print(f"Connection error occurred: {ce}")
-            return []
-        except requests.exceptions.HTTPError as he:
-            print(f"HTTP error occurred: {he}")
+            response = _request_with_retry(url, header)
+        except Exception as e:
+            print(f"Failed to pull from sensor {sensor} after retries: {e}")
             return []
         for line in response.content.decode('utf-8').splitlines():
             data.append(line)
@@ -129,13 +142,11 @@ async def pullfn(return_data = False):
     #return oldest data point added to data so we know not to re-sort the data from before that
     try:
         oldest_point = min(int(x[:10]) for x in data if x[0] in "0123456789")
-    except:
-        #return if no data was recieved from the API call
-        return 0   
+    except ValueError:
+        # min() raised because no data was received from the API call
+        return 0
     if return_data:
         print("Returning Pulled Data...")
         return [oldest_point, new_lines]
     else:
         return oldest_point
-
-

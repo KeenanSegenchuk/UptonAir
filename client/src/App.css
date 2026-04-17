@@ -599,3 +599,26 @@ h3, h2 {
 .show {
   display: auto;
 }
+
+/* ---- Skeleton loading animation ---- */
+@keyframes skeleton-pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.skeleton {
+  background: #ccc;
+  border-radius: 4px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* ---- Dark mode ---- */
+body.dark-mode {
+  filter: invert(1) hue-rotate(180deg);
+}
+body.dark-mode img,
+body.dark-mode video,
+body.dark-mode .leaflet-tile,
+body.dark-mode canvas {
+  filter: invert(1) hue-rotate(180deg);
+}

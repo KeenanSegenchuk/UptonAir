@@ -6,6 +6,10 @@ from log import *
 from fileUtil import getSensorMap
 from datetime import datetime
 
+# Whitelist of column names that may be used in dynamic SQL queries.
+# Any unit value not in this set is rejected before it reaches a query.
+ALLOWED_UNITS = {"humidity", "PMA", "PMB", "PMEPA", "AQI", "AQIEPA", "PM"}
+
 '''
 	pgUtil.py contains useful functions for interfacing with the postgreSQL database
 	
@@ -33,7 +37,7 @@ from datetime import datetime
   	    added after the start and before the end of each gap.
             Can exclude checking before certain point (default 0)
 	 Alerts:
-	  pgAlert: (int) => ([str]) :checks if any alerts have been triggered in the last <int> seconds, returns addresses of triggered alerts
+	  !Replaced with pgCheckAlert! pgAlert: (int) => ([str]) :checks if any alerts have been triggered in the last <int> seconds, returns addresses of triggered alerts
 	  pgBuildAlertsTable: (cur) => () :initializes alerts table
 	  pgPushAddress: (cur, tuple) => () :pushes rows to alerts table
 	  pgRemoveAddress: (cur, str) => () :removes all instance of an email address/phone number from alerts table
@@ -117,7 +121,7 @@ def formatLines(lines, format = "tuple"):
 
 	if format == "tuple":
 		return [tuple(line) for line in lines]
-	elif fomart == "str":
+	elif format == "str":
 		return [",".join(line) for line in lines]
 	else:
 		print("Error: unrecognized line format")
@@ -220,7 +224,8 @@ def pgInit(path, rebuild = False):
 	#check for connection to database
 	try:
 		conn, cur = pgOpen()
-	except:	
+	except Exception as e:
+		print(f"Failed to connect to database: {e}")
 		return False
 
 	#check for/setup table
@@ -379,7 +384,11 @@ def pgCheckAlerts():
         window_start = now - avg_window * 60
         log(f"Selected alert: {alert}")
         log(f"Query times: {window_start}, {now}")
-        
+
+        if unit not in ALLOWED_UNITS:
+            log(f"Skipping alert '{name}': invalid unit '{unit}'.")
+            continue
+
         # Get AQI averages for readings from relevant ids in the time window
         cur.execute(f"""
             SELECT id, AVG({unit}) as avg_aqi

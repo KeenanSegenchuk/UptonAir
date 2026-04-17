@@ -62,8 +62,6 @@ function ChatBox( {assistant_id} ) {
 	  context: getCtx()
 	});
 	
-	console.log(prompt);
-
 	if(showCompression && compressedSizeFN(epsilon) > 750) {
 		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
 		return;
@@ -75,7 +73,6 @@ function ChatBox( {assistant_id} ) {
 		  headers: { "Content-Type": "application/json" },
 		  body: JSON.stringify({ "prompt": prompt, "id":  sessionID}),
 		}).then(res => {
-			console.log("ChatBot Response:", res);
 			setResponse(res.data.response);
 		}).catch(error => {
 			console.error("Error querying chat bot:", error);
@@ -84,7 +81,7 @@ function ChatBox( {assistant_id} ) {
     };
 
 
-    const CloseButton = () => {
+    const CloseButton = () => (
       <button
         onClick={() => setShowChatBox(false)}
         style={{
@@ -106,7 +103,7 @@ function ChatBox( {assistant_id} ) {
       >
         ×
       </button>
-    };
+    );
 
 
     //autocompression function
@@ -116,7 +113,6 @@ function ChatBox( {assistant_id} ) {
     const [lastRawSize, setLastRawSize] = useState(0);
     useEffect(() => {
 	const compressedSize = compressedSizeFN(epsilon);
-	console.log(`Autocompressing... showCompression: ${showCompression}, low: ${low}, high: ${high}, epsilon: ${epsilon} , compressedSize: ${compressedSize}, rawSize: ${rawDataSize()}, lastRawSize: ${lastRawSize}`);
 
 	//exit when done compressing
 	if(!showCompression || (500 < compressedSize && compressedSize < 600)) {return;}
@@ -125,7 +121,6 @@ function ChatBox( {assistant_id} ) {
 
 	//reset binary search params when data changes
 	if(rawDataSize() !== lastRawSize) {
-		console.log("Reseting binary search and returning...");
 		setHigh(maxEpsilon);
 		setLow(0);
 		if(epsilon === maxEpsilon/2) {
@@ -142,12 +137,10 @@ function ChatBox( {assistant_id} ) {
 	if(compressedSize > 600) {
 		setLow(epsilon);
 		setEpsilon((high + epsilon)/2);
-		console.log("Increasing Epsilon");
 	}
 	if(compressedSize < 500) {
 		setHigh(epsilon);
 		setEpsilon((epsilon + low)/2);
-		console.log("Lowering Epsilon");
 	}
 		
 	//break from loop if data too large to fully compress
@@ -155,7 +148,7 @@ function ChatBox( {assistant_id} ) {
     }, [epsilon, showCompression, rawDataSize]);
 
     return (
-        <div id="ChatBox.js"> {/* TODO: MAKE WINDOW MOVEABLE AND RESIZEABLE */}
+        <div id="ChatBox.js">
 		<CloseButton/>
 		<center>
 			<h2 className="chatboxheader2">Ask a question:</h2>
@@ -194,36 +187,6 @@ function ChatBox( {assistant_id} ) {
 			<span className="chatboxspan">When advanced context is enabled and the chat bot is open, the dashboard will display compressed data so you know exactly what the bot sees.</span>
 		</center>		
 
-		{/*OLD DATA COMPRESSION CONTROLS
-		{showCompression &&
-			<center>
-			    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", paddingTop:"10px" }}>
-			      <h5 style={{ marginTop:"0px", marginBottom:"0px" }} htmlFor="boolCheck">Auto Compress Data:</h5>
-			      <input
-			        type="checkbox"
-			        checked={autoCompress}
-			        onChange={(e) => setAutoCompress(e.target.checked)}
-			        style={{ cursor: "pointer", width: "18px", height: "18px" }}
-			      />
-			    </div>
-			    {autoCompress ? 
-				<div/>
-			     :
-			        <div style={{marginTop:"0px", marginBottom:"25px", display:"flex", flexDirection: "column"}}>
-				    <h4 style={{marginTop:"5px"}}>{`Compression Level: ${epsilon}, Size: ${compressedSize}`}</h4>
-				    <input className="Marginless hideMobile"
-			              type="range"
-			              value={epsilon} min="0" max={maxEpsilon} step="0.1" 
-			              onChange={(e)=>{setEpsilon(e.target.value)}}
-			              style={{marginBottom: "-15px", marginTop: "-10px",  width: '60%', alignSelf: "center" }}
-			    	    />
-				</div>
-			    } 
-			    <span style={{fontSize:".9em", marginTop:"0px"}}>Check the graph on the dashboard to check how the chat bot will see your data.</span> 
-			</center>
-		}
-		*/}
-		{/*<button onClick={()=>{setShowCompression(prev => !prev);}}>{showCompression ? "Graph raw data on dashboard" : "Graph compressed data"}</button>*/} {/* Manually control whether graph data is compressed or not */}
 
 
 

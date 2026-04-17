@@ -13,12 +13,11 @@ const unitDesc = getObj("ud");
 
 
 function Alerts() {
-    const {BASE_URL, API_URL} = useAppContext();
+    const {BASE_URL, API_URL, csrfToken} = useAppContext();
     const dashboard_url = BASE_URL + "dashboard";
     const api = axios.create({
       baseURL: API_URL,
     });
-    console.log("api url", API_URL);
 
     const [email, setEmail] = useState('');
     const [unit, setUnit] = useState("AQIEPA");
@@ -35,6 +34,7 @@ function Alerts() {
 
     const [notification, setNotification] = useState(null);
     const [activeTab, setActiveTab] = useState('add');
+    const [submitted, setSubmitted] = useState(false);
 
     const handleEmailChange = (event) => setEmail(event.target.value);
     const handleCutoffChange = (event) => setAQIcutoff(event.target.value);
@@ -70,6 +70,8 @@ function Alerts() {
         setNotification({ message, isSuccess });
         setTimeout(() => setNotification(null), 21000);
     };
+
+    const isValidEmail = (addr) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr);
     //convert selection list to csv string
     const L2S = (selected) => {
         if (selected.includes("All")) return "All";
@@ -77,28 +79,54 @@ function Alerts() {
     };
 
     const addContact = () => {
+        if (!isValidEmail(email)) {
+            showNotification("Please enter a valid email address.", false);
+            return;
+        }
+        if (!alertName.trim()) {
+            showNotification("Please enter an alert name.", false);
+            return;
+        }
 	const ids = L2S(alertSensors);
 
-        api.post(`alerts/add/${email}/${alertName}/${alertType}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`)
+        api.post(`alerts/add/${email}/${alertName}/${alertType}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`, null, { headers: { 'X-CSRF-Token': csrfToken } })
             .then(response => {
                 showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
+                setSubmitted(true);
+                setTimeout(() => setSubmitted(false), 5000);
                 console.log("Response from contact info add request:", response);
             }).catch(error => {
-		const serverMessage = error.response?.data?.error || "Unknown error occurred.";
-                showNotification(`Error adding alert: ${serverMessage}`, false);
+                if (error.response?.status === 429) {
+                    showNotification("Too many requests. Please wait a while before adding another alert.", false);
+                } else {
+                    const serverMessage = error.response?.data?.error || "Unknown error occurred.";
+                    showNotification(`Error adding alert: ${serverMessage}`, false);
+                }
             });
     };
 
     const removeContact = () => {
+        if (!isValidEmail(email)) {
+            showNotification("Please enter a valid email address.", false);
+            return;
+        }
+        if (!alertName.trim()) {
+            showNotification("Please enter an alert name.", false);
+            return;
+        }
 
-        api.post(`alerts/remove/${email}/${alertName}`)
-	    .then(response => {
-		    const serverMessage = response.data?.message || 'Successfully removed alert';
-		    showNotification(`Success: ${serverMessage}`, true);
-		    console.log("Server message:", serverMessage);
-	    }).catch(error => {
-		const serverMessage = error.response?.data?.error || "Unknown error occurred.";
-                showNotification(`Error removing alert: ${serverMessage}`, false);
+        api.post(`alerts/remove/${email}/${alertName}`, null, { headers: { 'X-CSRF-Token': csrfToken } })
+            .then(response => {
+                const serverMessage = response.data?.message || 'Successfully removed alert';
+                showNotification(`Success: ${serverMessage}`, true);
+                console.log("Server message:", serverMessage);
+            }).catch(error => {
+                if (error.response?.status === 429) {
+                    showNotification("Too many requests. Please wait a while before trying again.", false);
+                } else {
+                    const serverMessage = error.response?.data?.error || "Unknown error occurred.";
+                    showNotification(`Error removing alert: ${serverMessage}`, false);
+                }
             });
     };
 
@@ -327,6 +355,15 @@ function Alerts() {
 		</div>
 	    )}	
 	    <div style={{height:"15px"}}/>
+            {submitted && (
+                <div style={{
+                    background: '#4CAF50', color: 'white', padding: '15px',
+                    borderRadius: '8px', textAlign: 'center', marginBottom: '10px',
+                    fontWeight: 'bold'
+                }}>
+                    ✓ Alert "{alertName}" created successfully for {email}!
+                </div>
+            )}
             {notification && (
                 <div className={`notification ${notification.isSuccess ? 'success' : 'error'}`}>
                     {notification.message}
