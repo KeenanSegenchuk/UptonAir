@@ -16,12 +16,14 @@ services:
       - IGNORE_MAX_PULL=0 # set to 1 to bypass the 2-week cap for pulling from purpleair
       - FILL_GAPS=1 # set 1 to fill gaps in data, see updateTask to set time after which to check for gaps
       - REBUILD_ALERTS=0 # set to REBUILD to fully reset alerts table !!WARNING!!: this will fully wipe and rebuild alerts table
-    ports:
-      - "5000:5000"  # Expose port 5000 to the host
+    expose:
+      - "5000"
     restart: unless-stopped
     depends_on:
       pgdb:
         condition: service_healthy
+    networks:
+      - default
     volumes:
       - ./flask-server/data.txt:/app/flask-server/data.txt
       - ./sensor-info.json:/app/flask-server/sensor-info.json
@@ -42,8 +44,8 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
