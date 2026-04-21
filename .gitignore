@@ -4,3 +4,5 @@
 data.txt
 flask-sever/data analysis/
 .claude
+certs
+flask-server/__pycache__/

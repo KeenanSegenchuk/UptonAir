@@ -56,16 +56,29 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nginx
-    ports:
-      - "80:80"  # Exposes port 80 for web traffic
-      - "443:443" # Expose ssl port for https
+    expose:
+      - "80"
+      - "443"
+#use this instead of "expose" if not using my custom NginxRouter service
+#    ports:
+#      - "80:80"  # Exposes port 80 for web traffic
+#      - "443:443" # Expose ssl port for https
     depends_on:
       - flask-server  # Ensures Flask is up before Nginx
+    environment:
+      - URL = ${URL}
+    networks:
+      - web-router
+      - default
     volumes:
-      - ./cert.pem:/etc/nginx/cert.pem:ro #https certificate / private key
-      - ./key.pem:/etc/nginx/key.pem:ro #public key
+      - ./certs/cert.pem:/etc/nginx/cert.pem:ro #https certificate / private key
+      - ./certs/key.pem:/etc/nginx/key.pem:ro #public key
       - ./client/build:/etc/nginx/html:ro #static webpage
 
 volumes:
   data:
     driver: local
+
+networks:
+  web-router:
+    external: true

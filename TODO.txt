@@ -5,6 +5,7 @@ UptonAir - Professional Improvement Checklist
 
 --- NEW FEATURES ---
 [ ] Add alert type to check if a sensor has stopped reporting.
+Skip for now [ ] Add user alert panel accesible through OTP sent to the email associated with the alerts 
 
 --- SECURITY ---
 [x] Rate-limit /api/chat (10/min, 100/day per IP)
@@ -28,6 +29,8 @@ skip this [ ] Add email verification step on alert signup (confirm link)
 [x] Fully Implement structured logging in log.py (replace print() calls)
 [x] Add retry/backoff on PurpleAir API calls (use tenacity or manual retry loop)
 [x] Add Docker health checks and restart policies in docker-compose.yml
+[ ] Branch pgCheckAlert logic for new alert_type of "downtime_alert".
+
 
 --- FRONTEND ---
 [x] Break up AppContext.js into focused custom hooks (useSensorData, useGraphConfig, useChatState)
