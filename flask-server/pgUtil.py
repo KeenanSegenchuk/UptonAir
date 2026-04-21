@@ -213,11 +213,16 @@ def pgInit(path, rebuild = False):
 		cur.execute(query,(table,))
 		return cur.fetchone()[0]
 	
+	def safe_cast(val, fn):
+		if value in ("null", "NULL", "Null", "None"):
+			return None
+		return fn(value)
+
 	def loadFile(path):
 		format = [int, int, float, float, float, float, int, int]
 		with open(path) as file:
 			data = file.read().splitlines()[1:]
-		process = lambda line: [format[i](entry) for i, entry in enumerate(line.split(","))]
+		process = lambda line: [safe_cast(entry, format[i]) for i, entry in enumerate(line.split(","))]
 		data = [process(line) for line in data]
 		return data
 
