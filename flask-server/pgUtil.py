@@ -313,9 +313,10 @@ def pgBuildAlertsTable(rebuild):
 			last_alert INT,
 			n_triggered INT,
 			unit TEXT,
-			alert_type TEXT, #"any" or "avg", decides if alert can be triggered by any selected sensor or the average of all selected
+			alert_type TEXT, 
 			CONSTRAINT unique_name_address UNIQUE (address, name)
 		);""")
+		#alert_type: "any" or "avg", decides if alert can be triggered by any selected sensor or the average of all selected
 
 	pgClose(conn, cur)
 
