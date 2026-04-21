@@ -214,9 +214,9 @@ def pgInit(path, rebuild = False):
 		return cur.fetchone()[0]
 	
 	def safe_cast(val, fn):
-		if value in ("null", "NULL", "Null", "None"):
+		if val in ("null", "NULL", "Null", "None"):
 			return None
-		return fn(value)
+		return fn(val)
 
 	def loadFile(path):
 		format = [int, int, float, float, float, float, int, int]
