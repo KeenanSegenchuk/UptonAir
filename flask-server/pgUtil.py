@@ -185,7 +185,13 @@ def pgQuery(cur, start, end, sensor, col = "*"):
 	
 
 def pgPushData(cur, data):
+	i = 0
+	c = 0
 	for row in data:
+		if i == 1000:
+			i = 0
+			c += 1
+			print(f"Restored {c} thousand rows...")
 		try:
 			cur.execute("""
 			    INSERT INTO readings (time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA)

@@ -111,6 +111,7 @@ if __name__ == "__main__":
 		conn, cur = pgOpen()
 		pgPushData(cur, data)
 		pgClose(conn, cur)
+		print("Finished filling gaps in db.")
 
 
 	#add generated columns 

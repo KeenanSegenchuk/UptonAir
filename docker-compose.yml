@@ -11,7 +11,7 @@ services:
       - EMAIL_PASSWORD=${EMAIL_PASSWORD} # app-specific password (can't be used to login to gmail, but allows sending smtp email)
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
-      - REINIT_DB=REINIT # control whether pgdb should be re initialized from data.txt ("REINIT") or persisted from the volume ("0")
+      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt ("REINIT") or persisted from the volume ("0")
       - LOOP=1 # 0 to disable data update loop
       - IGNORE_MAX_PULL=0 # set to 1 to bypass the 2-week cap for pulling from purpleair
       - FILL_GAPS=0 # set 1 to fill gaps in data, see updateTask to set time after which to check for gaps
@@ -62,10 +62,10 @@ services:
     expose:
       - "80"
       - "443"
-#use this instead of "expose" if not using my custom NginxRouter service
-#    ports:
-#      - "80:80"  # Exposes port 80 for web traffic
-#      - "443:443" # Expose ssl port for https
+use this instead of "expose" if not using my custom NginxRouter service
+    ports:
+      - "80:80"  # Exposes port 80 for web traffic
+      - "443:443" # Expose ssl port for https
     depends_on:
       - flask-server  # Ensures Flask is up before Nginx
     environment:
