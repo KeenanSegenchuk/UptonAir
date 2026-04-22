@@ -204,5 +204,42 @@ class TestAllowedUnits(unittest.TestCase):
             self.assertNotIn(val, self.allowed, f"'{val}' should not be in ALLOWED_UNITS")
 
 
+# ---------------------------------------------------------------------------
+# resizeGaps
+# ---------------------------------------------------------------------------
+
+class TestResizeGaps(unittest.TestCase):
+
+    def setUp(self):
+        from pgUtil import resizeGaps
+        self.resizeGaps = resizeGaps
+
+    def test_gap_smaller_than_max_unchanged(self):
+        gaps = [(0, 100)]
+        self.assertEqual(self.resizeGaps(gaps, maxGap=1000), [(0, 100)])
+
+    def test_gap_equal_to_max_unchanged(self):
+        gaps = [(0, 1000)]
+        self.assertEqual(self.resizeGaps(gaps, maxGap=1000), [(0, 1000)])
+
+    def test_gap_split_evenly(self):
+        gaps = [(0, 3000)]
+        result = self.resizeGaps(gaps, maxGap=1000)
+        self.assertEqual(result, [(0, 1000), (1000, 2000), (2000, 3000)])
+
+    def test_gap_split_with_remainder(self):
+        gaps = [(0, 2500)]
+        result = self.resizeGaps(gaps, maxGap=1000)
+        self.assertEqual(result, [(0, 1000), (1000, 2000), (2000, 2500)])
+
+    def test_multiple_gaps_mixed(self):
+        gaps = [(0, 500), (1000, 3500)]
+        result = self.resizeGaps(gaps, maxGap=1000)
+        self.assertEqual(result, [(0, 500), (1000, 2000), (2000, 3000), (3000, 3500)])
+
+    def test_empty_list(self):
+        self.assertEqual(self.resizeGaps([], maxGap=1000), [])
+
+
 if __name__ == "__main__":
     unittest.main()

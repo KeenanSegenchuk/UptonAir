@@ -1,5 +1,6 @@
 *.csr
 *.pem
+*.pyc
 .env
 data.txt
 pulled_data.txt

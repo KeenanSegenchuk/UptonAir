@@ -38,7 +38,6 @@ def update_loop():
             print(f"Error pulling data: {e}")
             traceback.print_exc()
             return
-        print("returned from pullfn")
 
         #convert from format pulled from purpleair to db format. change from pAir id to db id if id changed in purpleair
         new_lines = formatLines(new_lines, "tuple")
@@ -100,16 +99,17 @@ if __name__ == "__main__":
 	if (os.getenv("FILL_GAPS") == "1"):
 		print("FILL_GAPS Enabled. Checking for gaps in DB...")
 		#pull gapped data
-		gaps = pgFindGaps(min_time = 1749665708)
+		gaps = pgFindGaps(min_time = 1749665708, resize_gaps = True)
 		print(f"Pulling data to fill gaps: {gaps}")
-		data = []
-		for start, end in gaps:
-			data += asyncio.run(pull(start, end))
-		
-		#format and archive data
-		data = formatLines(data, "tuple")
 		conn, cur = pgOpen()
-		pgPushData(cur, data)
+		for start, end in gaps:
+			data = []
+			data += asyncio.run(pull(start, end))
+			if len(data) == 0:
+				continue
+
+			data = formatLines(data, "tuple")
+			pgPushData(cur, data)
 		pgClose(conn, cur)
 		print("Finished filling gaps in db.")
 

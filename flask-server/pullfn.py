@@ -61,7 +61,7 @@ async def pull(starttime, endtime):
     #keep track of new data to push to postgres
     new_lines = []
     #append to existing data
-    file = open("data.txtx", "a")
+    file = open("data.txt", "a")
     for line in data:
         if len(line) > 0 and line[0] in "0123456789":
             new_lines += [line]

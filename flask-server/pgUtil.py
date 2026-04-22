@@ -268,7 +268,37 @@ def pgInit(path, rebuild = False):
 	
 	return True
 
-def pgFindGaps(min_gap=1200, buffer=300, min_time=0):
+
+def resizeGap(gap, maxGap):
+	"""
+	Helper for resizeGaps
+	"""
+	res = []
+	start = gap[0]
+	end = start + maxGap
+	while end < gap[1]:
+		res += [(start, end)]
+		start = end
+		end = start + maxGap
+	res += [(start, gap[1])]
+	return res
+		
+def resizeGaps(gaps, maxGap=1209600):
+	"""
+	Transforms a list of (start, end) to replace any end-start>maxSize with seperates pairs 
+	[..., (start, end), ...]) - > [..., (start, start+maxSize), (start+maxsize, start+2*maxsize), ... , (end-x, end), ...]
+	"""
+	
+	res = []
+
+	for gap in gaps:
+		if gap[1] - gap[0] > maxGap:
+			res += resizeGap(gap, maxGap)
+		else:
+			res += [gap]
+	return res
+
+def pgFindGaps(min_gap=1200, buffer=300, min_time=0, resize_gaps=False):
 	"""
 	Returns a list of (start, end) tuples representing gaps in the readings table 
 	where the time difference between consecutive entries exceeds `min_gap` seconds.
@@ -296,6 +326,8 @@ def pgFindGaps(min_gap=1200, buffer=300, min_time=0):
 			start = times[i - 1] + buffer
 			end = times[i] - buffer
 			gaps.append((start, end))
+	if resize_gaps:
+		gaps = resizeGaps(gaps)
 
 	return gaps
 
