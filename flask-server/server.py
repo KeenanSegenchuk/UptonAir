@@ -258,7 +258,7 @@ def chat():
 # ALERTS
 # Add new email alert to database
 @alert_bp.route("/add/<string:address>/<string:name>/<string:alert_type>/<string:unit>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>", methods=["POST"])
-@limiter.limit("5 per hour")
+@limiter.limit("15 per hour")
 def add_alert(address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window):
 	"""
 	Subscribe an email address to an air quality alert.

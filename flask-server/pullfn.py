@@ -52,13 +52,16 @@ async def pull(starttime, endtime):
         except Exception as e:
             print(f"Failed to pull from sensor {sensor} after retries: {e}")
             return []
-        for line in response.content.decode('utf-8').splitlines():
-            data.append(line)
-            print(f'line: {line}')
+        with open("pulled_data.txt", "a") as file:
+            for line in response.content.decode('utf-8').splitlines():
+                data.append(line)
+                print(f'line: {line}')
+                file.write(line)
 
     #keep track of new data to push to postgres
     new_lines = []
     #append to existing data
+    file = open("data.txtx", "a")
     for line in data:
         if len(line) > 0 and line[0] in "0123456789":
             new_lines += [line]
@@ -124,10 +127,11 @@ async def pullfn(return_data = False):
         except Exception as e:
             print(f"Failed to pull from sensor {sensor} after retries: {e}")
             return []
-        with open("pulled_data.txt", "a"):
+        with open("pulled_data.txt", "a") as file:
             for line in response.content.decode('utf-8').splitlines():
                 data.append(line)
                 print(f'line: {line}')
+                file.write(line)
 
     file = open("data.txt", "a")
     #keep track of new data to push to postgres
