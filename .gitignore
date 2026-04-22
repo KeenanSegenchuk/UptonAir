@@ -2,6 +2,7 @@
 *.pem
 .env
 data.txt
+pulled_data.txt
 flask-sever/data analysis/
 .claude
 certs/
