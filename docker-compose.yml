@@ -11,10 +11,10 @@ services:
       - EMAIL_PASSWORD=${EMAIL_PASSWORD} # app-specific password (can't be used to login to gmail, but allows sending smtp email)
       - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
       - API_URL=raspberrypi.local/api
-      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt ("REINIT") or persisted from the volume ("0")
+      - REINIT_DB=REINIT # control whether pgdb should be re initialized from data.txt ("REINIT") or persisted from the volume ("0")
       - LOOP=1 # 0 to disable data update loop
       - IGNORE_MAX_PULL=0 # set to 1 to bypass the 2-week cap for pulling from purpleair
-      - FILL_GAPS=1 # set 1 to fill gaps in data, see updateTask to set time after which to check for gaps
+      - FILL_GAPS=0 # set 1 to fill gaps in data, see updateTask to set time after which to check for gaps
       - REBUILD_ALERTS=0 # set to REBUILD to fully reset alerts table !!WARNING!!: this will fully wipe and rebuild alerts table
     expose:
       - "5000"

@@ -241,9 +241,9 @@ def pgInit(path, rebuild = False):
 			time INT,
 			id INT,
 			humidity NUMERIC(4, 1),
-			PMA NUMERIC(6, 3),
-			PMB NUMERIC(6, 3),
-			PMEPA NUMERIC(6, 3),
+			PMA NUMERIC(7, 4),
+			PMB NUMERIC(7, 4),
+			PMEPA NUMERIC(7, 4),
 			AQI SMALLINT,
 			AQIEPA SMALLINT,
 			CONSTRAINT readings_pkey PRIMARY KEY (time, id)
