@@ -33,7 +33,7 @@ async def pull(starttime, endtime):
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
-    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
+    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity_a"
     key = os.getenv("PURPLEAIR_API_KEY")
 
     #populate data with responses from purpleair's api
@@ -100,7 +100,7 @@ async def pullfn(return_data = False):
     baseurl = ("https://api.purpleair.com/v1/sensors/")
     historyurl = ("/history/csv?")
     timeurl = "start_timestamp=" + str(starttime) + "&end_timestamp=" + str(endtime)
-    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity"
+    datafieldsurl = "&average=10&fields=pm2.5_atm_a%2C%20pm2.5_atm_b%2C%20humidity_a"
     key = os.getenv("PURPLEAIR_API_KEY")
 
     #populate data with responses from purpleair's api
@@ -124,9 +124,10 @@ async def pullfn(return_data = False):
         except Exception as e:
             print(f"Failed to pull from sensor {sensor} after retries: {e}")
             return []
-        for line in response.content.decode('utf-8').splitlines():
-            data.append(line)
-            print(f'line: {line}')
+        with open("pulled_data.txt", "a"):
+            for line in response.content.decode('utf-8').splitlines():
+                data.append(line)
+                print(f'line: {line}')
 
     file = open("data.txt", "a")
     #keep track of new data to push to postgres

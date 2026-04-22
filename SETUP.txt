@@ -54,6 +54,7 @@ Workflows:
 		When launching:
 			Run "docker-compose up",
 			or "docker-compose up --build" to rebuild and launch.
+			NOTE: make sure flask-server/data.txt and /data/ have write permissions of docker will not persists data to local
 		When updating:
 			Just run ./update script
 

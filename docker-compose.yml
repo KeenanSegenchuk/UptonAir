@@ -26,6 +26,7 @@ services:
       - default
     volumes:
       - ./flask-server/data.txt:/app/flask-server/data.txt
+      - ./flask-server/pulled_data.txt:/app/flask-server/pulled_data.txt
       - ./sensor-info.json:/app/flask-server/sensor-info.json
       - ./config.txt:/app/flask-server/config.txt
     healthcheck:
@@ -43,7 +44,7 @@ services:
       - POSTGRES_PASSWORD=passw0rd
       - POSTGRES_DB=postgres
     volumes:
-      - data:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
     expose:
       - "5432"
     restart: unless-stopped
