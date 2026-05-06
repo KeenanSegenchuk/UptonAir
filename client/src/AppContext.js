@@ -11,8 +11,6 @@ export const AppContext = createContext();
 export const useAppContext = () => useContext(AppContext);
 
 export const ContextProvider = ({ children }) => {
-  console.log("ContextProvider render");
-
   const graphConfig = useGraphConfig();
   const sensorData = useSensorData({ initialLineUnits: graphConfig.dashboardConfig.line_units });
   const chatState = useChatState();
@@ -110,7 +108,7 @@ export const ContextProvider = ({ children }) => {
     buttonPositions: graphConfig.buttonPositions, setButtonPositions: graphConfig.setButtonPositions,
     button_position: (sensor) => graphConfig.buttonPositions[sensor],
 
-    // sensorData
+    // sensorData --note: much of this like compressedData, epsilon, etc is just for the chatbox to see graph state
     data, setData: sensorData.setData, rawDataSize,
     rawData: sensorData.rawData,
     compressedData: sensorData.compressedData, setCompressedData: sensorData.setCompressedData,
