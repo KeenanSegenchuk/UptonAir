@@ -15,6 +15,7 @@ function ChatBox( {assistant_id} ) {
     const [userPrompt, setUserPrompt] = useState("");
     const [lastPrompt, setLastPrompt] = useState("");
     const [response, setResponse] = useState("");
+    const [compressionWarning, setCompressionWarning] = useState("");
     const [sessionID] = useState(() => Math.random().toString(36).slice(2));
 
     const {globalLineBool, compressedData, compressedSizeFN, rawDataSize, dataContext, lineMode, sensor_id, sensor_idAvgs, buttonAvgs, selectedSensors, units, lineUnits} = useAppContext();
@@ -61,11 +62,6 @@ function ChatBox( {assistant_id} ) {
 	  user_prompt: userPrompt,
 	  context: getCtx()
 	});
-	
-	if(showCompression && compressedSizeFN(epsilon) > 750) {
-		setResponse("Compressed Data too large, increase epsilon or enable auto compression.");
-		return;
-	}
 
 	setResponse("Waiting for response from server...");
 
@@ -107,7 +103,8 @@ function ChatBox( {assistant_id} ) {
 
 
     //autocompression function
-    const maxEpsilon = 30;
+    const maxEpsilon = 50;
+    const idealMaxEpsilon = 20;
     const [low, setLow] = useState(0);
     const [high, setHigh] = useState(maxEpsilon);
     const [lastRawSize, setLastRawSize] = useState(0);
@@ -115,7 +112,14 @@ function ChatBox( {assistant_id} ) {
 	const compressedSize = compressedSizeFN(epsilon);
 
 	//exit when done compressing
-	if(!showCompression || (500 < compressedSize && compressedSize < 600)) {return;}
+	if(!showCompression || (500 < compressedSize && compressedSize < 600)) {
+		if(showCompression && epsilon > idealMaxEpsilon) {
+			setCompressionWarning("Warning: The amount of data being compressed is very large, so compression may remove important features.");
+		} else {
+			setCompressionWarning("");
+		}
+		return;
+	}
 	//don't compress data if already small enough
 	if(rawDataSize() < 600) {setEpsilon(0); return;}
 
@@ -144,7 +148,10 @@ function ChatBox( {assistant_id} ) {
 	}
 		
 	//break from loop if data too large to fully compress
-	if(low > maxEpsilon - 1) {setShowCompression(false);}
+	if(low > maxEpsilon - 1) {
+		setCompressionWarning("Warning: Data is too large to compress within context limits. Consider a shorter time range.");
+		return;
+	}
     }, [epsilon, showCompression, rawDataSize]);
 
     return (
@@ -182,6 +189,8 @@ function ChatBox( {assistant_id} ) {
 		</div>
 		
 		<center>
+			{compressionWarning && <span className="chatboxspan" style={{color: "red"}}>{compressionWarning}</span>}
+			<br/>
 			<span className="chatboxspan">Enabling advanced context allows the chat bot to see a compressed version of the current graph.</span>
 			<br/><div style={{height: "3px"}}/>
 			<span className="chatboxspan">When advanced context is enabled and the chat bot is open, the dashboard will display compressed data so you know exactly what the bot sees.</span>
