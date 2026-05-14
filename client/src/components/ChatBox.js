@@ -197,9 +197,9 @@ function ChatBox( {assistant_id} ) {
 				By default the chatbot can see the current state of the dashboard except the data on the graph. To show data to the chatbot, you can enable "Advanced Context" above and compress the data.
 			</span>
 	
-			<pre>
+			{/*<pre>
 				{JSON.stringify(getCtx(), null, 2)}
-			</pre>
+			</pre>*/}
 		</center>
 
 		<center>

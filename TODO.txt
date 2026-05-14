@@ -51,7 +51,60 @@ skip this [ ] Add email verification step on alert signup (confirm link)
 [ ] Make "Trigger Alert When" options have circle check boxes rather than square & make them stack vertically if too wide to all fit on 1 line.
 
 --- PRODUCTION READINESS ---
+[ ] CI/CD: figure out how to build and automatically push arm images (see bottom)
 [x] API documentation — Flasgger/Swagger UI at /apidocs (all 9 routes documented)
 [x] Unit tests — PMtoAQI (all formula ranges + edge cases), email regex, ALLOWED_UNITS (flask-server/test_unit.py)
 skip for now [ ] Error tracking (Sentry or equivalent)
 skip for now & prolly 4ever [ ] Admin panel for sensor and alert management
+
+
+
+
+
+
+
+
+
+
+
+
+
+<CI/CD>
+
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up QEMU emulation for ARM support
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Set up the advanced Docker builder
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build for ARM and push to registry
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: your-dockerhub-username/your-app:latest
+
+
