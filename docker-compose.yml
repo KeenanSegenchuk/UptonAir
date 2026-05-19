@@ -6,6 +6,7 @@ services:
       target: flask-server
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
       - PURPLEAIR_API_KEY=${PURPLEAIR_API_KEY}
       - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
       - EMAIL_PASSWORD=${EMAIL_PASSWORD} # app-specific password (can't be used to login to gmail, but allows sending smtp email)
