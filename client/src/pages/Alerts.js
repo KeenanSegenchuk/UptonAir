@@ -34,7 +34,6 @@ function Alerts() {
 
     const [notification, setNotification] = useState(null);
     const [activeTab, setActiveTab] = useState('add');
-    const [submitted, setSubmitted] = useState(false);
 
     const handleEmailChange = (event) => setEmail(event.target.value);
     const handleCutoffChange = (event) => setAQIcutoff(event.target.value);
@@ -92,8 +91,6 @@ function Alerts() {
         api.post(`alerts/add/${email}/${alertName}/${alertType}/${unit}/${AQIcutoff}/${ids}/${cooldown}/${avgWindow}`, null, { headers: { 'X-CSRF-Token': csrfToken } })
             .then(response => {
                 showNotification(`Success! Alert "${alertName}" added for ${email}.`, true);
-                setSubmitted(true);
-                setTimeout(() => setSubmitted(false), 5000);
                 console.log("Response from contact info add request:", response);
             }).catch(error => {
                 if (error.response?.status === 429) {
@@ -355,15 +352,6 @@ function Alerts() {
 		</div>
 	    )}	
 	    <div style={{height:"15px"}}/>
-            {submitted && (
-                <div style={{
-                    background: '#4CAF50', color: 'white', padding: '15px',
-                    borderRadius: '8px', textAlign: 'center', marginBottom: '10px',
-                    fontWeight: 'bold'
-                }}>
-                    ✓ Alert "{alertName}" created successfully for {email}!
-                </div>
-            )}
             {notification && (
                 <div className={`notification ${notification.isSuccess ? 'success' : 'error'}`}>
                     {notification.message}
