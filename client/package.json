@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "axios": "^1.7.7",
+    "caniuse-lite": "^1.0.30001793",
     "echarts-for-react": "^3.0.2",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "baseline-browser-mapping": "^2.10.32",
     "eslint-config-react-app": "^7.0.1",
     "postcss": "^8.5.6",
     "source-map-explorer": "^2.5.3"
