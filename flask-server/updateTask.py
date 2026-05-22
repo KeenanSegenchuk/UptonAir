@@ -99,7 +99,7 @@ if __name__ == "__main__":
 	if (os.getenv("FILL_GAPS") == "1"):
 		print("FILL_GAPS Enabled. Checking for gaps in DB...")
 		#pull gapped data
-		gaps = pgFindGaps(min_time = 1749665708, resize_gaps = True)
+		gaps = pgFindGaps(min_time = 1771865708, resize_gaps = True)
 		print(f"Pulling data to fill gaps: {gaps}")
 		conn, cur = pgOpen()
 		for start, end in gaps:
