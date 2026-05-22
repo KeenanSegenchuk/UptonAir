@@ -96,11 +96,15 @@ if __name__ == "__main__":
 		print("Succesfully located chatlgos table.")
 
 	#fill gaps in database
-	if (os.getenv("FILL_GAPS") == "1"):
+	if (os.getenv("FILL_GAPS") != "0"):
 		print("FILL_GAPS Enabled. Checking for gaps in DB...")
-		#pull gapped data
-		gaps = pgFindGaps(min_time = 1771865708, resize_gaps = True)
+		id = int(v) if (v := os.getenv("FILL_GAPS", "")).isdigit() and len(v) == 6 else 0
+
+		#find gaps in data
+		gaps = pgFindGaps(min_time = 1771865708, resize_gaps = True, id = id)
 		print(f"Pulling data to fill gaps: {gaps}")
+		
+		#pull and push missing data
 		conn, cur = pgOpen()
 		for start, end in gaps:
 			data = []

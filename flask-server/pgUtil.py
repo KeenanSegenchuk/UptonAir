@@ -298,7 +298,7 @@ def resizeGaps(gaps, maxGap=1209600):
 			res += [gap]
 	return res
 
-def pgFindGaps(min_gap=1200, buffer=300, min_time=0, resize_gaps=False):
+def pgFindGaps(min_gap=1200, buffer=300, min_time=0, resize_gaps=False, id = 0):
 	"""
 	Returns a list of (start, end) tuples representing gaps in the readings table 
 	where the time difference between consecutive entries exceeds `min_gap` seconds.
@@ -309,12 +309,24 @@ def pgFindGaps(min_gap=1200, buffer=300, min_time=0, resize_gaps=False):
 	conn, cur = pgOpen()
 
 	# Fetch ordered list of timestamps
-	cur.execute("""
-		SELECT time FROM readings 
-		WHERE time > %s
-		GROUP BY time 
-		ORDER BY time ASC
-	""", (min_time,))
+	if id == 0:
+		#find gaps in all data
+		cur.execute("""
+			SELECT time FROM readings 
+			WHERE time > %s
+			GROUP BY time 
+			ORDER BY time ASC
+		""", (min_time,))
+	else:
+		#find gaps for specific sensor
+		cur.execute("""
+			SELECT time FROM readings 
+			WHERE time > %s AND id = %s
+			GROUP BY time 
+			ORDER BY time ASC
+		""", (min_time, id))
+		
+
 	times = [row[0] for row in cur.fetchall()]
 	pgClose(conn, cur)
 
