@@ -14,7 +14,7 @@ const unitDesc = getObj("ud");
 
 function Alerts() {
     const {BASE_URL, API_URL, csrfToken} = useAppContext();
-    const dashboard_url = BASE_URL + "dashboard";
+    const dashboard_url = BASE_URL;
     const info_url = BASE_URL + "info";
     const api = axios.create({
       baseURL: API_URL,
