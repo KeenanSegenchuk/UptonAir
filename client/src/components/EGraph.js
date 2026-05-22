@@ -322,9 +322,14 @@ function EGraph() {
         if (!chart) return;
 
         const updateAxisAndGradient = () => {
-        	const xAxis = chart?.getModel()?.getComponent('xAxis').axis; 
+        	const xAxis = chart?.getModel()?.getComponent('xAxis').axis;
 		if (!xAxis) return;
-        	const [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+        	let [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+		// Fall back to known state values if chart extent is uninitialized (e.g. startTime === endTime === 0)
+		if (!startTime || !endTime || startTime === endTime) {
+		    startTime = start;
+		    endTime = end;
+		}
         	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
                 const formatter = tickLabelFormats[formatIndex];
         
