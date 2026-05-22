@@ -23,8 +23,8 @@ function App() {
                 <Router>
                     <Suspense fallback={<div>Loading...</div>}>
                         <Routes>
-                            <Route path="/" element={<Landing />} />
-			    <Route path="/dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+                            <Route path="/info" element={<Landing />} />
+			    <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
                             <Route path="/alerts" element={<Alerts />} />
                         </Routes>
                     </Suspense>

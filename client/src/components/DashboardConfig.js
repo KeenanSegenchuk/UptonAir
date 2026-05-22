@@ -89,7 +89,7 @@ function DashboardConfig() {
 	
 		{true /*lineMode != "units"*/ &&
 			<label className="s16">
-			    Main Map/Graph Units:<br/>
+			    Measurement/Units:<br/>
 			    <select className="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
 	       		        {Object.keys(getObj("u")).map((val, index) => (
 					<option value={val}>{getObj("W" + val)}</option>

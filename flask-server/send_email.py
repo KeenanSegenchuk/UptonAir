@@ -346,7 +346,7 @@ def send_summary_email(alerts, email_address):
 				<td style="padding: 6px 12px;">{name}</td>
 				<td style="padding: 6px 12px;">{unit}</td>
 				<td style="padding: 6px 12px;">{min_AQI}</td>
-				<td style="padding: 6px 12px;">{ids}</td>
+				<td style="padding: 6px 12px;">{getSensorNames(ids)}</td>
 				<td style="padding: 6px 12px;">{cooldown} hr</td>
 				<td style="padding: 6px 12px;">{avg_window} min</td>
 				<td style="padding: 6px 12px;">{alert_type}</td>
