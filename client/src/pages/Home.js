@@ -15,6 +15,7 @@ function Home() {
     //setup urls
     const {API_URL, BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
+    const info_url = BASE_URL + "info";
 
     //other vars
     const [loading, setLoading] = useState(false);
@@ -41,7 +42,7 @@ function Home() {
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
-		<LinkButton className="leftLinkButton" text={isMobile?"Info":"More Info"} right={false} href={BASE_URL}/>
+		<LinkButton className="leftLinkButton" text={isMobile?"Info":"More Info"} right={false} href={info_url}/>
 		<h1 className="titleText">{isMobile ? "Dashboard" : config.WEBPAGE_TITLE + " Dashboard"}</h1>
 	        <LinkButton className="rightLinkButton" text={isMobile?"Alerts":"Get Notified"} href={alerts_url}/>
 	    </div>

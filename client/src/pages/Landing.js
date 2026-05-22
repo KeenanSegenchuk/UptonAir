@@ -10,7 +10,7 @@ import config from "../config.json";
 function Landing() {
     const {BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
-    const dashboard_url = BASE_URL + "dashboard";
+    const dashboard_url = BASE_URL;
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 

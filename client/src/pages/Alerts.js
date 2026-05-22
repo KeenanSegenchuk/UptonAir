@@ -15,6 +15,7 @@ const unitDesc = getObj("ud");
 function Alerts() {
     const {BASE_URL, API_URL, csrfToken} = useAppContext();
     const dashboard_url = BASE_URL + "dashboard";
+    const info_url = BASE_URL + "info";
     const api = axios.create({
       baseURL: API_URL,
     });
@@ -135,7 +136,7 @@ function Alerts() {
 	<div className="title" style={{width:"100%", display:"flex", height:"70px", padding:"0px"}}>
 	    <LinkButton className="leftLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={false} href={dashboard_url}/>
             <h1 className="titleText">{isMobile?"Alerts": config.WEBPAGE_TITLE + " Alerts"}</h1>
-	    <LinkButton className="rightLinkButton" text={isMobile?"Info":"Landing Page"} right={true} href={BASE_URL}/>
+	    <LinkButton className="rightLinkButton" text={isMobile?"Info":"Landing Page"} right={true} href={info_url}/>
 	</div>
 	
         <div className="alerts-container">
