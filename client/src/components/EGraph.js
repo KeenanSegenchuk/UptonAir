@@ -289,19 +289,20 @@ function EGraph() {
         if (!chart) return;
 
         const handleZoom = (e) => {
-	    const xAxis = chart.getModel().getComponent('xAxis').axis; 
+	    const zoomData = e.batch ? e.batch[0] : e;
+	    const xAxis = chart.getModel().getComponent('xAxis').axis;
 	    const [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
 	    //trigger gradient update by setting zoom
             setZoom({ start: startTime, end: endTime });
-            
+
 	    const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
             const formatter = tickLabelFormats[formatIndex];
 
 	    setGraphFormat(prev => ({
               ...prev,
               dataZoom: [
-                { type: "slider", xAxisIndex: 0, start: e.start, end: e.end },
-                { type: "inside", xAxisIndex: 0, start: e.start, end: e.end }
+                { type: "slider", xAxisIndex: 0, start: zoomData.start, end: zoomData.end },
+                { type: "inside", xAxisIndex: 0, start: zoomData.start, end: zoomData.end }
               ],
               xAxis: {
                 ...prev.xAxis, // keep existing xAxis config

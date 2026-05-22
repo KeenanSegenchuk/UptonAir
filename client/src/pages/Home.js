@@ -38,7 +38,7 @@ function Home() {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     return (
-	<div className="darkgreen" style = {{ height: '100vh', overflow: 'scroll', display: 'flex', flexDirection: 'column' }}>
+	<div className="darkgreen" style = {{ height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
 	    {/*Header*/}
 	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
