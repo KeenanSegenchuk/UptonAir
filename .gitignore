@@ -7,4 +7,5 @@ pulled_data.txt
 flask-sever/data analysis/
 .claude
 certs/
-flask-server/__pycache__/client/src/sensor-pos.json
+flask-server/__pycache__/
+client/src/sensor-pos.json
