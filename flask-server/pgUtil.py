@@ -241,7 +241,10 @@ def pgInit(path, rebuild = False):
 
 	#check for/setup table
 	if rebuild or not check(conn, cur, "readings"):
-		print(f"Forcing table rebuild from {path}.")
+		if rebuild:
+			print(f"Forcing table rebuild from {path}.")
+		else:
+			print("Initializing readings table since it does not exist.")
 		cur.execute("DROP TABLE IF EXISTS readings;")
 		cur.execute("""CREATE TABLE IF NOT EXISTS readings (
 			time INT,

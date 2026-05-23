@@ -52,7 +52,7 @@ def update_loop():
         print(f"About to clean after cutoff: {cutoff - update_time_seconds}")
         if os.getenv("CLEANING") != "true": 
             os.environ['CLEANING'] = "true"
-            cleanfn("data.txt", cutoff - update_time_seconds)
+            cleanfn("data/data.txt", cutoff - update_time_seconds)
             os.environ['CLEANING'] = "false"
             print("Finished Updating CSV.")
         else:
@@ -73,7 +73,7 @@ def update_loop():
 
 if __name__ == "__main__":
 	print("Data-Updater checking for db connection and readings table:")
-	while not pgInit("data.txt", os.getenv("REINIT_DB") == "REINIT"):
+	while not pgInit("data/data.txt", os.getenv("REINIT_DB") == "REINIT"):
 		print("pgInit could not connect to the database...")
 		print("Waiting 20 seconds then trying to connect again.")
 		sleep(20)

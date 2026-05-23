@@ -2,6 +2,7 @@
 *.pem
 *.pyc
 .env
+/data/
 data.txt
 pulled_data.txt
 flask-sever/data analysis/
