@@ -31,6 +31,8 @@ def _request_with_retry(url, headers, max_retries=3):
 
 
 async def pull(starttime, endtime, id = 0):
+	#this function is used to fill gaps in the database on startup when that is enabled
+
 	#init constants for building api call
 	baseurl = ("https://api.purpleair.com/v1/sensors/")
 	historyurl = ("/history/csv?")
@@ -80,6 +82,8 @@ async def pull(starttime, endtime, id = 0):
 	return new_lines
 
 async def pullfn(return_data = False):
+	#this is the function we use to pull our data normally
+
 	if not hasattr(pullfn, "ignore_pull_limit"):
 		pullfn.ignore_pull_limit = os.getenv("IGNORE_MAX_PULL") == "1"
 
@@ -105,7 +109,7 @@ async def pullfn(return_data = False):
 	lastSample = [-1 for sensor in sensors]
 
 	print(f"Checking for data pulled from sensors: {sensors}")
-	lastSample = [getTimestamp(sensor) for sensor in sensors] #if 0 set to 2 weeks ago so API call goes through
+	lastSample = [getTimestamp(sensor)+1 for sensor in sensors] #if 0 set to 2 weeks ago so API call goes through
 
 	print(f"Pulling data after last entry: {lastSample}...")
 

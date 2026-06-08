@@ -12,7 +12,7 @@ import traceback
 
 #This python file is meant to be run as a thread that updates the data every x minutes
 
-update_time_minutes = 20
+update_time_minutes = 10
 update_time_seconds = update_time_minutes*60
 alert_delay = 30
 
@@ -31,7 +31,7 @@ def alert_loop():
     print("No alerts triggered. See important-logs.txt for more alert logs.")
 
 def update_loop():
-    if maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
+    if True: #maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
         try:
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
         except Exception as e:

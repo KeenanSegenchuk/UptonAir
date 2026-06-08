@@ -187,7 +187,14 @@ def pgQuery(cur, start, end, sensor, col = "*"):
 def pgPushData(cur, data):
 	i = 0
 	c = 0
+	
+	#force values to constrain to db so extremely high values can be kept
+	MAX_VALS = (None, None, 999.9, 999.9, 999.9, 999, 999)
+	def clamp_row(row):
+		return tuple(min(v, MAX_VALS[i]) if MAX_VALS[i] is not None and v is not None else v for i, v in enumerate(row))
+
 	for row in data:
+		row = clamp_row(row)
 		if i == 1000:
 			i = 0
 			c += 1
@@ -250,9 +257,9 @@ def pgInit(path, rebuild = False):
 			time INT,
 			id INT,
 			humidity NUMERIC(4, 1),
-			PMA NUMERIC(7, 4),
-			PMB NUMERIC(7, 4),
-			PMEPA NUMERIC(7, 4),
+			PMA NUMERIC(7, 1),
+			PMB NUMERIC(7, 1),
+			PMEPA NUMERIC(7, 1),
 			AQI SMALLINT,
 			AQIEPA SMALLINT,
 			CONSTRAINT readings_pkey PRIMARY KEY (time, id)
