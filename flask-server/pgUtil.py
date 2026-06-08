@@ -191,7 +191,7 @@ def pgPushData(cur, data):
 	#force values to constrain to db so extremely high values can be kept
 	MAX_VALS = (None, None, 999.9, 999.9, 999.9, 999, 999)
 	def clamp_row(row):
-		return tuple(min(v, MAX_VALS[i]) if MAX_VALS[i] is not None and v is not None else v for i, v in enumerate(row))
+		return tuple(min(float(v), MAX_VALS[i]) if MAX_VALS[i] is not None and v is not None else v for i, v in enumerate(row))
 
 	for row in data:
 		row = clamp_row(row)
