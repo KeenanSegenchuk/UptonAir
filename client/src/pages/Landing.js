@@ -79,7 +79,7 @@ function Landing() {
             
             		<div style={{borderTop:"2px dashed white"}}/>
             	    	<h3 id="ap" className="tabbed s18">Types of Air Pollution</h3>
-            	    	<p className="s12 centered">The EPA currently uses the AQI scale to show health effects for different concentrations of 6 key air pollutants. These six include two types of solid particulate
+            	    	<p className="s12 centered">The EPA currently uses the AQI scale to show health effects for different concentrations of 6 key air pollutants. These six include two types of particulate
             		air pollution (PM2.5 and PM10) and 4 gaseous chemicals (ground-level ozone, 
             		carbon monoxide, sulfur dioxide, and nitrogen dioxide). Our PurpleAir monitors were awarded
             		to us through a DEP grant and only collect PM2.5. While PM2.5 readings do tend to reflect
@@ -90,7 +90,22 @@ function Landing() {
             	    	</p>
             	    	<div style={{height:"25px"}}/>
              
-            
+
+            		<div style={{borderTop:"2px dashed white"}}/>
+            	    	<h3 id="ap" className="tabbed s18">Mitigating Health Impact</h3>    
+			<p className="s12 centered"><a href="https://www.nature.com/articles/s41598-026-48063-8">This article published by Scientific Reports</a> found that residents of Somerville MA, 
+			a town in Boston with high levels of trafic-related air pollution, aged over 40 showed cognitive benefits from using an in-home HEPA air filter. 
+			The average participant using an air filter was able to complete a cognitive test 12% faster than those in the placebo group after 1 month of exposure.
+			
+            		<br/><br/>
+
+			<a href="https://www.lung.org/blog/poor-air-quality-protection">The American Lung Association</a> recommend people with respiratory health concerns to
+			use an indoor HEPA air filter, N95/NK95 mask, or limiting exposure to outdoor air during heatwaves and other days when air pollution is at hazardous levels. 
+			</p>
+            	    	<div style={{height:"25px"}}/>
+		
+
+
             		<div style={{borderTop:"2px dashed white"}}/>
             	    	<h3 id="ana" className="tabbed s18">Analyzing the Data</h3>
             	    	<div className="infodiv"><InfoContainer infodoc="infodocs/Particulate Pollution Patterns.txt"/></div>
@@ -103,25 +118,22 @@ function Landing() {
             			The Upton-Air dashboard reports a variety of different measurement to help you analyze local air quality readings. Below are descriptions of the measurements we report:
             		</p>
             		<div style={{height:"15px"}}/>
+            		<p className="s12" style={{marginLeft:"15px"}}>EPA Callibrated Readings (AQIEPA/PMEPA):</p>
+            		<p className="s8" style={{marginLeft:"30px"}}>
+				While PurpleAir monitors offer a cost-effect solution for air quality monitoring, the trade-off is that they cannot measure air quality as accurately as the $10,000+ EPA regulatory monitors. 
+				Humidity seems to have a large effect on PurpleAir PM2.5 sensors, so each monitor includes a humidity sensor which is used to calibrate PM2.5 values with respect to humidity to better match regulatory monitor readings.
+				These values are report on our site as "AQIEPA" and "PMEPA"
+            		</p>
+            		<div style={{height:"15px"}}/>
             		<p className="s12" style={{marginLeft:"15px"}}>PM:</p>
             		<p className="s8" style={{marginLeft:"30px"}}>
             			PM displays PM2.5, or the concentration of air particles less than 2.5 microns in diameter. This is reported as micrograms per cubic meter of air (ug/m^3). Micrograms are 1 millionth of a gram, so the concentrations being measured are very small.
-            		</p>
-            		<div style={{height:"15px"}}/>
-            		<p className="s12" style={{marginLeft:"15px"}}>PMEPA:</p>
-            		<p className="s8" style={{marginLeft:"30px"}}>
-            			PMEPA shows PM2.5 readings in ug/m^3 that are calibrated to better match with more expensive EPA sensors that are less sensitive to humidity changes.
             		</p>
             		<div style={{height:"15px"}}/>
             		<p className="s12" style={{marginLeft:"15px"}}>AQI:</p>
             		<p className="s8" style={{marginLeft:"30px"}}>
             			AQI measures the same thing as PM2.5, but is scaled to make it easier to understand the possible effects on your health.
             		</p>
-            		<div style={{height:"15px"}}/>
-            		<p className="s12" style={{marginLeft:"15px"}}>AQIEPA:</p>
-            		<p className="s8" style={{marginLeft:"30px"}}>
-            			AQIEPA is the default measurement displayed on the dashboard. It is on the same scale as normal AQI, but is calculated from PM2.5 levels that were adjusted for humidity to better match up with more expensive EPA sensors that are less sensitive to humidity changes.
-            		</p> 
             		<div style={{height:"15px"}}/>
             		<p className="s12" style={{marginLeft:"15px"}}>PMA/PMB:</p>
             		<p className="s8" style={{marginLeft:"30px"}}>

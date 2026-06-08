@@ -10,3 +10,4 @@ flask-sever/data analysis/
 certs/
 flask-server/__pycache__/
 client/src/sensor-pos.json
+flask-server/important-logs.txt

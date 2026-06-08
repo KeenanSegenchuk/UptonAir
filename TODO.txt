@@ -18,10 +18,9 @@ skip this [ ] Add email verification step on alert signup (confirm link)
 [x] Add CSRF protection to alert add/remove endpoints
 
 --- BUGS ---
-[x] ChatBox.js: CloseButton missing return statement (renders nothing)
-[x] chatbot.py: Typo prompt_ctw → prompt_ctx
-[x] pgUtil.py: Typo fomart → format in formatLines() (was listed as fileUtil.py)
-[x] fileUtil.py: return #TODO → raise NotImplementedError in getLastTimestamps()
+[ ] GMail: Sometimes users will recieve alerts in their inbox up to 7 hours after it's sent by the alerts email. It's possible this is only the case when 2+ alerts are sent to the same person in a batch. 
+		If that's the case then the ideal fix would be to aggregate alerts into one email.
+[ ] Negative AQIEPA readings: These are callibration aritfacts. The fix would be to add a tooltip to any bars that are negative which explains, Q/A style, why they are negative.
 
 --- BACKEND ---
 [x] Replace bare except: blocks — pgUtil.py, pullfn.py (ValueError), PMtoAQI.py (TypeError), server.py (Exception); removed nonsensical try/except around dict.get() in chat()
