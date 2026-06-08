@@ -59,13 +59,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nginx
-    expose:
-      - "80"
-      - "443"
+#    expose:
+#      - "80"
+#     - "443"
 #use this instead of "expose" if not using my custom NginxRouter service
-#    ports:
-#      - "80:80"  # Exposes port 80 for web traffic
-#      - "443:443" # Expose ssl port for https
+    ports:
+      - "80:80"  # Exposes port 80 for web traffic
+      - "443:443" # Expose ssl port for https
     depends_on:
       - flask-server  # Ensures Flask is up before Nginx
     environment:

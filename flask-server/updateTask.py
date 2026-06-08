@@ -31,7 +31,8 @@ def alert_loop():
     print("No alerts triggered. See important-logs.txt for more alert logs.")
 
 def update_loop():
-    if True: #maxTimestamp() < datetime.now().timestamp() - update_time_seconds:
+    #loop thru new data and check alerts
+    if maxTimestamp() < datetime.now().timestamp() - update_time_seconds/2:
         try:
             cutoff, new_lines = asyncio.run(pullfn(return_data=True))
         except Exception as e:
