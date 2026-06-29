@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Whitelist of column names that may be used in dynamic SQL queries.
 # Any unit value not in this set is rejected before it reaches a query.
-ALLOWED_UNITS = {"humidity", "PMA", "PMB", "PMEPA", "AQI", "AQIEPA", "PM"}
+ALLOWED_UNITS = {"humidity", "PMA", "PMB", "PMEPA", "AQI", "AQIEPA", "PM", "percent_difference"}
 
 '''
 	pgUtil.py contains useful functions for interfacing with the postgreSQL database
@@ -206,6 +206,8 @@ def pgPushData(cur, data):
 			    ON CONFLICT (time, id) DO NOTHING
 			""", row)
 		except Exception as e:
+			with open("data/failed_data.txt", "a") as fd:
+				fd.write(f"\n{row}")
 			print(f"Error inserting row {row}: {e}")
 
 def pgInit(path, rebuild = False):
