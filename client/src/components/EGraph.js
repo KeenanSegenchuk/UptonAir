@@ -290,8 +290,16 @@ function EGraph() {
 
         const handleZoom = (e) => {
 	    const zoomData = e.batch ? e.batch[0] : e;
-	    const xAxis = chart.getModel().getComponent('xAxis').axis;
-	    const [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+	    // Prefer startValue/endValue from the event (actual timestamps, reliable on mobile touch zoom)
+	    // Fall back to reading the axis model extent for percentage-only events
+	    let startTime, endTime;
+	    if (zoomData.startValue != null && zoomData.endValue != null) {
+		startTime = zoomData.startValue / 1000;
+		endTime = zoomData.endValue / 1000;
+	    } else {
+		const xAxis = chart.getModel().getComponent('xAxis').axis;
+		[startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+	    }
 	    //trigger gradient update by setting zoom
             setZoom({ start: startTime, end: endTime });
 
