@@ -228,7 +228,7 @@ def send_email3(alert_obj):
         for sensor_id, sensor_avg in triggered_ids
     ]
     other_sensor_data = [
-        (getSensorNames([sensor_id]), round(sensor_avg, 2))
+        (getSensorNames([sensor_id]), "Sensor Error" if sensor_avg is None else round(sensor_avg, 2))
         for sensor_id, sensor_avg in other_ids
     ]
 

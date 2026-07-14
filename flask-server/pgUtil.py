@@ -434,11 +434,11 @@ from collections import defaultdict
 def pgCheckAlerts():
     conn, cur = pgOpen()
     now = maxTimestamp() #int(time.time())
-    
+
     # Get all alerts that are eligible to trigger
     cur.execute("""
         SELECT address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window, last_alert, n_triggered FROM alerts
-        WHERE %s - last_alert >= cooldown * 60 * 60 
+        WHERE %s - last_alert >= cooldown * 60 * 60
     """, (now,))
     alerts = cur.fetchall()
 
@@ -474,14 +474,25 @@ def pgCheckAlerts():
         triggered_ids = []
         other_ids = []
         total = 0
+        n_valid = 0
         log(f"Checking alert threshold ({min_AQI}) against query results: {results}")
         for id_val, avg_aqi in results:
+            if avg_aqi is None:
+                log(f"Skipping id {id_val}: no {unit} readings in window.")
+                other_ids.append((id_val, None))
+                continue
+            n_valid += 1
             total += avg_aqi
             if avg_aqi > min_AQI:
                 triggered_ids.append((id_val, float(avg_aqi)))
             else:
-                other_ids.append((id_val, float(avg_aqi)))        
-        avg_all = total / len(results)
+                other_ids.append((id_val, float(avg_aqi)))    
+
+        if n_valid == 0:
+            continue 
+        else:
+            avg_all = total / n_valid
+
 
         # If any triggers occurred, record the result then update db entry
         #if triggered_ids:
