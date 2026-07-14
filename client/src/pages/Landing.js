@@ -28,6 +28,7 @@ function Landing() {
 
 	    {/* Brief overview of site's purpose */}
 	    <div style = {{textAlign:"center", border:"2px solid white", padding:"15px", width:"80%", marginLeft:"auto", marginRight:"auto", fontSize:"1.1em"}}>
+                <div style={{ borderBottom: "2px solid white"}}><h2 className="tabbed s25">Welcome to Upton-Air</h2></div>
 	        <p className="wmargin s12">Upton-Air.com was built by Sustainable Upton with the help of the town and the Mass Department of Environmental Protection in order to inform people on the local air quality.</p>
 	        <p className="wmargin s12">You can check current and historic air quality data on our dashboard page. For now our sensors only monitor small air particulates (PM2.5) and percent humidity. By default we measure air quality with the air quality index (AQI), an index developed by the U.S. EPA to break down pollutant levels into ranges which reflect their health effects.</p>
             
@@ -37,11 +38,57 @@ function Landing() {
 		<p className="wmargin s12">This page contains an overview of how to use the website, the broader context of air quality monitoring, and how to get involved.</p>
 
 	    </div>
+            <div style={{height:"35px"}}/>
 
 
-	    <div style={{height:"50px"}}/>
 
-	    <h2 className="noLineSpacing" style={{fontSize:"2.5em"}}>Table of Contents</h2>
+	    <div style = {{textAlign:"center", padding:"15px", width:"80%", maxWidth: "1500px", marginLeft:"auto", marginRight:"auto", fontSize:"1.1em"}}>
+                <h2 className="s25">How to Use Upton-Air</h2>
+		<div style={{height:"35px"}}/>
+		<h2>Staying Informed on Pollution Levels</h2>
+	        <p className="justifyText s12">
+	            	Our site offers a couple way to stay updated on our local air quality levels. The first is the <a href="upton-air.com">Upton-Air dashboard</a> and the second is signing up for our <a href="upton-air.com/alerts">automated email alerts</a>.
+			We recommend using these two methods in tandem: having the alerts notify you when air quality is on the rise, then checking the dashboard to gain a better understanding of the situation. Occasionally, sensors will malfunction and produce erroneous readings. 
+			For this reason, you should always check multiple sensors to confirm that the bad readings aren't localized to just one sensor. 
+	        </p>
+	        <div style = {{height:"35px"}}/>
+
+		<h2>Mitigating Health Risks</h2>
+		<p className="justifyText s12">
+			Small particulate pollution like our sensors measure <a href="https://www.nature.com/articles/s41598-026-48063-8">has been shown to have impact on neurological, cardiovascular, and respiratory health</a>, epsecially for developing children and older adults. 
+			While Upton's small particulate pollution concentrations are okay most of the time, 
+			 there are times where pollution levels rise and may have negative impact on sensitive populations. 
+			We use the <a href="https://www.epa.gov/wildfire-smoke-course/communicating-air-quality-conditions-air-quality-index">US EPA's Air Quality Index (AQI)</a> to report pollution on a scale that shows its potential impacts on these populations.
+			
+			<br/><br/>
+			
+			The best ways to reduce exposure to small particulate pollution are staying inside where you can control the environment, or wearing a mask.&nbsp;
+			<a href="https://www.iqair.com/newsroom/air-pollution-masks-what-works-what-doesn-t">N95 masks are capable of filtering out 95% of air particulates over 0.3 microns</a>, making them a great tool for reducing PM2.5 exposure. 
+
+			<br/><br/>
+			To reduce the level of indoor air pollution in your home, often just closing windows to reduce infiltration of outside air, turning off indoor pollution sources like gas stoves, and replacing your air filters regularly as instructed will do the trick. 
+			However, for those who may be extra concerned due to pre-existing condition, a certified HEPA filter will produce optimal results.
+			Here are some useful guides for improving indoor air quality: <a href="https://www.epa.gov/indoor-air-quality-iaq/improving-indoor-air-quality">the Environmental Protection Agency's Guide</a> and <a href="https://www.cdc.gov/respiratory-viruses/prevention/air-quality.html">the Center for Disease Control's Guide</a>.
+		
+			<br/><br/>
+			It is also worth noting that sunlight warms ground-level which helps disperse pollution. 
+			This means that we will generally experience the best air quality during the daytime, especially when skies are clear, though rain can also have a significantly positive effect on air quality as well.
+			Conversely, we tend to experience the worst air quality overnight and on foggy mornings or cloudy evenings.
+
+		</p>
+	        <div style = {{height:"35px"}}/>
+
+		<h2>Gaining an Understanding of Our Local Air Quality</h2>
+		<p className="justifyText s12">
+			Air Quality Monitoring is a complex problem with a lot of nuance. While people may tend to associate it with industry and wildfire smoke, small particulate pollution can be produced by a variety sources ranging from plants to automobiles. 
+			Furthermore, it can be heavily influenced by atmospheric conditions. Below is some additional information for anyone curious in gaining a better understanding of air quality. 
+		</p>
+	    </div>
+
+	    <div style={{height:"85px"}}/>
+
+	    <div className="hardcenter">
+	    <h2 className="noLineSpacing" style={{fontSize:"2.5em"}}>Additional Context - Table of Contents</h2>
             {/* Table of Contents */}
             <div style = {{marginTop: "10px", marginBottom:"10px"}}>
 		<a className="tabbed" href="#aqm" style={{fontSize:"2em"}}>Specifics about Air Quality Monitoring</a>
@@ -60,6 +107,9 @@ function Landing() {
 		<a href="#feedback" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Share Feedback </a>
 		<a href="#getinvolved" className="tabbed5 noLineSpacing" style={{color: "inherit", display: "block", fontSize:"1.5em"}}> - Get Involved </a>
             </div>
+	    </div>
+
+	    <div style={{height:"85px"}}/>
 
 
 	    <div style={{height:"50px"}}/>
@@ -92,8 +142,15 @@ function Landing() {
              
 
             		<div style={{borderTop:"2px dashed white"}}/>
-            	    	<h3 id="ap" className="tabbed s18">Mitigating Health Impact</h3>    
-			<p className="s12 centered"><a href="https://www.nature.com/articles/s41598-026-48063-8">This article published by Scientific Reports</a> found that residents of Somerville MA, 
+            	    	<h3 id="health" className="tabbed s18">Health Impacts</h3>    
+			<p className="s12 centered">
+
+			Boston College sought to map the health effect of air pollution across Massachusetts. <a href="https://link.springer.com/article/10.1186/s12940-022-00879-3">Their article</a> 
+			states that PM2.5 pollution has a broad impacts, negatively affecting neurological, respiratory, and cardiovascular health. 
+			
+			<br/><br/>
+
+			<a href="https://www.nature.com/articles/s41598-026-48063-8">This article published by Scientific Reports</a> found that residents of Somerville MA, 
 			a town in Boston with high levels of trafic-related air pollution, aged over 40 showed cognitive benefits from using an in-home HEPA air filter. 
 			The average participant using an air filter was able to complete a cognitive test 12% faster than those in the placebo group after 1 month of exposure.
 			

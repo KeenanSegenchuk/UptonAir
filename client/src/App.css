@@ -1,3 +1,8 @@
+/* Sliding Sections */
+.slidingSectionBody::-webkit-scrollbar {
+  display: none;
+}
+
 /* User Guide Styles */
 .figure {
   width: 70%;
@@ -14,6 +19,17 @@
   }
 }
 
+.justifyText { 
+  text-align: justify; 
+  text-align-center: center;
+}
+
+.hardcenter {
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 /* default react styles */
 .App {
