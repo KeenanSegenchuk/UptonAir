@@ -194,15 +194,21 @@ function SensorInfo2({ dummy }) {
 	        <h1 style={{fontSize:isMobile ? "1.5em" : "2.5em", padding: "10px"}} className="headerText">{`Current Sensor: ${lineMode==="sensors" && globalLineBool && objLen(selectedSensors) !== 1 ? "Multiple Sensors" : getObj("$"+sensor_id)}`}</h1>
 	    </div>
 
-	    <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '10px', '--circle-size': circleSize}}>
-                <button className="timeArrowButton" onClick={() => infoClick(prevIndex)}>
+	    <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '0', overflowX: 'auto', overflowY: 'visible', '--circle-size': circleSize}}>
+                <button className="timeArrowButton" style={{marginLeft: "15px", marginRight: "10px"}} onClick={() => infoClick(prevIndex)}>
                     <span className="timeArrowGlyph">‹</span>
                     <span className="timeArrowLabel">{contextLabels[dataContexts[prevIndex].context]}</span>
                 </button>
+                <div className="bannerSideLabel">
+                    <span className="bannerSideLabelLine">{contextLabels[dataContexts[contextIndex].context]}</span>
+                    <span className="bannerSideLabelLine">Average</span>
+                    <span className="bannerSideLabelLine">{circleUnit}</span>
+                </div>
+                <span className="bannerColon">:</span>
                 <div className="bannerCircle" style={{backgroundColor: circleColor, color: circleTextColor}}>
                     <h1 className="bannerCircleText">{String(circleAvg)} {circleUnit}</h1>
                 </div>
-                <button className="timeArrowButton" onClick={() => infoClick(nextIndex)}>
+                <button className="timeArrowButton" style={{marginLeft: "10px", marginRight: "15px"}} onClick={() => infoClick(nextIndex)}>
                     <span className="timeArrowGlyph">›</span>
                     <span className="timeArrowLabel">{contextLabels[dataContexts[nextIndex].context]}</span>
                 </button>

@@ -529,6 +529,7 @@ h3, h2 {
   border: none;
   position: relative;
   cursor: pointer;
+  flex: none;
   width: clamp(60px, 14vw, 100px);
   height: var(--circle-size, clamp(90px, 22vw, 170px));
   padding: 0;
@@ -542,30 +543,60 @@ h3, h2 {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 3em;
+  font-size: 4.5em;
   line-height: 1;
 }
 .timeArrowLabel {
   position: absolute;
-  top: calc(50% + 1.1em);
+  top: calc(50% + 1.3em);
   left: 0;
   width: 100%;
   text-align: center;
-  font-size: 1.1em;
+  font-size: 1.5em;
   line-height: 1.2;
 }
 {/*Banner Styles*/}
 .bannerCircle {
+  flex: none;
   width: var(--circle-size, clamp(90px, 22vw, 170px));
   height: var(--circle-size, clamp(90px, 22vw, 170px));
   border-radius: 50%;
   border: 5px solid black;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+.bannerSideLabel {
+  container-type: inline-size;
+  flex: none;
+  width: var(--circle-size, clamp(90px, 22vw, 170px));
+  height: var(--circle-size, clamp(90px, 22vw, 170px));
+  box-sizing: border-box;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  color: #000;
+}
+.bannerSideLabelLine {
+  white-space: nowrap;
+  line-height: 1.15;
+  /* sized relative to the box's own width via container query units, so long words
+     (e.g. "6 Month") shrink to fit instead of wrapping/overflowing */
+  font-size: 17cqw;
+}
+.bannerColon {
+  flex: none;
+  margin: 10px;
+  font-size: calc(var(--circle-size, clamp(90px, 22vw, 170px)) / 2.5);
+  font-weight: bold;
+  line-height: 1;
 }
 .bannerCircleText {
   margin: 0;

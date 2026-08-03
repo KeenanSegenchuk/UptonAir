@@ -12,7 +12,7 @@ const { getObj } = require("../getObj");
 const sensors = getObj("positions");
 
 //this is the Dashboard now :/
-function Home() { 
+function AltDashboard() { 
     //setup urls
     const {API_URL, BASE_URL} = useAppContext();
     const alerts_url = BASE_URL + "alerts";
@@ -65,5 +65,5 @@ function Home() {
     );
 }
 
-export default Alt-Dashboard;
+export default AltDashboard;
 

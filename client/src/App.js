@@ -5,7 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import('./pages/Home'));
-const AltDashboard = lazy(() => import('./pages/Alt-Dashboard'));
+const AltDashboard = lazy(() => import('./pages/AltDashboard'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 //const Test = lazy(() => import('./pages/Test'));
