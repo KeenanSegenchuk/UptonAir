@@ -11,7 +11,7 @@ function Banner({ avg, units }) {
     textColor = getObj(`T${avg}${units}`);
     quality = getObj(`Q${avg}${units}`);
     unit = getObj(`U${units}`);
-	
+
     /*ranges.some((range, i) => {
 	if(avg<=range) {textColor = textColors[i]; color = colors[i]; quality = qualities[i]; return true;}
 	return false;

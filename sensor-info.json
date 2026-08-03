@@ -21,6 +21,7 @@
 	"color":"red"
     },
     {
+	"pAir_id": "to be filled",
         "id": "222537",
 	"name": "Coach Rd. Appts.",
 	"color": "blue"
@@ -29,11 +30,6 @@
 	"id": "221859",
 	"name": "Community Center",
 	"color": "purple"
-    },
-    {
-	"id": "222527",
-	"name": "Victoria Dr.",
-	"color": "orange"
     },
     {
         "id": "221905",

@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import('./pages/Home'));
+const AltDashboard = lazy(() => import('./pages/Alt-Dashboard'));
 const Landing = lazy(() => import('./pages/Landing'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 //const Test = lazy(() => import('./pages/Test'));
@@ -25,6 +26,7 @@ function App() {
                         <Routes>
                             <Route path="/info" element={<Landing />} />
 			    <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+			    <Route path="/alt-dashboard" element={<ErrorBoundary><AltDashboard /></ErrorBoundary>} />
                             <Route path="/alerts" element={<Alerts />} />
                         </Routes>
                     </Suspense>

@@ -14,7 +14,15 @@ export function useSensorData({ initialLineUnits } = {}) {
   const [buttonAvgs, setButtonAvgs] = useState({});
 
   const isLineSelected = (sensor) => !!selectedSensors[sensor];
-  const toggleLineSelect = (sensor) => setSelectedSensors(prev => ({ ...prev, [sensor]: !prev[sensor] }));
+  const toggleLineSelect = (sensor) => setSelectedSensors(prev => {
+    const next = { ...prev, [sensor]: !prev[sensor] };
+    //if the sensor currently shown got deselected, hand sensor_id off to a sensor that's still selected
+    if (sensor === sensor_id && !next[sensor]) {
+      const stillSelected = Object.keys(next).filter(k => next[k]);
+      if (stillSelected.length > 0) setSensor_id(stillSelected[0]);
+    }
+    return next;
+  });
   const selectSensor = (sensor) => setSelectedSensors(prev => ({ ...prev, [sensor]: true }));
 
   return {

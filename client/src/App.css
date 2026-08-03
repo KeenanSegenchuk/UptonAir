@@ -524,7 +524,55 @@ h3, h2 {
     font-size: 1em;
   }
 }
+.timeArrowButton {
+  background: transparent;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  width: clamp(60px, 14vw, 100px);
+  height: var(--circle-size, clamp(90px, 22vw, 170px));
+  padding: 0;
+}
+.timeArrowButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.timeArrowGlyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  line-height: 1;
+}
+.timeArrowLabel {
+  position: absolute;
+  top: calc(50% + 1.1em);
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 1.1em;
+  line-height: 1.2;
+}
 {/*Banner Styles*/}
+.bannerCircle {
+  width: var(--circle-size, clamp(90px, 22vw, 170px));
+  height: var(--circle-size, clamp(90px, 22vw, 170px));
+  border-radius: 50%;
+  border: 5px solid black;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.bannerCircleText {
+  margin: 0;
+  padding: 0 10px;
+  font-size: clamp(0.8em, 2.4vw, 1.4em);
+  line-height: 1.15;
+}
 .banner {
   height: auto;
   text-align: center;

@@ -278,52 +278,110 @@ function EGraph() {
                 const day = date.getDate().toString().padStart(2, '0');
                 return `${month}/${day}`;
             }
-    ];    
+    ];
+
+    //when zoomed out enough to show one label per calendar date, build the list of
+    //noon timestamps (ms) for each date in range so ticks land at noon instead of midnight
+    const getNoonTickValues = (startSec, endSec) => {
+	const ticks = [];
+	if (!startSec || !endSec || startSec >= endSec) return ticks;
+
+	let d = new Date(startSec * 1000);
+	d.setHours(12, 0, 0, 0);
+	if (d.getTime() < startSec * 1000) d.setDate(d.getDate() + 1);
+
+	const endMs = endSec * 1000;
+	//cap the number of generated ticks to avoid runaway loops on huge ranges
+	for (let i = 0; d.getTime() <= endMs && i < 1000; i++) {
+	    ticks.push(d.getTime());
+	    d = new Date(d.getTime());
+	    d.setDate(d.getDate() + 1);
+	}
+	return ticks;
+    };
+
+    //mobile only: the graph can only fit ~7 time-only tick labels before they overlap,
+    //so evenly space maxTicks timestamps across the visible range instead of letting
+    //echarts pick its own (denser) "nice" interval
+    const getTimeTickValues = (startSec, endSec, maxTicks = 7) => {
+	if (!startSec || !endSec || startSec >= endSec) return [];
+	const startMs = startSec * 1000;
+	const endMs = endSec * 1000;
+	const stepMs = (endMs - startMs) / (maxTicks - 1);
+	return Array.from({ length: maxTicks }, (_, i) => Math.round(startMs + i * stepMs));
+    };
 
     //track zoom level
     const [gradient, setGradient] = useState({});
     const [zoom, setZoom] = useState({ start: start, end: end });
 
+    //attached via onChartReady on each <ReactECharts> below so it's rebound
+    //whenever the live instance changes (bar/line swap, key={dataContext} remount)
+    //coalesced to 1/frame: a wheel-zoom burst fires many datazoom events, and since
+    //the line chart re-renders with notMerge (full rebuild), reacting to every single
+    //event races the chart's own tooltip DOM teardown and throws "el is null"
+    const pendingZoom = useRef(null);
+    const zoomFrame = useRef(null);
+    const handleZoom = (e) => {
+	pendingZoom.current = e;
+	if (zoomFrame.current) return;
+	zoomFrame.current = requestAnimationFrame(() => {
+	    zoomFrame.current = null;
+	    applyZoom(pendingZoom.current);
+	});
+    };
+
+    const applyZoom = (e) => {
+	const chart = chartRef.current?.getEchartsInstance();
+	if (!chart) return;
+
+	const zoomData = e.batch ? e.batch[0] : e;
+	// Prefer startValue/endValue from the event (actual timestamps, reliable on mobile touch zoom)
+	// Fall back to reading the axis model extent for percentage-only events
+	let startTime, endTime;
+	if (zoomData.startValue != null && zoomData.endValue != null) {
+	    startTime = zoomData.startValue / 1000;
+	    endTime = zoomData.endValue / 1000;
+	} else {
+	    const xAxis = chart.getModel().getComponent('xAxis').axis;
+	    [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
+	}
+	//trigger gradient update by setting zoom
+        setZoom({ start: startTime, end: endTime });
+
+	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
+        const formatter = tickLabelFormats[formatIndex];
+	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
+	//back to echarts' own default tick placement so long ranges don't get a tick per day
+	const rangeDays = (endTime - startTime) / (24*60*60);
+	const noonTicks = formatIndex === 1
+	    ? (rangeDays <= 10 ? getNoonTickValues(startTime, endTime) : undefined)
+	    : (isMobile ? getTimeTickValues(startTime, endTime) : undefined);
+
+	setGraphFormat(prev => ({
+          ...prev,
+          dataZoom: [
+            { type: "slider", xAxisIndex: 0, start: zoomData.start, end: zoomData.end },
+            { type: "inside", xAxisIndex: 0, start: zoomData.start, end: zoomData.end }
+          ],
+          xAxis: {
+            ...prev.xAxis, // keep existing xAxis config
+            axisLabel: {
+              ...prev.xAxis?.axisLabel,
+              formatter: formatter,
+              customValues: noonTicks
+            },
+            axisTick: {
+              customValues: noonTicks
+            }
+          }
+        }));
+    };
+
     useEffect(() => {
-        const chart = chartRef.current?.getEchartsInstance();
-        if (!chart) return;
-
-        const handleZoom = (e) => {
-	    const zoomData = e.batch ? e.batch[0] : e;
-	    // Prefer startValue/endValue from the event (actual timestamps, reliable on mobile touch zoom)
-	    // Fall back to reading the axis model extent for percentage-only events
-	    let startTime, endTime;
-	    if (zoomData.startValue != null && zoomData.endValue != null) {
-		startTime = zoomData.startValue / 1000;
-		endTime = zoomData.endValue / 1000;
-	    } else {
-		const xAxis = chart.getModel().getComponent('xAxis').axis;
-		[startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
-	    }
-	    //trigger gradient update by setting zoom
-            setZoom({ start: startTime, end: endTime });
-
-	    const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
-            const formatter = tickLabelFormats[formatIndex];
-
-	    setGraphFormat(prev => ({
-              ...prev,
-              dataZoom: [
-                { type: "slider", xAxisIndex: 0, start: zoomData.start, end: zoomData.end },
-                { type: "inside", xAxisIndex: 0, start: zoomData.start, end: zoomData.end }
-              ],
-              xAxis: {
-                ...prev.xAxis, // keep existing xAxis config
-                axisLabel: {
-                  ...prev.xAxis?.axisLabel,
-                  formatter: formatter
-                }
-              }
-            }));
-        };
-
-        chart.on('datazoom', handleZoom);
-        return () => chart.off('datazoom');
+	return () => {
+	    if (zoomFrame.current) cancelAnimationFrame(zoomFrame.current);
+	};
     }, []);
 
     useEffect(() => {
@@ -341,7 +399,13 @@ function EGraph() {
 		}
         	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
                 const formatter = tickLabelFormats[formatIndex];
-        
+        	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
+        	//back to echarts' own default tick placement so long ranges don't get a tick per day
+        	const rangeDays = (endTime - startTime) / (24*60*60);
+        	const noonTicks = formatIndex === 1
+        	    ? (rangeDays <= 10 ? getNoonTickValues(startTime, endTime) : undefined)
+        	    : (isMobile ? getTimeTickValues(startTime, endTime) : undefined);
+
         	//update axis label setter
         	setGraphFormat(prev => ({
                       ...prev,
@@ -349,7 +413,11 @@ function EGraph() {
                         ...prev.xAxis, // keep existing xAxis config
                         axisLabel: {
                           ...prev.xAxis?.axisLabel,
-                          formatter: formatter
+                          formatter: formatter,
+                          customValues: noonTicks
+                        },
+                        axisTick: {
+                          customValues: noonTicks
                         }
                       }
                 }));
@@ -409,6 +477,7 @@ return (
 				notMerge={true}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
+				onChartReady={(chart) => chart.on('datazoom', handleZoom)}
 		      />
 		      {filteredData().length === 0 && (
 		        <div style={{
@@ -433,12 +502,13 @@ return (
 		        onChange={handleSlider}
 		        style={{ width: '60%' }}
 		    /></center>*/}
-		    <center style={{padding:"15px"}}>{getObj('$' + sensor_id)}, {dataContext} Historical Data</center>
+		    {/*<center style={{padding:"15px"}}>{getObj('$' + sensor_id)}, {dataContext} Historical Data</center>*/}
 		    <div style={{ position: "relative" }}>
 		      <ReactECharts option={{...graphFormat, ...gradient, series: [getBars()]}}
     				style={graphStyle}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
+				onChartReady={(chart) => chart.on('datazoom', handleZoom)}
 		      />
 		      {!filteredData()?.data?.length && (
 		        <div style={{
