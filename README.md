@@ -83,7 +83,7 @@ Provides your town's border for the map overlay. The easiest way to find one is 
 
 The nginx container expects `certs/cert.pem` and `certs/key.pem`. Which kind of certificate you need depends on whether you're proxying through Cloudflare (see [Publishing to the web](#publishing-to-the-web-domain--dns)):
 
-**If you're using Cloudflare for DNS, use Cloudflare's free **Origin CA** certificate:
+If you're using Cloudflare for DNS, use Cloudflare's free **Origin CA** certificate:
 
 1. In the Cloudflare dashboard, go to **SSL/TLS → Origin Server → Create Certificate**.
 2. Leave the default RSA key type and hostnames (your domain + `*.yourdomain.com`), 15-year validity is fine.
