@@ -21,6 +21,7 @@ This repo is designed to be reused: any town running its own PurpleAir sensors c
   - [Production (Docker)](#production-docker)
   - [Development](#development)
 - [Updating a running site](#updating-a-running-site)
+- [Publishing to the web (domain + DNS)](#publishing-to-the-web-domain--dns)
 - [Project structure](#project-structure)
 - [Contact](#contact)
 
@@ -80,16 +81,15 @@ Provides your town's border for the map overlay. The easiest way to find one is 
 
 ### HTTPS certificates
 
-The nginx container expects `certs/cert.pem` and `certs/key.pem`. For a real deployment, use a CA-issued certificate (e.g. via [Let's Encrypt](https://letsencrypt.org/)/certbot) for your domain. To generate a self-signed certificate for local testing:
+The nginx container expects `certs/cert.pem` and `certs/key.pem`. Which kind of certificate you need depends on whether you're proxying through Cloudflare (see [Publishing to the web](#publishing-to-the-web-domain--dns)):
 
-```bash
-mkdir -p certs
-openssl req -x509 -newkey rsa:4096 -nodes \
-  -keyout certs/key.pem -out certs/cert.pem -days 365 \
-  -subj "/CN=localhost"
-```
+**If you're using Cloudflare for DNS, use Cloudflare's free **Origin CA** certificate:
 
-Self-signed certs work, but browsers will warn visitors that the certificate isn't verified — fine for testing, not for a public launch.
+1. In the Cloudflare dashboard, go to **SSL/TLS → Origin Server → Create Certificate**.
+2. Leave the default RSA key type and hostnames (your domain + `*.yourdomain.com`), 15-year validity is fine.
+3. Cloudflare shows you a certificate and a private key once — save them as `certs/cert.pem` and `certs/key.pem` respectively (`mkdir -p certs` first).
+4. Under **SSL/TLS → Overview**, set the encryption mode to **Full (strict)** — this requires the origin to present a cert Cloudflare recognizes as valid, which the Origin CA cert satisfies.
+
 
 ## 2. Run it
 
@@ -147,6 +147,36 @@ This takes the containers down, rebuilds the client, rebuilds the server image, 
 ```bash
 docker compose build --no-cache
 ```
+
+## Publishing to the web (domain + DNS)
+
+In order to publish your website on the web you need a domain name. We purchased ours on GoDaddy and used Cloudflare to configure DNS and SSL, since it's free there.
+
+**1. Buy a domain.** Any registrar works — we used GoDaddy.
+
+**2. Point the domain at Cloudflare.**
+- Create a free account at [cloudflare.com](https://www.cloudflare.com/) and add your domain as a new site.
+- Cloudflare will give you two nameservers (something like `xxx.ns.cloudflare.com`).
+- In GoDaddy (or your registrar), replace the existing nameservers with the ones Cloudflare gave you. This handoff can take anywhere from a few minutes to ~24 hours to propagate.
+
+**3. Create the initial DNS record.**
+- In the Cloudflare dashboard, go to your domain's **DNS** settings and add an **A record**: name `@` (or your subdomain), content = your server's current public IP, proxy status **Proxied** (orange cloud) so Cloudflare terminates SSL for you.
+- See [HTTPS certificates](#https-certificates) for setting the SSL/TLS encryption mode and getting an origin certificate.
+
+**4. Keep the DNS record in sync with your server's IP.**
+
+If your server doesn't have a static IP (e.g. it's running on a residential connection rather than a VPS with a fixed address), that A record will go stale whenever your IP changes and the site will go down until it's updated. `cloudflare/cloudflare-ddns.sh` handles this: it looks up your current public IP and PUTs it to the DNS record via the Cloudflare API.
+
+To use it, fill in `ZONE_NAME`, `RECORD_NAME`, and `CF_API_TOKEN` at the top of the script (generate an API token in the Cloudflare dashboard under **My Profile → API Tokens**, with `Zone.DNS` edit permission for your zone). Then trigger it one of two ways:
+
+- **Polling with cron** (our solution for hosting the server on a linux machine) — run it on a schedule, e.g. every 5 minutes:
+  ```bash
+  crontab -e
+  # add this line:
+  */5 * * * * /path/to/UptonAir/cloudflare/cloudflare-ddns.sh
+  ```
+
+> **Do you actually need this script?** Only if your server's public IP can change. If you're hosting on a VPS/cloud instance with a static IP (DigitalOcean, AWS, etc.), you can just set the A record once in step 3 and skip the DDNS script entirely — there's nothing to keep in sync.
 
 ## Project structure
 
