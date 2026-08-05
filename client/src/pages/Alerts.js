@@ -104,7 +104,7 @@ function Alerts() {
     };
 
     const removeContact = () => {
-        if (!isValidEmail(email)) {
+        if (!email.trim()) {
             showNotification("Please enter a valid email address.", false);
             return;
         }
@@ -167,23 +167,6 @@ function Alerts() {
                 </div>
                 <div className="input-group" style = {{display:"flex", flexDirection:"column"}}>
                     
-		    {/*
-		    <input 
-                        type="email" 
-                        value={email} 
-                        onChange={handleEmailChange} 
-                        placeholder="your.email@example.com" 
-                        className="input-field"
-                    />
-		    <input
-                        type="text" 
-                        value={alertName} 
-                        onChange={handleNameChange} 
-                        placeholder="Unique Alert Name" 
-                        className="input-field"
-                    />
-		    */}
-		    
 		    <div style = {{display:"flex", flexDirection:"row", alignItems:"center"}}><label>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
 
 		    <input 

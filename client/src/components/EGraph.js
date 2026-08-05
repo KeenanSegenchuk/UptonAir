@@ -332,20 +332,15 @@ function EGraph() {
     };
 
     const applyZoom = (e) => {
-	const chart = chartRef.current?.getEchartsInstance();
-	if (!chart) return;
-
 	const zoomData = e.batch ? e.batch[0] : e;
-	// Prefer startValue/endValue from the event (actual timestamps, reliable on mobile touch zoom)
-	// Fall back to reading the axis model extent for percentage-only events
-	let startTime, endTime;
-	if (zoomData.startValue != null && zoomData.endValue != null) {
-	    startTime = zoomData.startValue / 1000;
-	    endTime = zoomData.endValue / 1000;
-	} else {
-	    const xAxis = chart.getModel().getComponent('xAxis').axis;
-	    [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
-	}
+	// Only act on events with real timestamps (actual user zoom/pan). Percent-only
+	// events also fire from ECharts' internal sync between the slider/inside dataZoom
+	// components, sometimes before the axis has the real data bound to it - reading
+	// the live axis extent in that case raced with the [data] effect below and could
+	// bake in a too-narrow range.
+	if (zoomData.startValue == null || zoomData.endValue == null) return;
+	const startTime = zoomData.startValue / 1000;
+	const endTime = zoomData.endValue / 1000;
 	//trigger gradient update by setting zoom
         setZoom({ start: startTime, end: endTime });
 
@@ -385,60 +380,44 @@ function EGraph() {
     }, []);
 
     useEffect(() => {
-	const chart = chartRef.current?.getEchartsInstance();
-        if (!chart) return;
+	// Bars are always plotted over exactly [start, end] (see getBars in graphUtil.js),
+	// so that's already the correct range for the default/unzoomed render - no need to
+	// ask the chart for its live axis extent, which raced with applyZoom above.
+	const formatIndex = (start + 2*24*60*60 < end) ? 1 : 0;
+        const formatter = tickLabelFormats[formatIndex];
+	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
+	//back to echarts' own default tick placement so long ranges don't get a tick per day
+	const rangeDays = (end - start) / (24*60*60);
+	const noonTicks = formatIndex === 1
+	    ? (rangeDays <= 10 ? getNoonTickValues(start, end) : undefined)
+	    : (isMobile ? getTimeTickValues(start, end) : undefined);
 
-        const updateAxisAndGradient = () => {
-        	const xAxis = chart?.getModel()?.getComponent('xAxis').axis;
-		if (!xAxis) return;
-        	let [startTime, endTime] = xAxis.scale.getExtent().map(v => v / 1000);
-		// Fall back to known state values if chart extent is uninitialized (e.g. startTime === endTime === 0)
-		if (!startTime || !endTime || startTime === endTime) {
-		    startTime = start;
-		    endTime = end;
-		}
-        	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
-                const formatter = tickLabelFormats[formatIndex];
-        	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
-        	//back to echarts' own default tick placement so long ranges don't get a tick per day
-        	const rangeDays = (endTime - startTime) / (24*60*60);
-        	const noonTicks = formatIndex === 1
-        	    ? (rangeDays <= 10 ? getNoonTickValues(startTime, endTime) : undefined)
-        	    : (isMobile ? getTimeTickValues(startTime, endTime) : undefined);
+	//update axis label setter
+	setGraphFormat(prev => ({
+              ...prev,
+              xAxis: {
+                ...prev.xAxis, // keep existing xAxis config
+                axisLabel: {
+                  ...prev.xAxis?.axisLabel,
+                  formatter: formatter,
+                  customValues: noonTicks
+                },
+                axisTick: {
+                  customValues: noonTicks
+                }
+              }
+        }));
 
-        	//update axis label setter
-        	setGraphFormat(prev => ({
-                      ...prev,
-                      xAxis: {
-                        ...prev.xAxis, // keep existing xAxis config
-                        axisLabel: {
-                          ...prev.xAxis?.axisLabel,
-                          formatter: formatter,
-                          customValues: noonTicks
-                        },
-                        axisTick: {
-                          customValues: noonTicks
-                        }
-                      }
-                }));
-        
-		log(`gradient... startTime:${startTime}, endTime:${endTime}, start:${start}, end:${end}`);
-        	//trigger gradient update by setting zoom
-                setGradient({
-        	    graphic: [{
-                      ...gradConf,
-                      style: {
-                        fill: graphUtil("midnightGradient")(startTime, endTime, 500)
-                      },
-        	    }]
-        	});
-		log(graphUtil("midnightGradient")(startTime, endTime, 500));
-        };
-
-	//requestAnimationFrame(() => {updateAxisAndGradient()});
-	setTimeout(() => {updateAxisAndGradient()}, 0);
-	return () => clearTimeout();
-    }, [data]);
+	log(`gradient... start:${start}, end:${end}`);
+	setGradient({
+	    graphic: [{
+              ...gradConf,
+              style: {
+                fill: graphUtil("midnightGradient")(start, end, 500)
+              },
+	    }]
+	});
+    }, [data, start, end]);
     
 
     //Update daylight gradient when timespan changes
