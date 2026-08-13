@@ -59,8 +59,12 @@ function Map({ buttons }) {
 	  />
 	):(
 	  <TileLayer
-            // Esri satellite imagery
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            // Esri World Imagery Wayback: a specific dated capture instead of
+            // Esri's "current" mosaic, which can flip to a bare fall/winter
+            // pass for a region. Release number picks the date; find a
+            // greener one at https://livingatlas.arcgis.com/wayback/ and
+            // update config.WAYBACK_RELEASE if this one isn't summery enough.
+            url={`https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/${config.WAYBACK_RELEASE}/{z}/{y}/{x}`}
             attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye'
           />
 	)}
