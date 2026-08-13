@@ -12,3 +12,4 @@ flask-server/__pycache__/
 client/src/sensor-pos.json
 flask-server/important-logs.txt
 docker-compose.prod.yml
+flask-server/new purpleair post to third party feature.txt

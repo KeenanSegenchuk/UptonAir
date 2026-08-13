@@ -3,6 +3,7 @@ import axios from 'axios';
 import "../App.css";
 import Map from "../components/Map";
 import SensorInfo from "../components/SensorInfo";
+import SensorInfo2 from "../components/SensorInfo2";
 import LinkButton from "../components/LinkButton";
 import { useAppContext } from "../AppContext";
 import config from "../config.json";
