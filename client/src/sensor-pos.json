@@ -8,7 +8,7 @@
   },
   {
     "id": "221881",
-    "pAir_id": "222089",
+    "pAir_id": "221821",
     "name": "Memorial",
     "color": "green",
     "lat": 42.170795,
@@ -29,6 +29,7 @@
     "lon": -71.60308
   },
   {
+    "pAir_id": "277371",
     "id": "222537",
     "name": "Coach Rd. Appts.",
     "color": "blue",
@@ -41,13 +42,6 @@
     "color": "purple",
     "lat": 42.173996,
     "lon": -71.60191
-  },
-  {
-    "id": "222527",
-    "name": "Victoria Dr.",
-    "color": "orange",
-    "lat": 42.165527,
-    "lon": -71.619896
   },
   {
     "id": "221905",

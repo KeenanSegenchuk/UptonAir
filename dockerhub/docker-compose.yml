@@ -1,0 +1,93 @@
+# dockerhub/docker-compose.yml
+#
+# Docker-Hub-based variant of ../docker-compose.yml — see ../UPDATE.txt.
+# Run all commands from the REPO ROOT (not from inside dockerhub/), e.g.:
+#
+#   docker compose -f dockerhub/docker-compose.yml --env-file .env <command>
+#
+# `name:` below pins the Compose project name to match the root
+# docker-compose.yml's default ("uptonair"), so this file manages the same
+# stack/network/containers instead of standing up a parallel one.
+name: uptonair
+
+services:
+  flask-server:
+    image: keenansegenchuk/uptonair-flask-server:latest
+    build:
+      context: ..
+      dockerfile: dockerhub/Dockerfile
+      target: flask-server
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - PURPLEAIR_API_KEY=${PURPLEAIR_API_KEY}
+      - PYTHONUNBUFFERED=1 # 1 to show py prints in this container 0 to squelch
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD} # app-specific password (can't be used to login to gmail, but allows sending smtp email)
+      - DB_URL=postgresql://postgres:passw0rd@pgdb:5432/postgres
+      - API_URL=raspberrypi.local/api
+      - REINIT_DB=0 # control whether pgdb should be re initialized from data.txt ("REINIT") or persisted from the volume ("0")
+      - LOOP=1 # 0 to disable data update loop
+      - IGNORE_MAX_PULL=0 # set to 1 to bypass the 2-week (or 1 hour (see pullfn)) cap for pulling from purpleair
+      - FILL_GAPS=0 # set 1 to fill gaps in data, see updateTask to set time after which to check for gaps
+      - REBUILD_ALERTS=0 # set to REBUILD to fully reset alerts table !!WARNING!!: this will fully wipe and rebuild alerts table
+    expose:
+      - "5000"
+    restart: unless-stopped
+    depends_on:
+      pgdb:
+        condition: service_healthy
+    networks:
+      - default
+    volumes:
+      - ../flask-server/data:/app/flask-server/data
+      - ../sensor-info.json:/app/flask-server/sensor-info.json
+      - ../config.txt:/app/flask-server/config.txt
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  pgdb:
+    image: postgres:17
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=passw0rd
+      - POSTGRES_DB=postgres
+    volumes:
+      - ../data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  nginx:
+    image: keenansegenchuk/uptonair-nginx:latest
+    build:
+      context: ..
+      dockerfile: dockerhub/Dockerfile.nginx
+    ports:
+      - "80:80"  # Exposes port 80 for web traffic
+      - "443:443" # Expose ssl port for https
+    depends_on:
+      - flask-server  # Ensures Flask is up before Nginx
+    environment:
+      - URL=${URL}
+    networks:
+      - default
+    volumes:
+      - ../certs/cert.pem:/etc/nginx/cert.pem:ro #https certificate / private key
+      - ../certs/key.pem:/etc/nginx/key.pem:ro #public key
+      # client/build is baked into the image (dockerhub/Dockerfile.nginx),
+      # not bind-mounted here — see ../UPDATE.txt
+
+volumes:
+  data:
+    driver: local

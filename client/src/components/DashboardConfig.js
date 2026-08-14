@@ -9,10 +9,13 @@ function DashboardConfig() {
 
     //load cookies to configure map background and data units
     const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox, darkMode, toggleDarkMode } = useAppContext();
-    const [mapType, setMapType] = useState('satellite');
+    const [showRoads, setShowRoads] = useState(false);
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
     const [cookieInit, setCookieInit] = useState(false);
+
+    // control config popup visibility (gear icon owns this now)
+    const [showConfig, setShowConfig] = useState(false);
 
     //track width to adjust how long data type labels are
     const [width, setWidth] = useState(0);
@@ -34,7 +37,7 @@ function DashboardConfig() {
 
     //check for values saved in cookies
     useEffect(() => {
-      const savedMapType = Cookies.get('map_type');
+      const savedShowRoads = Cookies.get('show_roads');
       const savedUnits = Cookies.get('units');
       //const savedLineUnits = Cookies.get('line_units');
 
@@ -43,7 +46,7 @@ function DashboardConfig() {
 
       const savedPlotType = Cookies.get('plot_type');
       console.log("units",savedUnits);
-      if (savedMapType) setMapType(savedMapType);
+      if (savedShowRoads) setShowRoads(savedShowRoads === "true");
       if (savedUnits) setUnits(savedUnits);
       //if (savedLineUnits) setLineUnits(savedLineUnits);
       if (savedPlotType) setPlot(savedPlotType);
@@ -53,9 +56,9 @@ function DashboardConfig() {
     //update cookies when selected
     useEffect(() => {
 	if(cookieInit)
-	      Cookies.set('map_type', mapType);
-      setDashboardConfig(prev => ({ ...prev, "map_type":mapType }));
-    }, [mapType]);
+	      Cookies.set('show_roads', showRoads);
+      setDashboardConfig(prev => ({ ...prev, "show_roads":showRoads }));
+    }, [showRoads]);
     useEffect(() => {
 	if(cookieInit)
     	      Cookies.set('units', units);
@@ -76,17 +79,105 @@ function DashboardConfig() {
     }, [plotType]);
 
     return (
+	    <>
+	    {/* Gear icon: opens/closes the config popup */}
+	    <div
+	      style={{
+	        position: 'absolute',
+	        top: 10,
+	        right: 10,
+	        zIndex: 1000
+	      }}
+	    >
+	      <button
+	        onClick={() => setShowConfig(prev => !prev)}
+	        style={{
+	          background: 'transparent',
+	          borderRadius: '50%',
+	          fontSize: '40px',
+	          border: 'none',
+	          cursor: 'pointer'
+	        }}
+	        title="Settings"
+	      >
+	        ⚙️
+	      </button>
+	    </div>
+	
+	    {/* Roads toggle: overlays road/label tiles on top of the satellite basemap */}
+	    <div
+	      style={{
+	        position: 'absolute',
+	        top: 75,
+	        right: 10,
+	        zIndex: 1000
+	      }}
+	    >
+	      <button
+	        onClick={() => setShowRoads(prev => !prev)}
+	        style={{
+	          background: showRoads ? 'rgba(80,200,120,0.6)' : 'rgba(255,255,255,0.6)',
+	          borderRadius: '6px',
+	          fontSize: '14px',
+	          border: 'none',
+	          padding: '6px 10px',
+	          cursor: 'pointer'
+	        }}
+	        title="Toggle Roads Overlay"
+	      >
+	        {showRoads ? "Hide Roads" : "Show Roads"}
+	      </button>
+	    </div>
+
+	    {/* Config Modal Overlay */}
+	    <div style={{display: showConfig ? "block":"none"}}>
+	      <div
+	        style={{
+	          position: "absolute",
+	          top: 0,
+	          left: 0,
+	          width: "100%",
+	          height: "100%",
+	          backgroundColor: "rgba(0,0,0,0.4)",
+	          zIndex: 1499,
+	        }}
+	        onClick={() => setShowConfig(false)}
+	      >
+	        <div
+	          style={{
+	            position: "absolute",
+	            maxHeight: "90%",
+	            top: "5%",
+	            left: "50%",
+	            transform: "translate(-50%)",
+	            width: "75%",
+	            backgroundColor: "rgba(240,255,240,0.95)",
+	            zIndex: 1500,
+	            padding: "20px",
+	            overflow: "auto",
+	            borderRadius: "10px",
+	            boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+	          }}
+	          onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
+	        >
+	          <button
+	            onClick={() => setShowConfig(false)}
+	            style={{
+	              position: "absolute",
+	              top: 10,
+	              right: 10,
+	              background: "transparent",
+	              border: "none",
+	              fontSize: "24px",
+	              cursor: "pointer",
+	            }}
+	            title="Close"
+	          >
+	            ✕
+	          </button>
 	    <div id="DashboardConfig.js" className="optionsdiv">
 	        <h2>Dashboard Config</h2>
-		<label className="s16">
-		    Map Background:<br/>
-		    <select className="s9" value={mapType} onChange={e => setMapType(e.target.value)}>
-                        <option value="satellite">Satellite</option>
-                        <option value="roads">Roads</option>
-                        {/* maybe add back later <option value="img">Image</option>*/}
-                    </select>
-		</label>
-	
+
 		{true /*lineMode != "units"*/ &&
 			<label className="s16">
 			    Measurement/Units:<br/>
@@ -223,6 +314,10 @@ function DashboardConfig() {
 		    /*<ChatBox/>*/
 		)}
 	    </div>
+	  </div>
+	</div>
+      </div>
+    </>
     );
 }
 

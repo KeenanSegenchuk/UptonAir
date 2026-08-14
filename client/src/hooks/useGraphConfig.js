@@ -9,7 +9,7 @@ export function useGraphConfig() {
   const [dashboardConfig, setDashboardConfig] = useState({
     plot_type: "echarts",
     units: "AQIEPA",
-    map_type: "satellite",
+    show_roads: false,
     line_units: [],
   });
   const [buttonPositions, setButtonPositions] = useState({ goal: {}, no_overlap: {} });

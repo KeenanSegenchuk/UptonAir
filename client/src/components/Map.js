@@ -12,10 +12,8 @@ import config from '../config.json';
 
 function Map({ buttons }) {
   // control map popup on mobile
-  const { setPopup, map_type } = useAppContext();
+  const { setPopup, show_roads } = useAppContext();
   const isMobile = window.matchMedia("(max-width: 767px)").matches;
-  // control config box popup
-  const [showConfig, setShowConfig] = useState(false);
 
   const triggerPopup = () => {
     if (isMobile) {
@@ -32,7 +30,7 @@ function Map({ buttons }) {
       .catch((error) => console.error('Error loading GeoJSON:', error));
   }, []);
   const townBorderStyle = {
-    color: map_type === "roads" ? "black" : "white",
+    color: "white",
     weight: 2,
     opacity: .6,
     fillOpacity: 0
@@ -52,22 +50,28 @@ function Map({ buttons }) {
 	zoom={Number(config.MAP_ZOOM)}
         style={{ height: '100%', width: '100%' }}
       >
-        {map_type === "roads" ? (
-	  <TileLayer
-	    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-	    attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-	  />
-	):(
-	  <TileLayer
-            // Esri World Imagery Wayback: a specific dated capture instead of
-            // Esri's "current" mosaic, which can flip to a bare fall/winter
-            // pass for a region. Release number picks the date; find a
-            // greener one at https://livingatlas.arcgis.com/wayback/ and
-            // update config.WAYBACK_RELEASE if this one isn't summery enough.
-            url={`https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/${config.WAYBACK_RELEASE}/{z}/{y}/{x}`}
-            attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye'
-          />
-	)}
+        <TileLayer
+          // Esri World Imagery Wayback: a specific dated capture instead of
+          // Esri's "current" mosaic, which can flip to a bare fall/winter
+          // pass for a region. Release number picks the date; find a
+          // greener one at https://livingatlas.arcgis.com/wayback/ and
+          // update config.WAYBACK_RELEASE if this one isn't summery enough.
+          url={`https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/${config.WAYBACK_RELEASE}/{z}/{y}/{x}`}
+          attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye'
+        />
+        {show_roads && (
+          <>
+            {/* Esri's transparent road-network overlay, meant to sit on top of World Imagery */}
+            <TileLayer
+              url="https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
+              attribution='&copy; Esri'
+            />
+            <TileLayer
+              url="https://services.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+              attribution='&copy; Esri'
+            />
+          </>
+        )}
         {townBorder && <GeoJSON data={townBorder} style={townBorderStyle} />}
 
 	{/* Place Sensors on Map */}
@@ -85,81 +89,8 @@ function Map({ buttons }) {
       </MapContainer>
 
 
-      {/* Config Popup */}
-      {/* Icon */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          zIndex: 1000
-        }}
-      >
-        <button
-          onClick={() => setShowConfig(prev => !prev)}
-          style={{
-            background: 'transparent',
-            borderRadius: '50%',
-            fontSize: '40px',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-          title="Settings"
-        >
-          ⚙️
-        </button>
-      </div>
-      
-      {/* Config Modal Overlay */}
-      <div style={{display: showConfig ? "block":"none"}}>
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.4)",
-            zIndex: 1499,
-          }}
-          onClick={() => setShowConfig(false)}
-        >
-          <div
-            style={{
-              position: "absolute",
-              maxHeight: "90%",
-              top: "5%",
-              left: "50%",
-              transform: "translate(-50%)",
-              width: "75%",
-              backgroundColor: "rgba(240,255,240,0.95)",
-              zIndex: 1500,
-              padding: "20px",
-              overflow: "auto",
-              borderRadius: "10px",
-              boxShadow: "0 0 20px rgba(0,0,0,0.3)",
-            }}
-            onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
-          >
-            <button
-              onClick={() => setShowConfig(false)}
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                background: "transparent",
-                border: "none",
-                fontSize: "24px",
-                cursor: "pointer",
-              }}
-              title="Close"
-            >
-              ✕
-            </button>
-            <DashboardConfig />
-          </div>
-        </div>
-	  </div>
+      {/* Config gear icon, roads toggle, and settings popup — all owned by DashboardConfig */}
+      <DashboardConfig />
 
       {/* HoverButton at top center */}
       {isMobile && 

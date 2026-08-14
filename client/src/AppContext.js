@@ -103,7 +103,7 @@ export const ContextProvider = ({ children }) => {
     dataContext: graphConfig.dataContext, setDataContext: graphConfig.setDataContext,
     dashboardConfig: graphConfig.dashboardConfig, setDashboardConfig: graphConfig.setDashboardConfig,
     units: graphConfig.dashboardConfig.units,
-    map_type: graphConfig.dashboardConfig.map_type,
+    show_roads: graphConfig.dashboardConfig.show_roads,
     plot_type: graphConfig.dashboardConfig.plot_type,
     buttonPositions: graphConfig.buttonPositions, setButtonPositions: graphConfig.setButtonPositions,
     button_position: (sensor) => graphConfig.buttonPositions[sensor],
