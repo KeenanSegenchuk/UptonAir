@@ -37,7 +37,7 @@ function Map({ buttons }) {
   };
 
   return (
-    <div id="Map.js" className="mapContainer" style={{ position: 'relative',
+    <div tutorial-label="Map" id="Map.js" className="mapContainer" style={{ position: 'relative',
 					   height: isMobile ? '100%' : undefined,
         				   width: isMobile ? '90vw' : undefined }}>
 

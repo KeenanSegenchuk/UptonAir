@@ -8,14 +8,14 @@ function DashboardConfig() {
     //this element can be used to configure the dashboard page, changing the map, data layer, etc.
 
     //load cookies to configure map background and data units
-    const { setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox, darkMode, toggleDarkMode } = useAppContext();
+    const { showConfig, setShowConfig, setDashboardConfig, lineUnits, setLineUnits, setNewLineUnit, isLineSelected, toggleLineSelect, lineMode, setLineMode, globalLineBool, setGlobalLineBool, sensor_id, setSensor_id, showChatBox, setShowChatBox, darkMode, toggleDarkMode } = useAppContext();
     const [showRoads, setShowRoads] = useState(false);
     const [units, setUnits] = useState('AQIEPA');
     const [plotType, setPlot] = useState('echarts');
     const [cookieInit, setCookieInit] = useState(false);
 
-    // control config popup visibility (gear icon owns this now)
-    const [showConfig, setShowConfig] = useState(false);
+    // control config popup visibility (AppContext owns this now.)
+    //const [showConfig, setShowConfig] = useState(false);
 
     //track width to adjust how long data type labels are
     const [width, setWidth] = useState(0);
@@ -175,11 +175,11 @@ function DashboardConfig() {
 	          >
 	            ✕
 	          </button>
-	    <div id="DashboardConfig.js" className="optionsdiv">
+	    <div tutorial-label="Options" id="DashboardConfig.js" className="optionsdiv">
 	        <h2>Dashboard Config</h2>
 
-		{true /*lineMode != "units"*/ &&
-			<label className="s16">
+		{true &&
+			<label tutorial-label="Units" className="s16">
 			    Measurement/Units:<br/>
 			    <select className="s9" value={units} style={{maxWidth:"90%"}} onChange={e => setUnits(e.target.value)}>
 	       		        {Object.keys(getObj("u")).map((val, index) => (

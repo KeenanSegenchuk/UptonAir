@@ -96,6 +96,7 @@ export const ContextProvider = ({ children }) => {
 
   const contextVals = {
     // graphConfig
+    showConfig: graphConfig.showConfig, setShowConfig: graphConfig.setShowConfig,
     getLine: graphConfig.getLine, setLine: graphConfig.setLine,
     globalLineBool: graphConfig.globalLineBool, setGlobalLineBool: graphConfig.setGlobalLineBool,
     hover: graphConfig.hover, setHover: graphConfig.setHover,

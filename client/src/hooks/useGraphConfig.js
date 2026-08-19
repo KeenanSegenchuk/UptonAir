@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 export function useGraphConfig() {
+  const [showConfig, setShowConfig] = useState(false);
   const [getLine, setLine] = useState(null);
   const [globalLineBool, setGlobalLineBool] = useState(false);
   const [hover, setHover] = useState("");
@@ -15,6 +16,7 @@ export function useGraphConfig() {
   const [buttonPositions, setButtonPositions] = useState({ goal: {}, no_overlap: {} });
 
   return {
+    showConfig, setShowConfig,
     getLine, setLine,
     globalLineBool, setGlobalLineBool,
     hover, setHover,

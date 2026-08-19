@@ -197,7 +197,7 @@ function SensorInfo({ dummy }) {
 
 	    <h1 className={`headerText ${mobileMultiSelect ? "showMobile" : "hide"}`}>Choose Timeframe</h1>
 
-            <div className="floatContainer" style={{display: 'flex', flexDirection: 'row', gap: '0'}}>
+            <div tutorial-label="Historical Averages" className="floatContainer" style={{display: 'flex', flexDirection: 'row', gap: '0'}}>
                 {filteredData().avgs.map((avg, index) => {
 		  log(`${dataContexts[index].context} avg : ${avg}`);
 		  return (

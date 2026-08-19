@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import "../App.css";
+import TutorialOverlay from "../components/TutorialOverlay";
 import Map from "../components/Map";
 import SensorInfo from "../components/SensorInfo";
 import SensorInfo2 from "../components/SensorInfo2";
@@ -40,9 +41,10 @@ function Home() {
 
     return (
 	<div className="darkgreen" style = {{ height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+	    <TutorialOverlay/>
 
 	    {/*Header*/}
-	    <div className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
+	    <div tutorial-label="Header" className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>
 		<LinkButton className="leftLinkButton" text={isMobile?"Info":"More Info"} right={false} href={info_url}/>
 		<h1 className="titleText">{isMobile ? "Dashboard" : config.WEBPAGE_TITLE + " Dashboard"}</h1>
 	        <LinkButton className="rightLinkButton" text={isMobile?"Alerts":"Get Notified"} href={alerts_url}/>

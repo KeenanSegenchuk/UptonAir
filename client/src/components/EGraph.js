@@ -440,7 +440,7 @@ useEffect(() => {
 }, []); 
 
 return (
-    <div id = "EGraph.js" className="Marginless">
+    <div tutorial-label="Graph" id = "EGraph.js" className="Marginless">
         <h1 className="headerText">{dataContext}{showCompression ? " Compressed " : " "}Readings {(!globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
         <div className="graphContainer">
             {/*<button className="Button hideMobile" onClick={toggleLineBool}>
