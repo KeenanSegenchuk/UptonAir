@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAppContext } from "../AppContext";
+import "../App.css";
 
 // How far the popup sits from the highlighted element, and how close it can get to the viewport edge
 const POPUP_MARGIN = 15;
@@ -78,7 +79,7 @@ function TutorialOverlay({}) {
     const [rect, setRect] = useState(null);
     const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
     const popupRef = useRef(null);
-    const {setShowConfig} = useAppContext();
+    const {showConfig, setShowConfig} = useAppContext();
 
     //*****handle step changes*****
 
@@ -87,10 +88,7 @@ function TutorialOverlay({}) {
 
     // Find the element we're currently explaining
     const updatePosition = () => {
-	if (stepIndex === -1)
-		return;
-
-        const element = document.querySelector(step.target);
+        const element = document.querySelector(step?.target);
 
         if (!element) {
             setRect(null);
@@ -111,10 +109,18 @@ function TutorialOverlay({}) {
     };
 
 
-    // Recalculate whenever the step changes
+    // Ask DashboardConfig to show/hide itself for the relevant steps
+    useEffect(() => {
+	showComponents();
+    }, [stepIndex]);
+
+    // Recalculate position once stepIndex OR showConfig settles. DashboardConfig
+    // toggles its target elements via `display: showConfig ? "block" : "none"`
+    // rather than mounting/unmounting them, so we can't compute the rect until
+    // showConfig has actually propagated through context and DashboardConfig
+    // has re-rendered with display:block.
     useEffect(() => {
         updatePosition();
-	showComponents();
 
         window.addEventListener('resize', updatePosition);
         window.addEventListener('scroll', updatePosition, true);
@@ -123,7 +129,7 @@ function TutorialOverlay({}) {
             window.removeEventListener('resize', updatePosition);
             window.removeEventListener('scroll', updatePosition, true);
         };
-    }, [stepIndex]);
+    }, [stepIndex, showConfig]);
 
     // Recompute the popup's position once its actual size is known, so placement
     // adapts to the target element and flips/clamps to stay on screen
@@ -153,9 +159,10 @@ function TutorialOverlay({}) {
     //*****render overlay*****
 
 
-    if (!rect) {
+    if (!rect || !step) {
 	return (
 	    <button
+		className="green bordered"
 	        onClick={next}
 	        style={{
 	            position: 'fixed',
@@ -164,6 +171,7 @@ function TutorialOverlay({}) {
 	            zIndex: 10000,
 	            padding: '12px 20px',
 	            cursor: 'pointer',
+		    fontSize: '1.2em'
 	        }}
 	    >
 	        Start Tutorial

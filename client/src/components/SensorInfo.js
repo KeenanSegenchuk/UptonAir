@@ -204,7 +204,9 @@ function SensorInfo({ dummy }) {
                     <div key={index} style={{ margin: "0", display: 'flex', flexDirection: 'column', width: "22%"}}>
                         <button className="floatBox avgButton" onClick={() => infoClick(index)}
 				style={index === contextIndex ? { backgroundColor: "#444", color: "white" } : {}}>{dataContexts[index].context}</button>
-                        <h1 className={`floatBox avgBox ${mobileMultiSelect ? "hideMobile" : ""}`} style={{backgroundColor: getObj(`X${Math.round(100 * avg) / 100}${units}`)}}>{Math.round(100 * avg) / 100}</h1>
+                        <h1 className={`floatBox avgBox ${mobileMultiSelect ? "hideMobile" : ""}`} style={{cursor: "pointer", backgroundColor: getObj(`X${Math.round(100 * avg) / 100}${units}`)}} onClick={() => infoClick(index)}>
+			     {Math.round(100 * avg) / 100}
+			</h1>
                     </div>
                   );
 		})}
@@ -212,6 +214,7 @@ function SensorInfo({ dummy }) {
 	    <div className={mobileMultiSelect ? "showMobile" : "hide"} style={{height:"25px"}}> </div>
 	    <div className="hideMobile" style={{height:"25px"}}></div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
+	    <div style={{"height":"65px"}}/>
 	</div>
     );
 }

@@ -41,7 +41,7 @@ function Home() {
 
     return (
 	<div className="darkgreen" style = {{ height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-	    <TutorialOverlay/>
+	    {!isMobile && <TutorialOverlay/>}
 
 	    {/*Header*/}
 	    <div tutorial-label="Header" className="title" style={{display:"flex", alignItems:"center", flexDirection:"row", height:"50px"}}>

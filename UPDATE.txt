@@ -1,85 +1,31 @@
 DEPLOYING UPDATES VIA DOCKER HUB
 =================================
 
-The default update flow (see README.md > "Updating a running site") builds
-every image directly on the Raspberry Pi via `./update`. That works, but
-building the flask-server image (pip installing everything, some of it
-compiled from source) on a Pi 4 is slow. That flow is untouched — this is
-an additional, alternate flow, not a replacement.
+Alternate to the default `./update` flow (see README.md). Builds images on
+your dev machine, pushes to Docker Hub, Pi just pulls and runs them.
 
-`dockerhub/` holds a second set of build files for that alternate flow:
+Docker Hub user: keenansegenchuk (repos: uptonair-flask-server, uptonair-nginx)
 
-    dockerhub/docker-compose.yml   image:-tagged variant of ../docker-compose.yml
-    dockerhub/Dockerfile           copy of ../Dockerfile (flask-server), unchanged
-    dockerhub/Dockerfile.nginx     nginx image that also bakes in client/build
-
-Build on your dev machine, push to Docker Hub, and have the Pi just pull
-the finished images instead of building them. The React client is built on
-the dev machine and baked straight into the nginx image (rather than
-bind-mounted), so a deploy is one atomic pair of images.
-
-Docker Hub user: **keenansegenchuk** (repos: `uptonair-flask-server`,
-`uptonair-nginx`)
-
---------------------------------------------------------------------------
-IMPORTANT: ALWAYS RUN THESE COMMANDS FROM THE REPO ROOT
---------------------------------------------------------------------------
-
-`dockerhub/docker-compose.yml` uses `../` paths (build context, volumes)
-that are relative to the compose file's own directory, so it must stay
-addressed as `-f dockerhub/docker-compose.yml` — don't `cd dockerhub`
-first and run it from in there, or the `../` paths will resolve one level
-too high.
-
-Compose also normally loads `.env` from the project directory, which
-defaults to wherever the compose file lives (`dockerhub/`) — that is NOT
-where `.env` is. Always pass `--env-file .env` explicitly (resolved
-relative to your cwd, i.e. the repo root) so the real `.env` gets picked
-up instead of being silently skipped:
-
-    docker compose -f dockerhub/docker-compose.yml --env-file .env <command>
-
-The compose file also pins `name: uptonair` so it manages the exact same
-project/containers/network as the root `docker-compose.yml`, instead of
-standing up a second parallel stack under a `dockerhub`-derived name. Don't
-run both flows' `up` at the same time regardless — they'd fight over ports
-80/443.
-
-On the dev machine (Windows / PowerShell), line-continuation is a backtick
-( ` ) at the end of the line, not a backslash ( \ ) like bash — a stray `\`
-gets parsed as a literal argument and breaks the command (e.g. swallowing
-the trailing `.` path). The `docker buildx build` examples below use
-backticks for that reason. If you paste them into cmd.exe instead of
-PowerShell, put the whole command on one line — cmd doesn't support either
-continuation character.
+Run all commands below from the repo root.
 
 --------------------------------------------------------------------------
 ONE-TIME SETUP
 --------------------------------------------------------------------------
 
-1. Create a Docker Hub account (hub.docker.com) if you don't have one, and
-   two repositories: `keenansegenchuk/uptonair-flask-server` and
-   `keenansegenchuk/uptonair-nginx`. (Docker Hub also auto-creates a repo
-   on first push if it doesn't exist yet.)
+1. Create Docker Hub account + repos `keenansegenchuk/uptonair-flask-server`
+   and `keenansegenchuk/uptonair-nginx` (auto-created on first push if
+   missing).
 
-2. Find out the Pi's CPU architecture — SSH into the Pi and run:
+2. SSH into the Pi and run:
 
        uname -m
 
-   - `aarch64`  -> Docker platform is `linux/arm64` (64-bit Raspberry Pi OS
-                   / Debian — the common case for a Pi 4 today)
-   - `armv7l`   -> Docker platform is `linux/arm/v7` (32-bit OS)
+   - `aarch64` -> platform `linux/arm64`
+   - `armv7l`  -> platform `linux/arm/v7`
 
-   Use whichever one matches in the commands below.
-
-3. On your DEV MACHINE, log in to Docker Hub:
+3. On dev machine:
 
        docker login
-
-4. Still on the dev machine, set up a buildx builder that can cross-build
-   for ARM (Docker Desktop ships with buildx + QEMU emulation already, this
-   just needs to be turned on once):
-
        docker buildx create --name pi-builder --use
        docker buildx inspect --bootstrap
 
@@ -87,68 +33,51 @@ ONE-TIME SETUP
 EVERY TIME YOU WANT TO PUSH AN UPDATE
 --------------------------------------------------------------------------
 
-Step 1 — On your DEV MACHINE, from the REPO ROOT (`cd ..` first if you're
-sitting in `dockerhub/`):
+Step 1 — On dev machine, from repo root (PowerShell):
 
-    # build the client first — dockerhub/Dockerfile.nginx copies this folder in
     cd client
     npm run build
     cd ..
 
-    # build + push the server image
     docker buildx build --platform linux/arm64 ` -f dockerhub/Dockerfile --target flask-server ` -t keenansegenchuk/uptonair-flask-server:latest ` --push .
 
-    # build + push the nginx image (client build + config baked in)
     docker buildx build --platform linux/arm64 ` -f dockerhub/Dockerfile.nginx ` -t keenansegenchuk/uptonair-nginx:latest ` --push .
 
-  If you're `cd`'d into `dockerhub/` instead of the repo root, the build
-  context (the last argument) must point at the repo root explicitly. Use --push .. instead of --push .
+  (Substitute `linux/arm/v7` if that's your Pi's platform. Optionally tag
+  with a version, e.g. `:1.4.0`, instead of/alongside `latest`.)
 
-  Tip: tag with a version instead of (or alongside) `latest`, e.g.
-  `-t keenansegenchuk/uptonair-nginx:1.4.0`, so you can roll back to a
-  known-good image later just by pulling that tag.
-
-Step 2 — On the PI, from the repo root:
+Step 2 — On the Pi, from repo root:
 
     cd ~/UptonAir
-    git pull        # picks up any dockerhub/ or config changes
+    git pull
 
     docker compose -f dockerhub/docker-compose.yml --env-file .env pull flask-server nginx
     docker compose -f dockerhub/docker-compose.yml --env-file .env up -d
-
-`up -d` only recreates containers whose image or config changed, so this
-won't bounce `pgdb` unnecessarily.
 
 --------------------------------------------------------------------------
 ROLLING BACK
 --------------------------------------------------------------------------
 
-If you tagged images with versions, roll back by pointing the `image:`
-line(s) in `dockerhub/docker-compose.yml` at the older tag, then on the Pi:
+1. Edit the `image:` tag(s) in `dockerhub/docker-compose.yml` to the older
+   version.
+2. On the Pi:
 
-    docker compose -f dockerhub/docker-compose.yml --env-file .env pull flask-server nginx
-    docker compose -f dockerhub/docker-compose.yml --env-file .env up -d
+       docker compose -f dockerhub/docker-compose.yml --env-file .env pull flask-server nginx
+       docker compose -f dockerhub/docker-compose.yml --env-file .env up -d
 
 --------------------------------------------------------------------------
-NOTES / THINGS TO WATCH FOR
+CHECKLIST / GOTCHAS
 --------------------------------------------------------------------------
 
-- `pgdb` already pulls the official `postgres:17` image from Docker Hub —
-  nothing to change there; `dockerhub/docker-compose.yml` uses it as-is.
-- The two flows share the same bind-mounted `data/` (Postgres) and
-  `flask-server/data/` directories, so switching between them preserves
-  your data — just don't run both stacks' `up` simultaneously (see above).
-- `dockerhub/Dockerfile.nginx` bakes in `client/build`; the root
-  `Dockerfile.nginx` still bind-mounts it. Don't mix the two — building
-  the dockerhub image without having freshly run `npm run build` first
-  will push stale (or missing) client files.
-- HTTPS certs (`certs/cert.pem` / `certs/key.pem`) stay bind-mounted in
-  both flows, not baked in — certs rotate independently of the app and you
-  don't want to rebuild/push an image just to renew one.
-- Make sure Docker Hub repo visibility (public/private) is what you
-  intend — a public repo means anyone can pull your images, though not
-  your `.env` secrets, which are injected at container runtime and never
-  baked into the image.
-- If you add/change environment variables in `docker-compose.yml`'s
-  flask-server service, mirror the change in `dockerhub/docker-compose.yml`
-  — they're independent files and won't stay in sync automatically.
+- Always include `-f dockerhub/docker-compose.yml --env-file .env` on
+  every `docker compose` command for this flow.
+- Never run both this flow's `up` and the root `docker-compose.yml`'s `up`
+  at the same time (port conflict on 80/443).
+- Run `npm run build` in `client/` before every push — the nginx image
+  bakes in `client/build`, so a stale/missing build gets pushed otherwise.
+- If you add/change env vars in the root `docker-compose.yml`'s
+  flask-server service, mirror the change in
+  `dockerhub/docker-compose.yml` — they don't stay in sync automatically.
+- Certs (`certs/cert.pem` / `certs/key.pem`) and `.env` are bind-mounted /
+  injected at runtime, never baked into the images.
+- `pgdb` uses the official `postgres:17` image as-is, nothing to build.

@@ -1,5 +1,5 @@
 import ReactECharts from 'echarts-for-react';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useAppContext } from "../AppContext";
 import { graphUtil } from "../graphUtil";
 import { getObj } from "../getObj";
@@ -322,25 +322,37 @@ function EGraph() {
     //event races the chart's own tooltip DOM teardown and throws "el is null"
     const pendingZoom = useRef(null);
     const zoomFrame = useRef(null);
-    const handleZoom = (e) => {
+    const applyZoomRef = useRef(null);
+    const handleZoom = useCallback((e) => {
 	pendingZoom.current = e;
 	if (zoomFrame.current) return;
 	zoomFrame.current = requestAnimationFrame(() => {
 	    zoomFrame.current = null;
-	    applyZoom(pendingZoom.current);
+	    applyZoomRef.current(pendingZoom.current);
 	});
-    };
+    }, []);
+    //stable identity above so the onEvents object below doesn't change reference every
+    //render (that would force echarts-for-react to dispose+recreate the chart on every
+    //render); the ref lets it always call the latest applyZoom closure
+    const onEvents = useMemo(() => ({ datazoom: handleZoom }), [handleZoom]);
 
     const applyZoom = (e) => {
 	const zoomData = e.batch ? e.batch[0] : e;
-	// Only act on events with real timestamps (actual user zoom/pan). Percent-only
-	// events also fire from ECharts' internal sync between the slider/inside dataZoom
-	// components, sometimes before the axis has the real data bound to it - reading
-	// the live axis extent in that case raced with the [data] effect below and could
-	// bake in a too-narrow range.
-	if (zoomData.startValue == null || zoomData.endValue == null) return;
-	const startTime = zoomData.startValue / 1000;
-	const endTime = zoomData.endValue / 1000;
+	// Prefer startValue/endValue (real timestamps) when ECharts provides them. Some
+	// dataZoom events (e.g. slider-driven or internally-synced ones) only carry
+	// percent start/end - convert those using the fixed [start, end] extent the bars
+	// are always plotted over, rather than reading the live chart's axis extent
+	// (which raced with the [data] effect below and could bake in a too-narrow range).
+	let startTime, endTime;
+	if (zoomData.startValue != null && zoomData.endValue != null) {
+	    startTime = zoomData.startValue / 1000;
+	    endTime = zoomData.endValue / 1000;
+	} else if (zoomData.start != null && zoomData.end != null) {
+	    startTime = start + (zoomData.start / 100) * (end - start);
+	    endTime = start + (zoomData.end / 100) * (end - start);
+	} else {
+	    return;
+	}
 	//trigger gradient update by setting zoom
         setZoom({ start: startTime, end: endTime });
 
@@ -372,6 +384,7 @@ function EGraph() {
           }
         }));
     };
+    applyZoomRef.current = applyZoom;
 
     useEffect(() => {
 	return () => {
@@ -392,9 +405,15 @@ function EGraph() {
 	    ? (rangeDays <= 10 ? getNoonTickValues(start, end) : undefined)
 	    : (isMobile ? getTimeTickValues(start, end) : undefined);
 
-	//update axis label setter
+	//update axis label setter, and reset the zoom slider/inside back to the full
+	//range - otherwise a timespan change (e.g. switching dataContext) leaves the
+	//dataZoom control showing whatever window the user had zoomed into previously
 	setGraphFormat(prev => ({
               ...prev,
+              dataZoom: [
+                { type: "slider", xAxisIndex: 0, start: 0, end: 100 },
+                { type: "inside", xAxisIndex: 0, start: 0, end: 100 }
+              ],
               xAxis: {
                 ...prev.xAxis, // keep existing xAxis config
                 axisLabel: {
@@ -407,6 +426,7 @@ function EGraph() {
                 }
               }
         }));
+	setZoom({ start, end });
 
 	log(`gradient... start:${start}, end:${end}`);
 	setGradient({
@@ -417,7 +437,7 @@ function EGraph() {
               },
 	    }]
 	});
-    }, [data, start, end]);
+    }, [start, end]);
     
 
     //Update daylight gradient when timespan changes
@@ -456,7 +476,7 @@ return (
 				notMerge={true}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
-				onChartReady={(chart) => chart.on('datazoom', handleZoom)}
+				onEvents={onEvents}
 		      />
 		      {filteredData().length === 0 && (
 		        <div style={{
@@ -487,7 +507,7 @@ return (
     				style={graphStyle}
 				opts={{renderer:"svg"}}
 				ref={chartRef}
-				onChartReady={(chart) => chart.on('datazoom', handleZoom)}
+				onEvents={onEvents}
 		      />
 		      {!filteredData()?.data?.length && (
 		        <div style={{
