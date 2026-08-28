@@ -2,10 +2,11 @@
 
 This repository contains the source code for [Upton Air](https://upton-air.com), a website built by Sustainable Upton to track air quality around town using [PurpleAir](https://www2.purpleair.com/) sensors. It provides:
 
+- Bakcground info on air quality monitoring
 - A live map with realtime sensor reading overlays
 - Historical graphing with day/night gradient shading and configurable time ranges
 - Configurable email alerts for air quality thresholds
-- A ChatGPT-powered popup that can see and discuss the graphed data
+- An optional ChatGPT-powered popup that can see and discuss the graphed data
 
 This repo is designed to be reused: any town running its own PurpleAir sensors can fork it, point it at their sensors and boundary, and have their own version of the site running. This guide walks through that setup.
 

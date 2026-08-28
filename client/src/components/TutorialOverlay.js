@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAppContext } from "../AppContext";
 import "../App.css";
+import Cookies from 'js-cookie';
 
 // How far the popup sits from the highlighted element, and how close it can get to the viewport edge
 const POPUP_MARGIN = 15;
@@ -74,12 +75,30 @@ const steps = [
 	},
 ];
 
+const welcome_step = {
+	target: '[tutorial-label="welcome"]',
+	title: 'Dashboard Tutorial',
+	text: 'Welcome to the Upton-Air dashboard. If you want quick guide on how to use the dashboard, click "Continue Tutorial". You can also skip this guide, and return to it later using the "Start Tutorial" button in the bottom right of the dashboard.'
+};
+
+
+
 function TutorialOverlay({}) {
     const [stepIndex, setStepIndex] = useState(-1);
     const [rect, setRect] = useState(null);
     const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
     const popupRef = useRef(null);
     const {showConfig, setShowConfig} = useAppContext();
+    const [seenTutorial, setSeenTutorial] = useState(true);
+
+    //*****use cookies to show tutorial upon first visit*****
+    useEffect(() => { 
+	if (!Cookies.get('seen_tutorial')) {
+		Cookies.set('seen_tutorial', true);
+		setSeenTutorial(false);
+	}
+    }, []);
+	
 
     //*****handle step changes*****
 
@@ -114,6 +133,16 @@ function TutorialOverlay({}) {
 	showComponents();
     }, [stepIndex]);
 
+    // Scroll the target into view whenever the step changes, so the highlighted
+    // element (and its popup) end up on screen. The scroll/resize listener below
+    // keeps `rect` in sync while the smooth scroll animates.
+    useEffect(() => {
+        const element = document.querySelector(step?.target);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [stepIndex, showConfig]);
+
     // Recalculate position once stepIndex OR showConfig settles. DashboardConfig
     // toggles its target elements via `display: showConfig ? "block" : "none"`
     // rather than mounting/unmounting them, so we can't compute the rect until
@@ -134,11 +163,28 @@ function TutorialOverlay({}) {
     // Recompute the popup's position once its actual size is known, so placement
     // adapts to the target element and flips/clamps to stay on screen
     useLayoutEffect(() => {
-        if (!rect || !popupRef.current) return;
+        if (!popupRef.current) return;
 
         const popupRect = popupRef.current.getBoundingClientRect();
+
+        // Welcome step has no target on screen, so just center it in the viewport
+        if (stepIndex === -1 && !seenTutorial) {
+            setPopupPos({
+                top: (window.innerHeight - popupRect.height) / 2,
+                left: (window.innerWidth - popupRect.width) / 2,
+            });
+            return;
+        }
+
+        if (!rect) return;
+
         setPopupPos(computePopupPosition(rect, step.placement, popupRect.width, popupRect.height));
-    }, [rect, stepIndex]);
+    }, [rect, stepIndex, seenTutorial]);
+
+    const setSeenTutorialWrapper = (foo) => {
+	setSeenTutorial(true);
+	foo();
+    };
 
     const next = () => {
         if (stepIndex < steps.length - 1) {
@@ -155,12 +201,14 @@ function TutorialOverlay({}) {
         }
     };
 
+    const close = () => {
+        setSeenTutorial(true);
+        setStepIndex(-1);
+    };
+
 
     //*****render overlay*****
-
-
-    if (!rect || !step) {
-	return (
+    const start_button = (
 	    <button
 		className="green bordered"
 	        onClick={next}
@@ -176,11 +224,10 @@ function TutorialOverlay({}) {
 	    >
 	        Start Tutorial
 	    </button>
-	);
-    }
+    );
 
-    return (
-        <>
+    const overlay = (step) => (
+	<>
             {/* Darkened background */}
             <div
                 style={{
@@ -192,6 +239,7 @@ function TutorialOverlay({}) {
             />
 
             {/* Highlight around the target */}
+	    {rect &&
             <div
                 style={{
                     position: 'fixed',
@@ -207,6 +255,7 @@ function TutorialOverlay({}) {
                     pointerEvents: 'none',
                 }}
             />
+	    }
 
             {/* Popup */}
             <div
@@ -216,6 +265,7 @@ function TutorialOverlay({}) {
                     top: popupPos.top,
                     left: popupPos.left,
 
+                    boxSizing: 'border-box',
                     width: '300px',
                     padding: '20px',
 
@@ -226,6 +276,24 @@ function TutorialOverlay({}) {
                     zIndex: 10000,
                 }}
             >
+                <button
+                    onClick={close}
+                    aria-label="Close"
+                    style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        fontSize: '1.1em',
+                        lineHeight: 1,
+                        padding: '4px',
+                    }}
+                >
+                    &times;
+                </button>
+
                 <h3>{step.title}</h3>
 
                 <p>{step.text}</p>
@@ -237,25 +305,42 @@ function TutorialOverlay({}) {
                     }}
                 >
                     <button
-                        onClick={previous}
-                        disabled={stepIndex === 0}
+                        onClick={stepIndex === -1 ? () => setSeenTutorialWrapper(previous) : previous}
                     >
-                        Back
+                        {stepIndex === -1 
+				? 'Skip Tutorial' 
+				: stepIndex === 0
+					? 'Exit'
+					: 'Back'}
                     </button>
 
                     <span>
                         {stepIndex + 1} / {steps.length}
                     </span>
 
-                    <button onClick={next}>
-                        {stepIndex === steps.length - 1
-                            ? 'Finish'
-                            : 'Next'}
+                    <button onClick={stepIndex === -1 ? () => setSeenTutorialWrapper(next) : next}>
+                        {stepIndex === -1
+				? 'Start Tutorial'
+				: stepIndex === steps.length - 1
+                        	    ? 'Finish'
+                        	    : 'Next'}
                     </button>
                 </div>
             </div>
         </>
     );
+
+
+    {/* Conditionally show welcome step which tells you about the start button */}
+    if (stepIndex === -1 && !seenTutorial) {
+	return overlay(welcome_step);	
+    }
+
+    if (!rect || !step) {
+	return start_button;
+    }
+
+    return overlay(step);
 }
 
 export default TutorialOverlay;

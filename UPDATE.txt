@@ -54,6 +54,16 @@ Step 2 — On the Pi, from repo root:
     docker compose -f dockerhub/docker-compose.yml --env-file .env pull flask-server nginx
     docker compose -f dockerhub/docker-compose.yml --env-file .env up -d
 
+	OR (just client)
+	
+    docker compose -f dockerhub/docker-compose.yml --env-file .env pull nginx
+    docker compose -f dockerhub/docker-compose.yml --env-file .env up -d nginx
+
+	OR (just server)
+	
+    docker compose -f dockerhub/docker-compose.yml --env-file .env pull flask-server
+    docker compose -f dockerhub/docker-compose.yml --env-file .env up -d flask-server
+
 --------------------------------------------------------------------------
 ROLLING BACK
 --------------------------------------------------------------------------
