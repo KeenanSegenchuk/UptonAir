@@ -16,6 +16,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flasgger import Swagger
 
+from updateTask import fill_gaps
 from pullfn import *
 from fileUtil import getSensors, getLastTimestamp
 from getByDate import *
@@ -186,17 +187,6 @@ def health():
 # PULL ARCHIVE
 @app.route("/api/full_data")
 def raw_data():
-    """
-    Download the full sensor readings archive as CSV.
-    ---
-    tags:
-      - Raw Data
-    produces:
-      - text/csv
-    responses:
-      200:
-        description: CSV file containing all historical readings (time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA).
-    """
     with open(datafile, "r") as data:
         csv_data = data.read()
 
@@ -210,40 +200,6 @@ def raw_data():
 @app.post('/api/chat')
 @limiter.limit("10 per minute; 100 per day")
 def chat():
-	"""
-	Send a prompt to the AI assistant with optional session context.
-	---
-	tags:
-	  - Chatbot
-	parameters:
-	  - in: body
-	    name: body
-	    required: true
-	    schema:
-	      type: object
-	      properties:
-	        body:
-	          type: object
-	          required: [prompt]
-	          properties:
-	            prompt:
-	              type: string
-	              example: "What is the current air quality in Upton?"
-	            id:
-	              type: string
-	              description: Session ID — reuse across requests to maintain conversation context.
-	              example: "abc123"
-	responses:
-	  200:
-	    description: Chatbot response.
-	    schema:
-	      type: object
-	      properties:
-	        response:
-	          type: string
-	  429:
-	    description: Rate limit exceeded (10 per minute or 100 per day per IP).
-	"""
 	payload = request.get_json().get("body")
 	if isinstance(payload, str):
 		payload = json.loads(payload)
@@ -260,74 +216,6 @@ def chat():
 @alert_bp.route("/add/<string:address>/<string:name>/<string:alert_type>/<string:unit>/<int:min_AQI>/<string:ids>/<int:cooldown>/<int:avg_window>", methods=["POST"])
 @limiter.limit("15 per hour")
 def add_alert(address, name, alert_type, unit, min_AQI, ids, cooldown, avg_window):
-	"""
-	Subscribe an email address to an air quality alert.
-	---
-	tags:
-	  - Alerts
-	parameters:
-	  - name: address
-	    in: path
-	    type: string
-	    required: true
-	    description: Email address to notify.
-	    example: user@example.com
-	  - name: name
-	    in: path
-	    type: string
-	    required: true
-	    description: Unique name for this alert (must be unique per email address).
-	    example: my-alert
-	  - name: alert_type
-	    in: path
-	    type: string
-	    required: true
-	    enum: [avg, any]
-	    description: >
-	      "avg" triggers when the average of all selected sensors exceeds the threshold.
-	      "any" triggers when any single selected sensor exceeds the threshold.
-	  - name: unit
-	    in: path
-	    type: string
-	    required: true
-	    enum: [AQI, AQIEPA, PMA, PMB, PMEPA, humidity, PM]
-	    description: The measurement column to compare against the threshold.
-	  - name: min_AQI
-	    in: path
-	    type: integer
-	    required: true
-	    description: Threshold value that triggers the alert.
-	    example: 100
-	  - name: ids
-	    in: path
-	    type: string
-	    required: true
-	    description: Comma-separated sensor IDs to monitor, or "All" for every sensor.
-	    example: "1,2,3"
-	  - name: cooldown
-	    in: path
-	    type: integer
-	    required: true
-	    description: Minimum hours between alert emails.
-	    example: 24
-	  - name: avg_window
-	    in: path
-	    type: integer
-	    required: true
-	    description: Averaging window in minutes (rounded to nearest 10).
-	    example: 60
-	responses:
-	  200:
-	    description: Alert added successfully.
-	  400:
-	    description: Invalid email address, duplicate alert name, or invalid unit.
-	  403:
-	    description: CSRF validation failed.
-	  429:
-	    description: Rate limit exceeded (5 per hour per IP).
-	  500:
-	    description: Unknown database error.
-	"""
 	if not _check_csrf(request):
 		return jsonify(error="CSRF validation failed."), 403
 	if not _EMAIL_RE.match(address):
@@ -363,38 +251,6 @@ def add_alert(address, name, alert_type, unit, min_AQI, ids, cooldown, avg_windo
 @alert_bp.route("/remove/<string:address>/<string:name>", methods=["POST"])
 @limiter.limit("10 per hour")
 def remove_alert(address, name):
-	"""
-	Unsubscribe from an air quality alert by email and alert name.
-	---
-	tags:
-	  - Alerts
-	parameters:
-	  - name: address
-	    in: path
-	    type: string
-	    required: true
-	    description: Email address associated with the alert.
-	    example: user@example.com
-	  - name: name
-	    in: path
-	    type: string
-	    required: true
-	    description: >
-	      Name of the alert to remove.
-	      Pass "ALERT_SUMMARY" to receive a summary email of all active alerts instead of removing one.
-	    example: my-alert
-	responses:
-	  200:
-	    description: Alert removed successfully, or summary email sent.
-	  400:
-	    description: No alert found for the given email and name.
-	  403:
-	    description: CSRF validation failed.
-	  429:
-	    description: Rate limit exceeded (10 per hour per IP).
-	  500:
-	    description: Unknown database error.
-	"""
 	if not _check_csrf(request):
 		return jsonify(error="CSRF validation failed."), 403
 
@@ -426,44 +282,6 @@ app.register_blueprint(alert_bp)
 # Average the data of all sensors for given timespan
 @data_bp.route("/avg/<string:units>/<int:start>-<int:end>")
 def avg(units, start, end):
-	"""
-	Get the average reading of every sensor for a time range.
-	---
-	tags:
-	  - Data
-	parameters:
-	  - name: units
-	    in: path
-	    type: string
-	    required: true
-	    enum: [AQI, AQIEPA, PMA, PMB, PMEPA, humidity, PM]
-	  - name: start
-	    in: path
-	    type: integer
-	    required: true
-	    description: Start of time range as a Unix timestamp.
-	  - name: end
-	    in: path
-	    type: integer
-	    required: true
-	    description: End of time range as a Unix timestamp.
-	responses:
-	  200:
-	    description: List of per-sensor average values.
-	    schema:
-	      type: array
-	      items:
-	        type: object
-	        properties:
-	          id:
-	            type: integer
-	            description: Sensor ID.
-	          avg:
-	            type: number
-	            description: Average reading for the time range.
-	  400:
-	    description: Invalid unit.
-	"""
 	if units not in ALLOWED_UNITS:
 		return jsonify(error=f"Invalid unit '{units}'."), 400
 	sensors = getSensors()
@@ -486,38 +304,6 @@ def avg(units, start, end):
 # Average the data of given sensor for given timespan
 @data_bp.route("/avg/<string:units>/<int:start>-<int:end>/<int:sensor_id>")
 def avgS(units, start, end, sensor_id):
-	"""
-	Get the average reading of a single sensor for a time range.
-	---
-	tags:
-	  - Data
-	parameters:
-	  - name: units
-	    in: path
-	    type: string
-	    required: true
-	    enum: [AQI, AQIEPA, PMA, PMB, PMEPA, humidity, PM]
-	  - name: start
-	    in: path
-	    type: integer
-	    required: true
-	    description: Start of time range as a Unix timestamp.
-	  - name: end
-	    in: path
-	    type: integer
-	    required: true
-	    description: End of time range as a Unix timestamp.
-	  - name: sensor_id
-	    in: path
-	    type: integer
-	    required: true
-	    description: Sensor ID. Use 0 for the town-wide average.
-	responses:
-	  200:
-	    description: Average value as a float, or the string "N/A" if no data exists for the range.
-	  400:
-	    description: Invalid unit.
-	"""
 	if units not in ALLOWED_UNITS:
 		return jsonify(error=f"Invalid unit '{units}'."), 400
 	res = "N/A"
@@ -537,46 +323,7 @@ def avgS(units, start, end, sensor_id):
 #pull time, data for given timespan and sensor for plotting
 @data_bp.route("/time/<string:units>/<int:start>-<int:end>/<int:sensor_id>")
 def timeS(units, start, end, sensor_id):
-	"""
-	Get time-series readings for a sensor over a time range, for graphing.
-	---
-	tags:
-	  - Data
-	parameters:
-	  - name: units
-	    in: path
-	    type: string
-	    required: true
-	    enum: [AQI, AQIEPA, PMA, PMB, PMEPA, humidity, PM]
-	  - name: start
-	    in: path
-	    type: integer
-	    required: true
-	    description: Start of time range as a Unix timestamp.
-	  - name: end
-	    in: path
-	    type: integer
-	    required: true
-	    description: End of time range as a Unix timestamp.
-	  - name: sensor_id
-	    in: path
-	    type: integer
-	    required: true
-	    description: Sensor ID. Use 0 for the town-wide average across all sensors.
-	responses:
-	  200:
-	    description: Object containing a list of [timestamp, value] pairs ordered by time.
-	    schema:
-	      type: object
-	      properties:
-	        data:
-	          type: array
-	          items:
-	            type: array
-	            example: [1724187600, 42]
-	  400:
-	    description: Invalid unit.
-	"""
+
 	if units not in ALLOWED_UNITS:
 		return jsonify(error=f"Invalid unit '{units}'."), 400
 	conn, cur = pgOpen()
@@ -599,58 +346,6 @@ def timeS(units, start, end, sensor_id):
 #Get data averages for each sensor for past x days/hours
 @data_bp.route("/sensorinfo/<string:units>/<int:sensor_id>/<string:timeframes>/<string:starts>")
 def sensorinfo(units, sensor_id, timeframes, starts):
-	"""
-	Get pre-formatted averages across multiple timeframes for a single sensor.
-	Used to populate the sensor info sidebar on the dashboard.
-	---
-	tags:
-	  - Data
-	parameters:
-	  - name: units
-	    in: path
-	    type: string
-	    required: true
-	    enum: [AQI, AQIEPA, PMA, PMB, PMEPA, humidity, PM]
-	  - name: sensor_id
-	    in: path
-	    type: integer
-	    required: true
-	    description: Sensor ID. Use 0 for the town-wide average.
-	  - name: timeframes
-	    in: path
-	    type: string
-	    required: true
-	    description: Comma-separated list of human-readable timeframe labels (e.g. "1hr,24hr,7day").
-	    example: "1hr,24hr,7day,30day"
-	  - name: starts
-	    in: path
-	    type: string
-	    required: true
-	    description: Comma-separated Unix timestamps marking the start of each timeframe. The last value is used as the banner average.
-	    example: "1724184000,1724101200,1723582800,1721494800"
-	responses:
-	  200:
-	    description: Sensor averages for each requested timeframe plus a banner average.
-	    schema:
-	      type: object
-	      properties:
-	        id:
-	          type: integer
-	        avgs:
-	          type: array
-	          description: Average for each timeframe except the last (which becomes banner_avg).
-	          items:
-	            type: number
-	        inputs:
-	          type: array
-	          description: Timeframe labels passed in.
-	          items:
-	            type: string
-	        banner_avg:
-	          description: Average for the last timeframe, displayed prominently in the UI.
-	  400:
-	    description: Invalid unit.
-	"""
 	if units not in ALLOWED_UNITS:
 		return jsonify(error=f"Invalid unit '{units}'."), 400
 	end = datetime.now().timestamp()
@@ -678,6 +373,15 @@ def sensorinfo(units, sensor_id, timeframes, starts):
 	}
 	return response
 
+@data_bp.route("/fill_gaps/<int:start>/<int:id>/<string:api_key>")
+def fill_gap_after_start(start, id, api_key):
+	if api_key != os.getenv("PURPLEAIR_API_KEY"):
+		return jsonify(error="Invalid purpleair api key."), 400
+
+	gaps = fill_gaps(id, start)
+	return 200 #maybe return gaps as well so i can see what's been filled without needing to look at server logs.
+	
+
 # Register Blueprint
 app.register_blueprint(data_bp)
 
@@ -685,34 +389,6 @@ app.register_blueprint(data_bp)
 #Pull raw data from given timespan and sensor
 @raw_bp.route("/<int:start>-<int:end>/<string:sensor_ids>")
 def get_data(start, end, sensor_ids):
-    """
-    Download raw readings for one or more sensors over a time range as CSV.
-    ---
-    tags:
-      - Raw Data
-    produces:
-      - text/csv
-    parameters:
-      - name: start
-        in: path
-        type: integer
-        required: true
-        description: Start of time range as a Unix timestamp.
-      - name: end
-        in: path
-        type: integer
-        required: true
-        description: End of time range as a Unix timestamp.
-      - name: sensor_ids
-        in: path
-        type: string
-        required: true
-        description: Comma-separated list of sensor IDs.
-        example: "1,2,3"
-    responses:
-      200:
-        description: CSV file with columns time, id, humidity, PMA, PMB, PMEPA, AQI, AQIEPA.
-    """
     sensor_ids = [int(sid) for sid in sensor_ids.split(",")]
     conn, cur = pgOpen()
 

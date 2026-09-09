@@ -71,6 +71,27 @@ def update_loop():
         #send text alert to admin if database is not up to date
         checkStatus()
 
+def fill_gaps(id, min_time = 1771865708):
+	#find and fill gaps in data. takes a single sensor or all sensors (id = 0)
+
+	#find gaps in data
+	gaps = pgFindGaps(min_time, resize_gaps = True, id = id)
+	print(f"Pulling data to fill gaps: {gaps}")
+		
+	#pull and push missing data
+	conn, cur = pgOpen()
+	for start, end in gaps:
+		data = []
+		data += asyncio.run(pull(start, end))
+		if len(data) == 0:
+			continue
+
+		data = formatLines(data, "tuple")
+		pgPushData(cur, data)
+	pgClose(conn, cur)
+	print("Finished filling gaps in data.")
+
+	return gaps
 
 if __name__ == "__main__":
 	print("Data-Updater checking for db connection and readings table:")
@@ -100,24 +121,7 @@ if __name__ == "__main__":
 	if (os.getenv("FILL_GAPS") != "0"):
 		print("FILL_GAPS Enabled. Checking for gaps in DB...")
 		id = int(v) if (v := os.getenv("FILL_GAPS", "")).isdigit() and len(v) == 6 else 0
-
-		#find gaps in data
-		gaps = pgFindGaps(min_time = 1771865708, resize_gaps = True, id = id)
-		print(f"Pulling data to fill gaps: {gaps}")
-		
-		#pull and push missing data
-		conn, cur = pgOpen()
-		for start, end in gaps:
-			data = []
-			data += asyncio.run(pull(start, end))
-			if len(data) == 0:
-				continue
-
-			data = formatLines(data, "tuple")
-			pgPushData(cur, data)
-		pgClose(conn, cur)
-		print("Finished filling gaps in db.")
-
+		fill_gaps(id)
 
 	#add generated columns 
 	#pgAddPercentDifferenceColumn()
