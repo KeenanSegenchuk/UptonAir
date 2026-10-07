@@ -26,7 +26,8 @@
     "prebuild": "node setup.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:coverage": "react-scripts test --watchAll=false --coverage"
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +53,33 @@
     "eslint-config-react-app": "^7.0.1",
     "postcss": "^8.5.6",
     "source-map-explorer": "^2.5.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js",
+      "!src/reportWebVitals.js",
+      "!src/setupTests.js",
+      "!src/old files/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 7,
+        "statements": 7
+      },
+      "./src/hooks/": {
+        "lines": 95,
+        "branches": 80
+      },
+      "./src/graphUtil.js": {
+        "lines": 85
+      },
+      "./src/getObj.js": {
+        "lines": 80
+      },
+      "./src/RDPcompression.js": {
+        "lines": 95
+      }
+    }
   }
 }

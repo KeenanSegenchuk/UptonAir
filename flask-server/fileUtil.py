@@ -1,6 +1,25 @@
 import json
+import os
 
-sensor_file = "sensor-info.json"
+
+def _resolve_sensor_file():
+	#sensor-info.json lives at the repo root but this module is imported from
+	#several working directories (flask-server/, the container /app, tests).
+	#Resolve it once, relative to this file, so cwd never matters.
+	here = os.path.dirname(os.path.abspath(__file__))
+	candidates = (
+		os.path.join(here, "..", "sensor-info.json"),
+		os.path.join(here, "sensor-info.json"),
+		"sensor-info.json",
+	)
+	for path in candidates:
+		if os.path.exists(path):
+			return os.path.abspath(path)
+	return "sensor-info.json"
+
+
+#tests monkeypatch this module-level name to point at a fixture file
+sensor_file = _resolve_sensor_file()
 
 def getLastTimestamp(filename = "data.txt"):
 	#get last timestamp from data file

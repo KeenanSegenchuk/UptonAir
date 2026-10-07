@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import "../App.css";
 import "../DeepseekCSSorcery/Alerts.css";
-import LinkButton from "../components/LinkButton";
+import SiteHeader from "../components/SiteHeader";
 import { useAppContext } from "../AppContext";
 import config from "../config.json";
 
@@ -133,11 +133,7 @@ function Alerts() {
     return (
       <div style={{width:"100%"}}>
 	{/*Header*/}
-	<div className="title" style={{width:"100%", display:"flex", height:"70px", padding:"0px"}}>
-	    <LinkButton className="leftLinkButton" text={isMobile?"Dashboard":"To Dashboard"} right={false} href={dashboard_url}/>
-            <h1 className="titleText">{isMobile?"Alerts": config.WEBPAGE_TITLE + " Alerts"}</h1>
-	    <LinkButton className="rightLinkButton" text={isMobile?"Info":"Landing Page"} right={true} href={info_url}/>
-	</div>
+	<SiteHeader pageTitle="Alerts Page" leftLabel="Dashboard" leftLink={dashboard_url} rightLabel="Info" rightLabelExpanded="More Info" rightLink={info_url} />
 	
         <div className="alerts-container">
 	    <center className="title">

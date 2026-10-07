@@ -1,0 +1,88 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flask-server
+
+    services:
+      postgres:
+        # Matches the production image in docker-compose.yml.
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: passwOrd
+          POSTGRES_DB: test_uptonair
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d test_uptonair"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DB_URL: postgresql://postgres:passwOrd@localhost:5432/test_uptonair
+      # REQUIRE_DB turns "database unreachable -> skip" into a hard failure, so
+      # a broken database can never show up here as a green run.
+      REQUIRE_DB: "1"
+      OPENAI_API_KEY: test-noop-key
+      PURPLEAIR_API_KEY: test-noop-key
+      EMAIL_PASSWORD: test-noop-password
+      SECRET_KEY: test-csrf-secret-do-not-use-in-prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Matches the python:3.9-slim base image in Dockerfile.
+          python-version: "3.9"
+          cache: pip
+          cache-dependency-path: |
+            flask-server/requirements.txt
+            flask-server/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest --cov --cov-report=term-missing --cov-fail-under=65
+
+  frontend:
+    name: Frontend (jest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate src/sensor-pos.json
+        # sensor-pos.json is a gitignored build artefact that getObj.js imports.
+        # setup.js writes it and tolerates a missing PurpleAir key (the sensors
+        # simply come out without lat/lon, which no test depends on).
+        run: node setup.js
+
+      - name: Run tests
+        run: npm run test:coverage
+        env:
+          CI: "true"

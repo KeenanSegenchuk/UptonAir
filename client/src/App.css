@@ -168,6 +168,9 @@
   .graphDiv {
     width: 100%;
   }
+  .title {
+    padding: 0;
+  }
 }
 /*----Styles from pages----*/
 .MainBody {
@@ -340,6 +343,7 @@ h3, h2 {
   position: relative;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
   border: 2px solid white;
   background: #38ba5b;
   padding: 0 1rem; /* optional padding for spacing */
@@ -367,7 +371,7 @@ h3, h2 {
 
 .rightLinkButton,
 .leftLinkButton {
-    flex: 2; 
+    flex: 2;
     display: flex;
     justify-content: center;
 }
@@ -405,6 +409,7 @@ h3, h2 {
     justify-content: center;
     overflow: hidden; /* Prevent overflow past viewport */
     width: auto;
+    flex-shrink: 0;
 }
 .floatButton {
     margin-top: 15%;
@@ -439,6 +444,9 @@ h3, h2 {
     border: 5px solid black;
     overflow-y: auto;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 .sensorOverlay {
     position: relative;
@@ -453,6 +461,10 @@ h3, h2 {
   box-sizing: border-box;
   text-align: center;
   width: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 @media (min-width: 768px) {
   .sensorDiv{
@@ -633,11 +645,20 @@ h3, h2 {
   }
 }
 {/*Graph Styles*/}
+#EGraph\.js {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
 .graphContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin: 10px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
 }
 .graphElement {
     display: flex;

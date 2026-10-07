@@ -70,7 +70,7 @@ Add one entry per sensor you want the site to monitor:
 ```
 
 - **`id`** — the ID the server uses internally to track the sensor.
-- **`pAir_id`** *(optional)* — the sensor's PurpleAir ID. Used to remap a location's history onto a new sensor when the physical unit is replaced. Defaults to `id` if omitted.
+- **`pAir_id`** *(optional)* — the ID used to pull data from PurpleAir — defaults to `id` if omitted. You only need to use this if a sensor's ID on PurpleAir changes because you replaced the air monitor.
 - **`name`** — display name for the sensor's location.
 - **`color`** — color used for the sensor on the map and in the line graph.
 
@@ -80,16 +80,11 @@ Add one entry per sensor you want the site to monitor:
 
 Provides your town's border for the map overlay. The easiest way to find one is [osm-boundaries.com](https://osm-boundaries.com/map) — their search only matches town names (not "town, state"), so you may need to scroll through results, and you'll need a free OpenStreetMap account to download the file.
 
-### HTTPS certificates
+### `HTTPS Certificates`
 
-The nginx container expects `certs/cert.pem` and `certs/key.pem`. Which kind of certificate you need depends on whether you're proxying through Cloudflare (see [Publishing to the web](#publishing-to-the-web-domain--dns)):
+The server's web traffic router (nginx) expects the https certs to be located at `certs/cert.pem` and `certs/key.pem`. Without these files, web browsers will warn visiters that they can't verify the authenticity of this site.
+Your DNS provider should provide these certificates. (See [Publishing to the web](#publishing-to-the-web-domain--dns))
 
-If you're using Cloudflare for DNS, use Cloudflare's free **Origin CA** certificate:
-
-1. In the Cloudflare dashboard, go to **SSL/TLS → Origin Server → Create Certificate**.
-2. Leave the default RSA key type and hostnames (your domain + `*.yourdomain.com`), 15-year validity is fine.
-3. Cloudflare shows you a certificate and a private key once — save them as `certs/cert.pem` and `certs/key.pem` respectively (`mkdir -p certs` first).
-4. Under **SSL/TLS → Overview**, set the encryption mode to **Full (strict)** — this requires the origin to present a cert Cloudflare recognizes as valid, which the Origin CA cert satisfies.
 
 
 ## 2. Run it
@@ -178,6 +173,19 @@ To use it, fill in `ZONE_NAME`, `RECORD_NAME`, and `CF_API_TOKEN` at the top of 
   ```
 
 > **Do you actually need this script?** Only if your server's public IP can change. If you're hosting on a VPS/cloud instance with a static IP (DigitalOcean, AWS, etc.), you can just set the A record once in step 3 and skip the DDNS script entirely — there's nothing to keep in sync.
+
+**5. HTTPS certificates**
+
+The server's web traffic router (nginx) expects the https certs to be located at `certs/cert.pem` and `certs/key.pem`. Without these files, web browsers will warn visiters that they can't verify the authenticity of this site.
+
+If you're using Cloudflare for DNS, use Cloudflare's free **Origin CA** certificate:
+
+- In the Cloudflare dashboard, go to **SSL/TLS → Origin Server → Create Certificate**.
+- Leave the default RSA key type and hostnames (your domain + `*.yourdomain.com`), 15-year validity is fine.
+- Cloudflare shows you a certificate and a private key once — save them as `certs/cert.pem` and `certs/key.pem` respectively (`mkdir -p certs` first).
+- Under **SSL/TLS → Overview**, set the encryption mode to **Full (strict)** — this requires the origin to present a cert Cloudflare recognizes as valid, which the Origin CA cert satisfies.
+
+
 
 ## Project structure
 

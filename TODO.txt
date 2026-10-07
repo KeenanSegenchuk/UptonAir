@@ -29,6 +29,9 @@ skip this [ ] Add email verification step on alert signup (confirm link)
 [x] Add retry/backoff on PurpleAir API calls (use tenacity or manual retry loop)
 [x] Add Docker health checks and restart policies in docker-compose.yml
 [ ] Branch pgCheckAlert logic for new alert_type of "downtime_alert".
+[ ] On-demand gap fill without restart: extract updateTask.py:100-119 into pgFillGaps(min_time, id);
+        add POST /api/raw/fill_gaps (admin-token auth, runs in a thread -> 202, pg_try_advisory_lock guard);
+        optional GET status route. Removes need to toggle FILL_GAPS env + restart container.
 
 
 --- FRONTEND ---
@@ -50,9 +53,15 @@ skip this [ ] Add email verification step on alert signup (confirm link)
 [ ] Make "Trigger Alert When" options have circle check boxes rather than square & make them stack vertically if too wide to all fit on 1 line.
 
 --- PRODUCTION READINESS ---
-[ ] CI/CD: figure out how to build and automatically push arm images (see bottom)
+[~] CI/CD: .github/workflows/tests.yml runs backend + frontend suites on push/PR.
+        Still todo: build and automatically push arm images (see bottom), and make that build
+        job `needs: [backend, frontend]` so it cannot ship a red build.
 [x] API documentation — Flasgger/Swagger UI at /apidocs (all 9 routes documented)
-[x] Unit tests — PMtoAQI (all formula ranges + edge cases), email regex, ALLOWED_UNITS (flask-server/test_unit.py)
+[x] Automated tests — see TESTING.md
+        backend: 168 pytest tests in flask-server/tests/ (95 unit, 73 integration against a real Postgres),
+                 70% coverage, gate at 65%
+        frontend: 118 jest tests (utils, hooks, ErrorBoundary, Banner, ToggleButton, LinkButton, App smoke)
+        replaces the old flask-server/test_unit.py + tests.py
 skip for now [ ] Error tracking (Sentry or equivalent)
 skip for now & prolly 4ever [ ] Admin panel for sensor and alert management
 

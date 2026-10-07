@@ -233,6 +233,9 @@ def pgInit(path, rebuild = False):
 
 	def loadFile(path):
 		format = [int, int, float, float, float, float, int, int]
+		if not os.path.exists(path):
+			print(f"Seed data file {path} not found; building an empty readings table.")
+			return []
 		with open(path) as file:
 			data = file.read().splitlines()[1:]
 		process = lambda line: [safe_cast(entry, format[i]) for i, entry in enumerate(line.split(","))]
@@ -434,6 +437,11 @@ from collections import defaultdict
 def pgCheckAlerts():
     conn, cur = pgOpen()
     now = maxTimestamp() #int(time.time())
+
+    if now is None:
+        #no readings at all — nothing can have been triggered
+        conn.close()
+        return []
 
     # Get all alerts that are eligible to trigger
     cur.execute("""

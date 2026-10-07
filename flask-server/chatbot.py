@@ -1,7 +1,16 @@
 from pgUtil import pgPushChat, pgGetMemory
 import os, json
 from openai import OpenAI
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+_client = None
+
+def _get_client():
+	#build the OpenAI client on first use so importing this module (and server.py)
+	#does not require OPENAI_API_KEY to be set. Still fails loudly on a real call.
+	global _client
+	if _client is None:
+		_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+	return _client
 
 
 instructions="""
@@ -108,7 +117,7 @@ def send_prompt(prompt_raw, sessionID):
 	except:
 		print("!Unknown error adding memory in send_prompt!")
 
-	response = client.responses.create(
+	response = _get_client().responses.create(
 		model="o4-mini",
 		instructions=instructions,
 		input=prompt

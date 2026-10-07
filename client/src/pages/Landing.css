@@ -1,0 +1,82 @@
+/*
+  Landing page styling.
+  Inspired by the bold, high-contrast, poster-like layout of Zohran Mamdani's
+  campaign site: flat color blocks, big confident headlines, warm cream
+  content cards, and simple pill-shaped nav buttons. Built on top of this
+  site's existing green brand color.
+  All rules are scoped under .landingPage so they never leak into the other
+  pages (Home, Alerts, AltDashboard) that reuse shared classes like .title.
+*/
+
+.landingPage {
+  background: #157a25;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+  color: #1a1a1a;
+}
+
+/* ---- Content ---- */
+.landingPage .infoDiv {
+  background: #f5eddb;
+  color: #1a1a1a;
+  max-width: 860px;
+  margin: 1.5rem auto 0;
+  padding: 2rem 2rem 2.25rem;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.landingPage .infoDiv:first-of-type {
+  margin-top: 2rem;
+}
+
+.landingPage .infoHeader {
+  margin: 0 0 1.1rem;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #157a25;
+}
+
+.landingPage .miniInfoHeader {
+  margin: 1.5rem 0 0.5rem;
+  padding-top: 0.25rem;
+  font-size: clamp(1.05rem, 0.9rem + 0.6vw, 1.3rem);
+  font-weight: 700;
+  color: #1a1a1a;
+  border-top: 2px solid #ddd0ae;
+}
+
+.landingPage .infoDiv > .miniInfoHeader:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0.25rem;
+}
+
+.landingPage .infoParagraph {
+  margin: 0.6rem 0;
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  line-height: 1.65;
+  color: #262626;
+}
+
+.landingPage .infoParagraph a {
+  color: #157a25;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landingPage .infoParagraph a:hover {
+  color: #0f5c1b;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 767px) {
+  .landingPage .infoDiv {
+    margin: 1.25rem 0.75rem 0;
+    padding: 1.5rem 1.25rem 1.75rem;
+    border-radius: 14px;
+  }
+}

@@ -211,7 +211,6 @@ function SensorInfo({ dummy }) {
                   );
 		})}
             </div>
-	    <div className={mobileMultiSelect ? "showMobile" : "hide"} style={{height:"25px"}}> </div>
 	    <div className="hideMobile" style={{height:"25px"}}></div>
 	    <EGraph sensor_id={sensor_id} start={dataContexts[contextIndex].start} end={end} dummy={dummy}/> 
 	    <div style={{"height":"65px"}}/>

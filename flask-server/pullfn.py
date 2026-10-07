@@ -73,11 +73,11 @@ async def pull(starttime, endtime, id = 0):
 	#keep track of new data to push to postgres
 	new_lines = []
 	#append to existing data
-	file = open(data_path, "a")
-	for line in data:
-		if len(line) > 0 and line[0] in "0123456789":
-			new_lines += [line]
-			file.write(line + "\n")
+	with open(data_path, "a") as file:
+		for line in data:
+			if len(line) > 0 and line[0] in "0123456789":
+				new_lines += [line]
+				file.write(line + "\n")
 
 	return new_lines
 
@@ -98,8 +98,9 @@ async def pullfn(return_data = False):
 	starttime = int(time()) - onehour
 
 	#open data file
-	file = open(data_path, "r").read().splitlines()
-	while len(file[-1]) == 0 or file[-1][0] not in "0123456789":
+	with open(data_path, "r") as data_file:
+		file = data_file.read().splitlines()
+	while file and (len(file[-1]) == 0 or file[-1][0] not in "0123456789"):
 		print(f"Deleting non-data text line from data.txt: {file[-1]}")
 		del file[-1]
 	file = [x.split(",") for x in file]
@@ -147,14 +148,14 @@ async def pullfn(return_data = False):
 				print(f'line: {line}')
 				file.write(line)
 
-	file = open(data_path, "a")
 	#keep track of new data to push to postgres
 	new_lines = []
 	#append to existing data
-	for line in data:
-		if len(line) > 0 and line[0] in "0123456789":
-			new_lines += [line]
-			file.write(line + "\n")
+	with open(data_path, "a") as file:
+		for line in data:
+			if len(line) > 0 and line[0] in "0123456789":
+				new_lines += [line]
+				file.write(line + "\n")
 
 	pullfn.ignore_pull_limit = False
 

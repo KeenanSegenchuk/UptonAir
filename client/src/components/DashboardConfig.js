@@ -188,14 +188,16 @@ function DashboardConfig() {
 			    </select>
 			</label>
 		}
-
-		<label className="s16">
-		    Graph Style:<br/>
-		    <select className="s9"  value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
-                        <option value="bar">Bar Graph</option>
-                        <option value="line">Line Graph</option>
-                    </select>
-		</label>
+		
+		{!isMobile && (
+			<label className="s16">
+			    Graph Style:<br/>
+			    <select className="s9"  value={globalLineBool ? "line" : "bar"} onChange={e => setGlobalLineBool(e.target.value === "line")}>
+	                        <option value="bar">Bar Graph</option>
+	                        <option value="line">Line Graph</option>
+	                    </select>
+			</label>
+		)}	
 
 		{/* single-select sensor */}
 		{!(globalLineBool && lineMode==="sensors") && (
@@ -302,10 +304,12 @@ function DashboardConfig() {
 			<span style={{"fontSize":"30px"}}>🤖</span>
 		</div>
 
-		<button
-		  style={{"fontSize": "16px", "padding": "8px", "width":"100%", "marginTop":"8px"}}
-		  onClick={toggleDarkMode}
-		>{darkMode ? "Light Mode" : "Dark Mode"}</button>
+		{/* Removed: Option to toggle dark mode
+			<button
+			  style={{"fontSize": "16px", "padding": "8px", "width":"100%", "marginTop":"8px"}}
+			  onClick={toggleDarkMode}
+			>{darkMode ? "Light Mode" : "Dark Mode"}</button>
+		*/}
 
 		{showChatBox && (
 		    <MoveableWindow title="Chat Bot" onClose={()=>setShowChatBox(false)} initial={{ x: 200, y: 100, width: 800, height: 600 }}>

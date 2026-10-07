@@ -14,7 +14,11 @@ function EGraph() {
 	//setup data management
 	const {dataContext, sensor_id, data, hover, switches, setPopup, units, lineUnits, lineMode, showCompression, showChatBox} = useAppContext(); 
 	const contexts = getObj("DataContexts");
+
+	//setup refs for dynamic graph sizing
 	const chartRef = useRef(null);
+	const gradientNoteRef = useRef(null);
+	const lineNoteRef = useRef(null);
 
     	const debug = false;
     	const log = (text, val = -1) => {
@@ -48,14 +52,16 @@ function EGraph() {
 		}
 	}, [switches]);
 
-	//track component width
+	//track component width & height
 	const containerRef = useRef(null);
 	const [width, setWidth] = useState(0);
+	const [height, setHeight] = useState(0);
 	useEffect(() => {
 	  const element = containerRef.current;
 	  if (!element) return;
 	  const ro = new ResizeObserver(([entry]) => {
 	    const newWidth = entry.contentRect.width;
+	    const newHeight = entry.contentRect.height;
 	    setWidth(prevWidth => {
 	      // Only update if width changed to avoid rerenders
 	      if (Math.abs(prevWidth - newWidth) > 30) {
@@ -63,10 +69,20 @@ function EGraph() {
 	      }
 	      return prevWidth; // No change → no rerender
 	    });
+	    setHeight(prevHeight => {
+		if (Math.abs(prevHeight - newHeight) > 10) 
+			{return newHeight;}
+		return prevHeight;
+	    });
 	  });
 	  ro.observe(element);
 	  return () => ro.disconnect();
 	}, []);
+
+	//calculate actual chart height by subtracting other elements in the contianer.
+	const isLineBranch = globalLineBool || (showCompression && showChatBox); //check if linegraph legend is on
+	const chartHeight = height - (gradientNoteRef.current?.offsetHeight ?? 0) - (isLineBranch ? lineNoteRef.current?.offsetHeight ?? 0 : 0); //filter out gradient note and legend heights
+
 
 	//times
 	const [end] = useState(() => Math.floor(Date.now() / 1000));
@@ -88,7 +104,7 @@ function EGraph() {
 	const isMobile = window.matchMedia("(max-width: 767px)").matches;
 	const graphStyle = isMobile
 	  ? { width: `${width}px`, height: "250px" }
-	  : { width: `${width}px`, height: "400px" };
+	  : { width: `${width}px`, height: "400px" }; //for dynamic height do height: `${chartHeight}px`
 
 	
 	const gradConf = useMemo(() => (
@@ -105,12 +121,12 @@ function EGraph() {
 	      }
 	    : {
 	        type: 'rect',
-	        left: width / 10,
+	        left: width / 10,  //for dynamic height use: 200
 	        top: 50,
 	        z: 0,
 	        shape: {
-	          width: 8 * width / 10,
-	          height: 280,
+		  width: 8 * width / 10, //for dynamic height: width - 400
+	          height: 280, //for dynamic height: (chartHeight) - 113
 	        }
 	      }
 	), [width]);
@@ -224,6 +240,7 @@ function EGraph() {
     const [graphFormat, setGraphFormat] = useState({
 	xAxis: {
 		type: 'time',
+		splitNumber: 7,
                 axisLabel: {
                     formatter: function (value) {
                         const date = new Date(value);
@@ -250,8 +267,15 @@ function EGraph() {
 		    return value.min < 0 ? -3 : 0;
 		  }
     	},
+
+	/* uncomment this and adjust gradConf for dynamic graph height
+	...(!isMobile && {
+		grid: { top: 50, left: 200, right: 200, bottom: 64 },
+	}),
+	*/	
+
 	dataZoom: [
-		{ type: 'slider', xAxisIndex: 0, start: 0, end: 100 },     // slider scroll/zoom bar
+		{ type: 'slider', xAxisIndex: 0, ...(!isMobile && {bottom: 8, height: 35}), start: 0, end: 100 },     // slider scroll/zoom bar
 		{ type: 'inside', xAxisIndex: 0 }      // inside zoom / pan (mouse wheel / touch / drag)
 	],
     	tooltip: {
@@ -277,39 +301,19 @@ function EGraph() {
                 const month = (date.getMonth() + 1).toString().padStart(2, '0');
                 const day = date.getDate().toString().padStart(2, '0');
                 return `${month}/${day}`;
+            },
+            function (value) {
+        	const date = new Date(value);
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                let hours = date.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours;
+                return `${month}/${day}, ${hours}${ampm}`;
             }
     ];
 
-    //when zoomed out enough to show one label per calendar date, build the list of
-    //noon timestamps (ms) for each date in range so ticks land at noon instead of midnight
-    const getNoonTickValues = (startSec, endSec) => {
-	const ticks = [];
-	if (!startSec || !endSec || startSec >= endSec) return ticks;
-
-	let d = new Date(startSec * 1000);
-	d.setHours(12, 0, 0, 0);
-	if (d.getTime() < startSec * 1000) d.setDate(d.getDate() + 1);
-
-	const endMs = endSec * 1000;
-	//cap the number of generated ticks to avoid runaway loops on huge ranges
-	for (let i = 0; d.getTime() <= endMs && i < 1000; i++) {
-	    ticks.push(d.getTime());
-	    d = new Date(d.getTime());
-	    d.setDate(d.getDate() + 1);
-	}
-	return ticks;
-    };
-
-    //mobile only: the graph can only fit ~7 time-only tick labels before they overlap,
-    //so evenly space maxTicks timestamps across the visible range instead of letting
-    //echarts pick its own (denser) "nice" interval
-    const getTimeTickValues = (startSec, endSec, maxTicks = 7) => {
-	if (!startSec || !endSec || startSec >= endSec) return [];
-	const startMs = startSec * 1000;
-	const endMs = endSec * 1000;
-	const stepMs = (endMs - startMs) / (maxTicks - 1);
-	return Array.from({ length: maxTicks }, (_, i) => Math.round(startMs + i * stepMs));
-    };
 
     //track zoom level
     const [gradient, setGradient] = useState({});
@@ -356,30 +360,28 @@ function EGraph() {
 	//trigger gradient update by setting zoom
         setZoom({ start: startTime, end: endTime });
 
-	const formatIndex = (startTime + 2*24*60*60 < endTime) ? 1 : 0;
+	//<=2 days: time only; 2-5 days: MM/DD Ham/pm; >=5 days: MM/DD only
+	const spanDays = (endTime - startTime) / (24*60*60);
+	const formatIndex = spanDays <= 2 ? 0 : (spanDays < 4 ? 2 : 1);
         const formatter = tickLabelFormats[formatIndex];
-	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
-	//back to echarts' own default tick placement so long ranges don't get a tick per day
-	const rangeDays = (endTime - startTime) / (24*60*60);
-	const noonTicks = formatIndex === 1
-	    ? (rangeDays <= 10 ? getNoonTickValues(startTime, endTime) : undefined)
-	    : (isMobile ? getTimeTickValues(startTime, endTime) : undefined);
 
 	setGraphFormat(prev => ({
           ...prev,
           dataZoom: [
-            { type: "slider", xAxisIndex: 0, start: zoomData.start, end: zoomData.end },
+            { type: "slider", xAxisIndex: 0, ...(!isMobile && {bottom: 8, height: 35}), start: zoomData.start, end: zoomData.end },
             { type: "inside", xAxisIndex: 0, start: zoomData.start, end: zoomData.end }
           ],
           xAxis: {
             ...prev.xAxis, // keep existing xAxis config
+            splitNumber: 7,
+            //let echarts place ticks; only the label text format depends on range
             axisLabel: {
               ...prev.xAxis?.axisLabel,
               formatter: formatter,
-              customValues: noonTicks
+              customValues: undefined
             },
             axisTick: {
-              customValues: noonTicks
+              customValues: undefined
             }
           }
         }));
@@ -396,14 +398,10 @@ function EGraph() {
 	// Bars are always plotted over exactly [start, end] (see getBars in graphUtil.js),
 	// so that's already the correct range for the default/unzoomed render - no need to
 	// ask the chart for its live axis extent, which raced with applyZoom above.
-	const formatIndex = (start + 2*24*60*60 < end) ? 1 : 0;
+	//<=2 days: time only; 2-5 days: MM/DD Ham/pm; >=5 days: MM/DD only
+	const spanDays = (end - start) / (24*60*60);
+	const formatIndex = spanDays <= 2 ? 0 : (spanDays < 5 ? 2 : 1);
         const formatter = tickLabelFormats[formatIndex];
-	//one tick per day at noon only looks reasonable up to ~10 days; beyond that, fall
-	//back to echarts' own default tick placement so long ranges don't get a tick per day
-	const rangeDays = (end - start) / (24*60*60);
-	const noonTicks = formatIndex === 1
-	    ? (rangeDays <= 10 ? getNoonTickValues(start, end) : undefined)
-	    : (isMobile ? getTimeTickValues(start, end) : undefined);
 
 	//update axis label setter, and reset the zoom slider/inside back to the full
 	//range - otherwise a timespan change (e.g. switching dataContext) leaves the
@@ -411,18 +409,20 @@ function EGraph() {
 	setGraphFormat(prev => ({
               ...prev,
               dataZoom: [
-                { type: "slider", xAxisIndex: 0, start: 0, end: 100 },
+                { type: "slider", xAxisIndex: 0, ...(!isMobile && {bottom: 8, height: 35}), start: 0, end: 100 },
                 { type: "inside", xAxisIndex: 0, start: 0, end: 100 }
               ],
               xAxis: {
                 ...prev.xAxis, // keep existing xAxis config
+                splitNumber: 7,
+                //let echarts place ticks; only the label text format depends on range
                 axisLabel: {
                   ...prev.xAxis?.axisLabel,
                   formatter: formatter,
-                  customValues: noonTicks
+                  customValues: undefined
                 },
                 axisTick: {
-                  customValues: noonTicks
+                  customValues: undefined
                 }
               }
         }));
@@ -462,13 +462,13 @@ useEffect(() => {
 return (
     <div tutorial-label="Graph" id = "EGraph.js" className="Marginless">
         <h1 className="headerText">{dataContext}{showCompression ? " Compressed " : " "}Readings {(!globalLineBool || lineMode === "sensors") && `(${units})`}</h1>
-        <div className="graphContainer">
+        <div className="graphContainer" ref={containerRef}>
             {/*<button className="Button hideMobile" onClick={toggleLineBool}>
             	{lineBool ? "Switch to Bars View" : "Switch to Line Graph View"}
             </button>*/}
             {globalLineBool || (showCompression && showChatBox) ? (
-		<div className="graphDiv" ref={containerRef}>
-		    {lineMode === "sensors" ? <center style={{padding:"15px"}}>Multiple Sensors</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>}
+		<div className="graphDiv">
+		    {isMobile ? <></> : lineMode === "sensors" ? <center style={{padding:"15px"}} ref={lineNoteRef}>Multiple Sensors</center> : <center style={{padding:"15px"}}>Sensor: {getObj('$' + sensor_id)}</center>}
 		    <div style={{ position: "relative" }}>
 		      <ReactECharts key={dataContext}
 				option={{...graphFormat, ...gradient, series: filteredData().map(formatLine)}}
@@ -491,7 +491,7 @@ return (
 		    </div>
 		</div>
             ) : (
-		<div className="graphDiv" ref={containerRef}>
+		<div className="graphDiv">
 		    {/*<h2 className="Marginless hideMobile">Use slider to set number of bars:</h2>
 		    <center><input className="Marginless hideMobile"
 		        type="range"
@@ -522,8 +522,9 @@ return (
 		    </div>
 		</div>
             )}
-	    <center className="bodyText">*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
+	    <center className="bodyText" ref={gradientNoteRef}>*The graphs' color gradient shows the time of day with darker hues representing times closer to midnight.</center>
         </div>
+	<div style={{height:"15px"}} className="footBuffer"/>
     </div>
 );
 

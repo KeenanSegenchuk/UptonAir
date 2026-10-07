@@ -12,9 +12,8 @@ Run all commands below from the repo root.
 ONE-TIME SETUP
 --------------------------------------------------------------------------
 
-1. Create Docker Hub account + repos `keenansegenchuk/uptonair-flask-server`
-   and `keenansegenchuk/uptonair-nginx` (auto-created on first push if
-   missing).
+1. Create Docker Hub account + repos. For me: `keenansegenchuk/uptonair-flask-server`
+   and `keenansegenchuk/uptonair-nginx`.
 
 2. SSH into the Pi and run:
 
@@ -22,6 +21,8 @@ ONE-TIME SETUP
 
    - `aarch64` -> platform `linux/arm64`
    - `armv7l`  -> platform `linux/arm/v7`
+
+   This will tell you the cpu architecture so we know what architecture to build it for.
 
 3. On dev machine:
 
